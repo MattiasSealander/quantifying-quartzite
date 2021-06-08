@@ -66,17 +66,81 @@ Here is a citation [@Marwick2017]
 # Results
 
 <!-- Here's some example analysis code: -->
+```{r load-packages}
+library(tidyverse)
+library(rrtools)
+library(here)
+library(infer)
+library(prospectr)
+library(FactoMineR)
+library(factoextra)
 
-```{r get-data, eval = FALSE}
-# Note the path that we need to use to access our data files when rendering this document
-my_data <- read.csv(here::here('analysis/data/raw_data/my_csv_file.csv'))
+#Read in raw NIR measurements with meatadata
+NIR <- as.data.frame(read.csv2(here("analysis/data/raw_data//NIR_raw_data.csv"), sep = ";", dec = ".", header = TRUE, encoding = "UTF-8"))
+
+#Prepare filtering
+artefact <- c("Point", "Point fragment", "Preform")
+material <- c("Quartzite", "Breccie quartz", "Breccie quartzite", "Felsitic porphyric quartz", "Quartz")
+
+#Filter data to focus on quartzite points, point fragments and preforms
+Points <-
+  NIR %>%
+    filter(material %in% material,
+           type %in% artefact)
 ```
 
-```{r demo-plot, fig.cap="A plot of random numbers"}
-plot(rnorm(10))
+
+```{r vis-nir-scree, fig.cap="Contributing variables to PC1"}
+#Select data for visible range of spectrum
+vis_nir <-
+  Points %>%
+    select(unique_id, X400.0:X700.0)
+
+#mean center measurements
+vis_nir_center <-
+  vis_nir %>%
+    mutate(across(c(2:302), scale, scale = FALSE))
+
+#centered  PCA
+VNIR.pca <- FactoMineR::PCA(vis_nir_center[,c(2:302)], graph = FALSE, scale.unit = FALSE)
+
+#Screeplot of contributing variables to PC1
+#dashed reference line corresponds to the expected value if the contribution was uniform.
+fviz_contrib(VNIR.pca,
+             choice = "var",
+             fill = "black",
+             color = "black",
+             axes = 1,
+             top = 60,
+             title = "Contribution of variables to PC1") +
+        theme_minimal(base_size = 20) +
+        theme(axis.title.x=element_blank(), text = element_text(size=10),
+                axis.text.x = element_text(angle=45, hjust=1))
 ```
 
-Figure \@ref(fig:demo-plot) shows how we can have a caption and cross-reference for a plot
+Figure \@ref(fig:vis-nir-scree) shows that higher absorbance in the red part of the spectrum contributes more to PC1.
+
+```{r vis-nir-pca, fig.cap="PCA of NIR measurements in the 400 - 700 nm part of the spectrum"}
+#PCA of centered data
+fviz_pca_ind(VNIR.pca, axes = c(1, 2),
+                geom = c("point"),
+                geom.ind = c("point"), # show points only (but not "text")
+                label = "var",
+                palette = c("#BC3C29FF", "#0072B5FF", "#EE4C97FF", "#E18727FF"),
+                col.ind = Points$hue, #color by sample hue
+                fill.ind = Points$hue, #fill point by sample hue
+                addEllipses = FALSE,
+                repel = TRUE,
+                obs.scale = 1, var.scale = 1,
+                legend.title = "Hue",
+                title = "PCA - Quartzite points") +
+      theme_minimal(base_size = 20) +
+      scale_shape_manual(values=c(21,22,23,24)) +
+      labs(x = "PC1 (98%)",
+           y = "PC2 (1.9%)")
+```
+
+
 
 ```{r demo-inline-code}
 x <- round(pi, 2)
