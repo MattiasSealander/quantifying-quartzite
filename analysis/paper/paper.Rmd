@@ -277,290 +277,77 @@ One almost translucent sample also ends up among the darker material. Upon close
 
  \linebreak
 
-```{r xrf-violin-plot, fig.width=15, fig.height=15, fig.fullwidth=TRUE, fig.cap="Violin plot of element content in quartzite samples measured using pXRF. **n** represents no. of measurements above Limit of Detection (LOD) for that element out of a total of 478 measurements. Note the bimodal distribution of Si measurements, these groups are reflected in the score plot of the PCA"}
-
-#Make long version of Points df to prep for violin plots
+```{r xrf-violin-plot, fig.width=15, fig.height=10, fig.fullwidth=TRUE, fig.cap="Violin plot of element content in quartzite samples measured using pXRF. **n** represents no. of measurements above Limit of Detection (LOD) for that element out of a total of 478 measurements. Note the bimodal distribution of Si measurements, these groups are reflected in the score plot of the PCA"}
+#Prepare data in long format for violin plots
 Points_long <-
   Points %>%
-    select(X12Mg,X13Al, X14Si, X15P, X16S, X19K, X20Ca, X23V, X25Mn, X26Fe, X30Zn, X38Sr, X39Y, X40Zr, X56Ba, X81Ti) %>%
-      gather(key = "Element", value = "Value")
+  select(X12Mg,X13Al, X14Si, X15P, X16S, X19K, X20Ca, X23V, X25Mn, X26Fe, X30Zn, X38Sr, X39Y, X40Zr, X56Ba, X81Ti) %>%
+  gather(key = "Element", value = "Value")
 
+#Remove initial X introduced by read.csv to column names
+Points_long$Element <- substring(Points_long$Element, 2)
 
-
-#Filter long df to focus on Mg, and generate a violin plot
-Mg <-
+# Add column with elemental groups for visualisation
+Points_long <-
   Points_long %>%
-  filter(Element == "X12Mg") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="salmon1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X12Mg))))) +
-  theme_bw() +
-  ylim(0,5) +
-  xlab("Mg") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
+    mutate(Group = case_when(
+      endsWith(Element, "Mg") ~ "Alkaline Earth",
+      endsWith(Element, "Al") ~ "Basic metal",
+      endsWith(Element, "Si") ~ "Semimetal",
+      endsWith(Element, "P") ~ "Nonmetal",
+      endsWith(Element, "S") ~ "Nonmetal",
+      endsWith(Element, "K") ~ "Alkali Metal",
+      endsWith(Element, "Ca") ~ "Alkaline Earth",
+      endsWith(Element, "V") ~ "Transition Metal",
+      endsWith(Element, "Mn") ~ "Transition Metal",
+      endsWith(Element, "Fe") ~ "Transition Metal",
+      endsWith(Element, "Zn") ~ "Transition Metal",
+      endsWith(Element, "Sr") ~ "Alkaline Earth",
+      endsWith(Element, "Y") ~ "Transition Metal",
+      endsWith(Element, "Zr") ~ "Transition Metal",
+      endsWith(Element, "Ba") ~ "Alkaline Earth",
+      endsWith(Element, "Ti") ~ "Transition Metal",
+    ))
 
-#Filter long df to focus on Al, and generate a violin plot
-Al <-
-  Points_long %>%
-  filter(Element == "X13Al") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="lightgoldenrod1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X13Al))))) +
-  theme_bw() +
-  ylim(0,10) +
-  xlab("Al") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
+#Prepare colors
+colors <- c("darkorange", "darkolivegreen3", "skyblue1", "lightslateblue", "salmon1", "lightgoldenrod1")
 
-#Filter long df to focus on Si, and generate a violin plot
-Si <-
-  Points_long %>%
-    filter(Element == "X14Si") %>%
-      ggplot(aes(x=Element, y=Value)) +
-      geom_violin(fill="lightgoldenrod1") +
-      ggtitle(paste("n = ", length(which(!is.na(Points$X14Si))))) +
-      theme_bw() +
-      ylim(10,100) +
-      xlab("Si") +
-      theme(
-        axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-        plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-        axis.title.y=element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank())
+#Lookup for element labeller
+Elements <- c(
+  '12Mg' = "Mg",
+  '13Al' = "Al",
+  '14Si' = "Si",
+  '15P' = "P",
+  '16S'= "S",
+  '19K' = "K",
+  '20Ca' ="Ca",
+  '23V' = "V",
+  '25Mn' = "Mn",
+  '26Fe' = "Fe",
+  '30Zn' = "Zn",
+  '38Sr' = "Sr",
+  '39Y' = "Y",
+  '40Zr' = "Zr",
+  '56Ba' = "Ba",
+  '81Ti' = "Ti"
+  )
 
-#Filter long df to focus on P, and generate a violin plot
-P <-
-  Points_long %>%
-  filter(Element == "X15P") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="lightgoldenrod1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X15P))))) +
-  theme_bw() +
-  ylim(0,2) +
-  xlab("P") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
-
-#Filter long df to focus on S, and generate a violin plot
-S <-
-  Points_long %>%
-  filter(Element == "X16S") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="lightgoldenrod1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X16S))))) +
-  theme_bw() +
-  ylim(0,2.5) +
-  xlab("S") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
-
-#Filter long df to focus on K, and generate a violin plot
-K <-
-  Points_long %>%
-  filter(Element == "X19K") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="salmon1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X19K))))) +
-  theme_bw() +
-  ylim(0,10) +
-  xlab("K") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
-
-#Filter long df to focus on Ca, and generate a violin plot
-Ca <-
-  Points_long %>%
-  filter(Element == "X20Ca") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="salmon1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X20Ca))))) +
-  theme_bw() +
-  ylim(0,1) +
-  xlab("Ca") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
-
-#Filter long df to focus on V, and generate a violin plot
-V <-
-  Points_long %>%
-  filter(Element == "X23V") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="skyblue1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X23V))))) +
-  theme_bw() +
-  ylim(0,0.05) +
-  xlab("V") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
-
-#Filter long df to focus on Mn, and generate a violin plot
-Mn <-
-  Points_long %>%
-  filter(Element == "X25Mn") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="skyblue1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X25Mn))))) +
-  theme_bw() +
-  ylim(0,0.75) +
-  xlab("Mn") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
-
-#Filter long df to focus on Fe, and generate a violin plot
-Fe <-
-  Points_long %>%
-  filter(Element == "X26Fe") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="skyblue1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X26Fe))))) +
-  theme_bw() +
-  ylim(0,2) +
-  xlab("Fe") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
-
-#Filter long df to focus on Zn, and generate a violin plot
-Zn <-
-  Points_long %>%
-  filter(Element == "X30Zn") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="skyblue1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X30Zn))))) +
-  theme_bw() +
-  ylim(0,0.05) +
-  xlab("Zn") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
-
-#Filter long df to focus on Sr, and generate a violin plot
-Sr <-
-  Points_long %>%
-  filter(Element == "X38Sr") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="salmon1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X38Sr))))) +
-  theme_bw() +
-  ylim(0,0.02) +
-  xlab("Sr") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
-
-#Filter long df to focus on Y, and generate a violin plot
-Y <-
-  Points_long %>%
-  filter(Element == "X39Y") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="skyblue1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X39Y))))) +
-  theme_bw() +
-  ylim(0,0.01) +
-  xlab("Y") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
-
-#Filter long df to focus on Zr, and generate a violin plot
-Zr <-
-  Points_long %>%
-  filter(Element == "X40Zr") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="skyblue1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X40Zr))))) +
-  theme_bw() +
-  ylim(0,0.1) +
-  xlab("Zr") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
-
-#Filter long df to focus on Ba, and generate a violin plot
-Ba <-
-  Points_long %>%
-  filter(Element == "X56Ba") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="salmon1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X56Ba))))) +
-  theme_bw() +
-  ylim(0,0.5) +
-  xlab("Ba") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
-
-#Filter long df to focus on Ti, and generate a violin plot
-Ti <-
-  Points_long %>%
-  filter(Element == "X81Ti") %>%
-  ggplot(aes(x=Element, y=Value)) +
-  geom_violin(fill="lightgoldenrod1") +
-  ggtitle(paste("n = ", length(which(!is.na(Points$X81Ti))))) +
-  theme_bw() +
-  ylim(0,1.5) +
-  xlab("Ti") +
-  theme(
-    axis.title.x = element_text(size = 10, face = "bold", colour = "black"),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
-
-#16 figures arranged in 4 rows and 4 columns
-grid.arrange(Mg,Al,Si,P,S,K,Ca,V,Mn,Fe,Zn,Sr,Y,Zr,Ba,Ti,ncol=4)
+#Violin plot of elemental content, trimmed, with fill based on elemental groups
+Points_long %>%
+  drop_na(Value) %>%
+    ggplot(aes(x=Element, y=Value, fill = Group)) +
+    geom_violin(trim = TRUE) +
+    facet_wrap( ~ Element, scales = "free", labeller = labeller(Element = Elements)) +
+    scale_fill_manual(values=colors) +
+    theme_bw() +
+    theme(
+      legend.title = element_text(size = 12, face = "bold", colour = "black"),
+      strip.text.x = element_text(size = 12, face = "bold", colour = "black"),
+      axis.title.x = element_blank(),
+      plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
+      axis.title.y=element_blank(),
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank())
 ```
 
  \linebreak
