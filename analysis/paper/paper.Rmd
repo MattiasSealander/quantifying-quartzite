@@ -250,8 +250,8 @@ There are two distinctive features present in the Raman data. The first can be i
 
 A third feature, present in a small subset of the samples, appears as two peaks spaced closely together at ca. 695 cm-1 and 795 cm-1. Comparing these to reference samples from the mineral and rock collections kept at the Department of Ecology and Environmental Science at Umeå University, the same peaks turned up in measurements collected on shale from XXXX. There is a fairly large band around 500 cm-1 which can be indicative of the presence of amorphous carbon (aC) [@hodkiewicz10], and it is likely the features observed above are another indication of carbon present within the samples. No other features were pr 
 
-The resulting PCA model (fig. \@ref(fig:nir-pca)) shows a clear trend along the first component (80.3 %) related to the above two features. The measurements with mainly quartz peaks gravitate towards the positive side of the 1st component, and those where the graphite peaks are dominant towards the opposite side. It is also clear that the darker material feature more pronounced graphite peaks, whereas the lighter and more translucent objects mainly feature quartz peaks. As in the case of the NIR data, however, there are exceptions that break this trend, as well as a “muddled” middle group with both well-pronounced graphite and quartz peaks. 
-The 2nd component (6.82 %) mainly seems to differentiate spectra with a lot of noise, where the objects were difficult to sample. In contrast, along the 3rd component those samples that feature more pronounced peaks around 700 - 800 cm-1 groups up separately from the *quartz group*. 
+The resulting PCA model (fig. \@ref(fig:nir-pca1)) shows a clear trend along the first component (81.5 %) related to the above two features. The measurements with mainly quartz peaks gravitate towards the positive side of the 1st component, and those where the graphite peaks are dominant towards the opposite side. It is also clear that the darker material feature more pronounced graphite peaks, whereas the lighter and more translucent objects mainly feature quartz peaks. As in the case of the NIR data, however, there are exceptions that break this trend, as well as a “muddled” middle group with both well-pronounced graphite and quartz peaks. 
+The 2nd component (6.29 %) mainly seems to differentiate spectra with a lot of noise, where the objects were difficult to sample. In contrast, along the 3rd component those samples that feature more pronounced peaks around 700 - 800 cm-1 groups up separately from the *quartz group*. 
 
  \linebreak
 
@@ -261,8 +261,14 @@ knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION C
 
  \linebreak
 
-```{r raman-pca, fig.width=18, fig.height=5, fig.fullwidth=TRUE, fig.cap="PCA score plot of 1st and 2nd components of the raman analysis. The materials group based on two main features, the quartz-peak at 460 cm-1 and the D/G band peaks around 1300 cm-1 and 1600 cm-1. Darker materials feature more pronounced D/G band peaks while the white and more translucent materials feature only the quartz peak."}
-knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_3_nir_averaged_pca_p1_p2.jpg')
+```{r raman-pca1, fig.width=18, fig.height=5, fig.fullwidth=TRUE, fig.cap="PCA score plot of 1st and 2nd components of the raman analysis. The materials group based on two main features, the quartz-peak at 460 cm-1 and the D/G band peaks around 1300 cm-1 and 1600 cm-1. Darker materials feature more pronounced D/G band peaks while the white and more translucent materials feature only the quartz peak."}
+knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_6_raman_average_pca_p1_p2.jpg')
+```
+
+ \linebreak
+
+```{r raman-pca2, fig.width=18, fig.height=5, fig.fullwidth=TRUE, fig.cap="PCA score plot of 1st and 3rd components of the raman analysis. The materials group based on two main features, the quartz-peak at 460 cm-1 and the D/G band peaks around 1300 cm-1 and 1600 cm-1. Darker materials feature more pronounced D/G band peaks while the white and more translucent materials feature only the quartz peak."}
+knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_7_raman_average_pca_p1_p3.jpg')
 ```
 
  \linebreak
