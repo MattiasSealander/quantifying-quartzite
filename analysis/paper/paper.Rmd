@@ -54,24 +54,59 @@ library(tidyverse)
 library(ggplot2)
 library(gridExtra)
 library(ggsci)
+library(prospectr)
+library(patchwork)
+library(factoextra)
+library(ggbiplot)
 
 #Import xrf data
 XRF.csv <-
 read.csv2("C:/Users//masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/data/raw_data//XRF/XRF_quantitative.csv", sep = ";", dec = ".", header = TRUE)
 
+#Import nir data, set empty fields to NA
+nir.csv <-
+  read.csv2("C:/Users//masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/data/derived_data//NIR_master_averaged_20210827.csv", sep = ";",
+            dec = ",", header = TRUE, na = c("","NA","NULL",NULL))
+
+#Import raman data, set empty fields to NA
+raman.csv <-
+  read.csv2("C:/Users//masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/data/derived_data//raman_baseline_corrected_20210826.csv", sep = ";", dec = ",", header = TRUE, na = c("","NA","NULL",NULL))
+
+
 #Import sample list, set empty fields to NA
 samples <-
   as.data.frame(read.csv2("C:/Users//masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/data/raw_data//bifacial_points.csv", sep = ";", dec = ".", header = TRUE, na.strings=c("", "NA")))
 
-#Filter data to focus on quartzite points, point fragments and preforms made from quartz/quartzite materials
-Points <-
+#Filter xrf, nir and raman data to focus on points and preforms made from quartz/quartzite material 
+Points.xrf <-
   XRF.csv %>%
   filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
          type == "Point" | type == "Point fragment" | type == "Preform")
 
+
+Points.nir <-
+  nir.csv %>%
+  filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
+         type == "Point" | type == "Point fragment" | type == "Preform")
+
+
+Points.raman <-
+  raman.csv %>%
+  filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
+         type == "Point" | type == "Point fragment" | type == "Preform")
+
+#Fill the NA fields in the munsell_hue column and mark them as translucent samples
+Points.nir[8][is.na(Points.nir[8])] <- "Translucent"
+Points.raman[8][is.na(Points.raman[8])] <- "Translucent"
+Points.xrf[8][is.na(Points.xrf[8])] <- "Translucent"
+
+#prepare color/fill and symbols for score plots
+colors <- c("#E31CFF", "#718EFF", "#0080FF", "#D5DF9E", "#C6DF39", "#FFFFC1", "#FFFFA1", "#FFFF00", "#FFFF38", "#FFB468", "#000000", "#202020", "#404040", "#606060", "#808080", "#9F9F9F", "#DFDFDF", "#FFFFFF")
+shapes <- c(24,25,23,22,21)
+
 #Import loadings from Evince
 loadings <-
- as.data.frame(read.csv2("C:/Users//masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/data/raw_data/XRF/XRF_P_values.csv", sep = ";", dec = ".", header = TRUE, encoding = "UTF-8"))
+ as.data.frame(read.csv2("C:/Users//masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/data/raw_data/XRF/XRF_P_values_long.csv", sep = ";", dec = ".", header = TRUE, encoding = "UTF-8"))
 ```
 <!-- The actual document text starts here: -->
 
@@ -149,6 +184,7 @@ knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION C
  \linebreak
 
 ```{r distribution-by-parish, fig.cap= paste("Distribution of the", length(sample_uniq), "points and preforms across the parishes in Västerbotten, Sweden. Note that while Lycksele feature a large number of samples", length(lycksele_301), "of these are from the site of Lycksele 301"), fig.width=12, fig.height=10, fig.fullwidth=TRUE}
+
 #Stacked bar chart with counts of samples per parish and type
 ggplot(Points2, aes(x= fct_rev(parish), fill = type)) +
   geom_bar() +
@@ -236,8 +272,55 @@ The average spectra for the three groups show that the *dark* group has the high
 
  \linebreak
 
-```{r nir-pca, fig.width=18, fig.height=5, fig.fullwidth=TRUE, fig.cap="PCA score plot of 1st and 2nd components for the 1 000 nm – 2 500 nm region of the spectrum. Quartz-based material with a darker surface group to the right in the model, while those with white surface group in the bottom left quadrant. A trend of translucent material and opaque material with a beige tint grouping in the top left can also be seen."}
-knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_3_nir_averaged_pca_p1_p2.jpg')
+<!--```{r nir-pca, fig.width=18, fig.height=5, fig.fullwidth=TRUE, fig.cap="PCA score plot of 1st and 2nd components for the 1 000 nm – 2 500 nm region of the #spectrum. Quartz-based material with a darker surface group to the right in the model, while those with white surface group in the bottom left quadrant. A trend #of translucent material and opaque material with a beige tint grouping in the top left can also be seen."}
+#knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_3_nir_averaged_pca_p1_p2.jpg')
+``` -->
+```{r nir-pca, fig.width=20, fig.height=8, fig.cap= "PCA score plot of 1st and 2nd components for the 1 000 nm – 2 500 nm region of the spectrum. Quartz-based material with a darker surface group to the right in the model, while those with white surface group in the bottom left quadrant. A trend of translucent material and opaque material with a beige tint grouping in the top left can also be seen."}
+
+#perform PCA with SNV normalization and mean-center
+nir.pca <-
+  prcomp(Points.nir[,c(678:2178)], center = TRUE, scale = FALSE)
+
+#prepare a basic score plot with fviz_pca_ind using PC1 and PC2
+basic_plot1 <-
+  fviz_pca_ind(nir.pca, axes = c(1,2), label="none")
+
+#prepare labels for PCs
+pc1var <- round(summary(nir.pca)$importance[2,1]*100, digits=1)
+pc2var <- round(summary(nir.pca)$importance[2,2]*100, digits=1)
+pc1lab <- paste0("PC1 (",as.character(pc1var),"%)")
+pc2lab <- paste0("PC2 (",as.character(pc2var),"%)")
+
+#bind the basic fviz plot for PC 1 and 2, and use as basis for a more customizeable plot in ggpplot
+ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
+             aes(x=x, y=y, 
+                 shape = material, 
+                 fill = munsell_hue)) +
+  geom_point(size=3) +
+  theme_bw() +
+  ggtitle("Near infrared 1 000 - 2 500 nm") +
+  labs(x = pc1lab,
+       y = pc2lab) +
+  scale_shape_manual(name = "Material",
+                     values=shapes) +
+  scale_fill_manual(name = "Munsell hue",
+                    breaks = c("Translucent", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y", "7.5Y", "10Y", "5YR", "N1", "N2", "N3", "N4", "N5", "N6", "N8", "N9"),
+                    values=colors) +
+  guides(shape = guide_legend(override.aes = list(fill = "black"), 
+                              ncol=2, 
+                              title.position="top", 
+                              title.hjust = 0.5),
+         fill = guide_legend(override.aes = list(shape = 22,
+                                                 fill = colors,
+                                                 color = "black",
+                                                 size=3),
+                             title.position="top", title.hjust = 0.5))+
+  theme(plot.title = element_text(size = 12, face = "bold", colour = "black", vjust = - 10, hjust = 0.02),
+        axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
+        axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
+        legend.title = element_text(size = 12, face = "bold", colour = "black"),
+        legend.background = element_rect(linetype = "solid", color = "black"),
+        legend.position = "bottom")
 ```
 
  \linebreak
@@ -253,20 +336,100 @@ The 2nd component (6.29 %) mainly seems to differentiate spectra with a lot of n
 
  \linebreak
 
-```{r raman-average, fig.width=15, fig.height=15, fig.fullwidth=TRUE, fig.cap="Average spectra of raman measurements sampled on grey-to-dark quartzite featuring both the *quartz peak* at 460 cm-1, as well as the *graphite peaks* at 1 287  cm-1 (D band) and 1 598 cm-1 (G band)"}
+<!--```{r raman-average, fig.height=15, fig.fullwidth=TRUE, fig.cap="Average spectra of raman measurements sampled on grey-to-dark quartzite featuring both the *quartz peak* at 460 cm-1, as well as the *graphite peaks* at 1 287  cm-1 (D band) and 1 598 cm-1 (G band)"}
 knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_4_raman_spectra_dark.jpg')
+```-->
+```{r raman-average, fig.width=20, fig.height=15, fig.cap="Average spectra of raman measurements sampled on grey-to-dark quartzite featuring both the *quartz peak* at 460 cm-1, as well as the *graphite peaks* at 1 287  cm-1 (D band) and 1 598 cm-1 (G band)"}
+
+#perform PCA with SNV normalization and mean-center
+raman.pca <-
+  prcomp(standardNormalVariate(X = Points.raman[,c(29:320)]), center = TRUE, scale = FALSE)
+
+#prepare different basic score plots with fviz_pca_ind
+basic_plot1 <-
+  fviz_pca_ind(raman.pca, axes = c(1,2), label="none")
+
+basic_plot2 <-
+  fviz_pca_ind(raman.pca, axes = c(1,3), label="none")
+
+#prepare labels for PCs
+pc1var <- round(summary(raman.pca)$importance[2,1]*100, digits=1)
+pc2var <- round(summary(raman.pca)$importance[2,2]*100, digits=1)
+pc3var <- round(summary(raman.pca)$importance[2,3]*100, digits=1)
+pc1lab <- paste0("PC1 (",as.character(pc1var),"%)")
+pc2lab <- paste0("PC2 (",as.character(pc2var),"%)")
+pc3lab <- paste0("PC3 (",as.character(pc3var),"%)")
+
+#bind the basic fviz plot for PC 1 and 2, and use as basis for a more customizeable plot in ggpplot
+p1 <- ggplot(cbind(basic_plot1$data, Points.raman[, c(8,10)]),
+       aes(x=x, y=y, 
+           shape = material, 
+           fill = munsell_hue)) +
+  geom_point(size=3) +
+  theme_bw() +
+  ggtitle("Raman") +
+  labs(x = pc1lab,
+       y = pc2lab) +
+  scale_shape_manual(name = "Material",
+                     values=shapes) +
+  scale_fill_manual(name = "Munsell hue",
+                    breaks = c("Translucent", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y", "7.5Y", "10Y", "5YR", "N1", "N2", "N3", "N4", "N5", "N6", "N8", "N9"),
+                    values=colors) +
+  guides(shape = guide_legend(override.aes = list(fill = "black"), 
+                              ncol=2, 
+                              title.position="top", 
+                              title.hjust = 0.5),
+         fill = guide_legend(override.aes = list(shape = 22,
+                                                 fill = colors,
+                                                 color = "black",
+                                                 size=3),
+                             title.position="top", title.hjust = 0.5))+
+  theme(legend.position = "none")
+
+#bind the basic fviz plot for PC 1 and 3, and use as basis for a more customizeable plot in ggpplot
+p2 <- ggplot(cbind(basic_plot2$data, Points.raman[, c(8,10)]),
+       aes(x=x, y=y, 
+           shape = material, 
+           fill = munsell_hue)) +
+  geom_point(size=3) +
+  theme_bw() +
+  labs(x = pc1lab,
+       y = pc3lab) +
+  scale_shape_manual(name = "Material",
+                     values=shapes) +
+  scale_fill_manual(name = "Munsell hue",
+                    breaks = c("Translucent", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y", "7.5Y", "10Y", "5YR", "N1", "N2", "N3", "N4", "N5", "N6", "N8", "N9"),
+                    values=colors) +
+  guides(shape = guide_legend(override.aes = list(fill = "black"), 
+                              ncol=2, 
+                              title.position="top", 
+                              title.hjust = 0.5),
+         fill = guide_legend(override.aes = list(shape = 22,
+                                                 fill = colors,
+                                                 color = "black",
+                                                 size=3),
+                             title.position="top", title.hjust = 0.5))+
+  theme(legend.position = "none")
+
+
+combined <-
+  p1 + p2 & theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
+                  axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
+                  axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
+                  legend.title = element_text(size = 12, face = "bold", colour = "black"),
+                  legend.background = element_rect(linetype = "solid", color = "black"),
+                  legend.position = "bottom")
+
+
+combined +
+  plot_layout(nrow = 2, guides = "collect")
 ```
+
 
  \linebreak
 
-```{r raman-pca1, fig.width=18, fig.height=5, fig.fullwidth=TRUE, fig.cap="PCA score plot of 1st and 2nd components of the raman analysis. The materials group based on two main features, the quartz-peak at 460 cm-1 and the D/G band peaks around 1300 cm-1 and 1600 cm-1. Darker materials feature more pronounced D/G band peaks while the white and more translucent materials feature only the quartz peak."}
-knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_6_raman_average_pca_p1_p2.jpg')
-```
-
- \linebreak
-
-```{r raman-pca2, fig.width=18, fig.height=5, fig.fullwidth=TRUE, fig.cap="PCA score plot of 1st and 3rd components of the raman analysis. The materials group based on two main features, the quartz-peak at 460 cm-1 and the D/G band peaks around 1300 cm-1 and 1600 cm-1. Darker materials feature more pronounced D/G band peaks while the white and more translucent materials feature only the quartz peak."}
-knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_7_raman_average_pca_p1_p3.jpg')
+```{r raman-pca1, fig.fullheight=TRUE, fig.fullwidth=TRUE, fig.cap="PCA score plots for the raman analysis. Along the 1st component (P1) materials group based on two main features, the quartz-peak at 460 cm-1 and the D/G bands around 1300 cm-1 and 1600 cm-1. Darker materials feature more pronounced D/G band peaks while the white and more translucent materials feature only the quartz peak A) Plot of 1st and 2nd components; noisier spectra drift outwards along P2 B) Plot of 1st and 3rd components; noisier spectra are separated out from other samples, but spectra with peaks around 700-800 cm-1 are drawn towards the bottom right."}
+knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_6_raman_average_pca_p1_p2_p3.jpg')
 ```
 
  \linebreak
@@ -281,10 +444,10 @@ One almost translucent sample also ends up among the darker material. Upon close
 
  \linebreak
 
-```{r xrf-violin-plot, fig.width=15, fig.height=10, fig.fullwidth=TRUE, fig.cap="Violin plot of element content in quartzite samples measured using pXRF. **n** represents no. of measurements above Limit of Detection (LOD) for that element out of a total of 478 measurements. Note the bimodal distribution of Si measurements, these groups are reflected in the score plot of the PCA"}
+```{r xrf-violin-plot, fig.width=15, fig.height=15, fig.fullwidth=TRUE, fig.cap="Violin plot of element content in quartzite samples measured using pXRF. **n** represents no. of measurements above Limit of Detection (LOD) for that element out of a total of 478 measurements. Note the bimodal distribution of Si measurements, these groups are reflected in the score plot of the PCA"}
 #Prepare data in long format for violin plots
 Points_long <-
-  Points %>%
+  Points.xrf %>%
   select(X12Mg,X13Al, X14Si, X15P, X16S, X19K, X20Ca, X23V, X25Mn, X26Fe, X30Zn, X38Sr, X39Y, X40Zr, X56Ba, X81Ti) %>%
   gather(key = "Element", value = "Value")
 
@@ -317,6 +480,7 @@ Points_long <-
 colors <- c("darkorange", "darkolivegreen3", "skyblue1", "lightslateblue", "salmon1", "lightgoldenrod1")
 
 #Lookup for element labeller
+#Ändra ordning så att de mer avvikande (Si, Mn etc) hamnar uppe till vänster
 Elements <- c(
   '12Mg' = "Mg",
   '13Al' = "Al",
@@ -356,47 +520,23 @@ Points_long %>%
 
  \linebreak
 
-```{r xrf-loadings, fig.width=8, fig.height=8, fig.fullwidth=TRUE, fig.cap="The three first loading vectors (P1-P3) with scores for each loading (element)"}
-#Prepare plots for 3-plot bargraph figure of loadings
-#PC1 loadings
-P1 <-
-  ggplot(loadings, aes(x = fct_rev(Element), y = P1)) +
+```{r xrf-loadings, fig.width=8, fig.height=8, fig.cap="The three first loading vectors (P1-P3) with scores for each loading (element)"}
+#bar graph of the loadings (P1-P3) for the XRF data  
+loadings %>%
+  ggplot(aes(x=fct_rev(Element), y=Value)) +
     geom_bar(
       stat = "identity", position = "identity",
-      color = "black", fill = "darkgrey") +
-  theme_minimal() +
-  theme(plot.margin = margin(10,10,10,10),
-        axis.title.y=element_blank(),
-        axis.text.y = element_text(size=14, face="bold", colour = "black"),
-        axis.title.x = element_text(size = 14, face = "bold", colour = "black")) +
-  coord_flip()
-#PC2 loadings
-P2 <-
-  ggplot(loadings, aes(x = fct_rev(Element), y = P2)) +
-  geom_bar(
-    stat = "identity", position = "identity",
-    color = "black", fill = "darkgrey") +
-  theme_minimal() +
-  theme(plot.margin = margin(10,10,10,10),
-        axis.title.y=element_blank(),
-        axis.text.y=element_blank(),
-        axis.title.x = element_text(size = 14, face = "bold", colour = "black")) +
-  coord_flip()
-#PC3 loadings
-P3 <-
-  ggplot(loadings, aes(x = fct_rev(Element), y = P3)) +
-  geom_bar(
-    stat = "identity", position = "identity",
-    color = "black", fill = "darkgrey") +
-  theme_minimal() +
+      color = "black", fill = "darkgrey",
+      width = 0.5) +
+  facet_wrap( ~ P, scales = "free") +
+  theme_bw() +
   theme(plot.margin = margin(10,10,10,10),
         axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.title.x = element_text(size = 14, face = "bold", colour = "black")) +
+        axis.text.y = element_text(size=10, face="bold", colour = "black"),
+        axis.title.x = element_blank(),
+        strip.text.x = element_text(size=14, face="bold", colour="black")) +
   coord_flip()
 
-#Composite figure of above bar graphs
-grid.arrange(P1, P2, P3, ncol=3)
 ```
 
  \linebreak
