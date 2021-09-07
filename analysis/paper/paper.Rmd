@@ -51,6 +51,7 @@ knitr::opts_chunk$set(
 
 ```{r load-packages-and-data}
 library(tidyverse)
+library(gridExtra)
 library(ggplot2)
 library(gridExtra)
 library(ggsci)
@@ -61,38 +62,38 @@ library(ggbiplot)
 
 #Import xrf data
 XRF.csv <-
-read.csv2("C:/Users//masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/data/raw_data//XRF/XRF_quantitative.csv", sep = ";", dec = ".", header = TRUE)
+  read.csv2("./analysis/data/raw_data/XRF/XRF_quantitative.csv", sep = ";", dec = ".", header = TRUE)
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2("C:/Users//masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/data/derived_data//NIR_master_averaged_20210827.csv", sep = ";",
+  read.csv2("./analysis/data/derived_data/NIR_master_averaged_20210827.csv", sep = ";",
             dec = ",", header = TRUE, na = c("","NA","NULL",NULL))
 
 #Import raman data, set empty fields to NA
 raman.csv <-
-  read.csv2("C:/Users//masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/data/derived_data//raman_baseline_corrected_20210826.csv", sep = ";", dec = ",", header = TRUE, na = c("","NA","NULL",NULL))
+  read.csv2("./analysis/data/derived_data/raman_baseline_corrected_20210826.csv", sep = ";", dec = ",", header = TRUE, na = c("","NA","NULL",NULL))
 
 
 #Import sample list, set empty fields to NA
 samples <-
-  as.data.frame(read.csv2("C:/Users//masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/data/raw_data//bifacial_points.csv", sep = ";", dec = ".", header = TRUE, na.strings=c("", "NA")))
+  read.csv2("./analysis/data/raw_data/bifacial_points.csv", sep = ";", dec = ".", header = TRUE, na.strings=c("", "NA"))
 
 #Filter xrf, nir and raman data to focus on points and preforms made from quartz/quartzite material 
 Points.xrf <-
   XRF.csv %>%
-  filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
+    filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
          type == "Point" | type == "Point fragment" | type == "Preform")
 
 
 Points.nir <-
   nir.csv %>%
-  filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
+    filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
          type == "Point" | type == "Point fragment" | type == "Preform")
 
 
 Points.raman <-
   raman.csv %>%
-  filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
+    filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
          type == "Point" | type == "Point fragment" | type == "Preform")
 
 #Fill the NA fields in the munsell_hue column and mark them as translucent samples
@@ -106,7 +107,7 @@ shapes <- c(24,25,23,22,21)
 
 #Import loadings from Evince
 loadings <-
- as.data.frame(read.csv2("C:/Users//masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/data/raw_data/XRF/XRF_P_values_long.csv", sep = ";", dec = ".", header = TRUE, encoding = "UTF-8"))
+ as.data.frame(read.csv2("./analysis/data/raw_data/XRF/XRF_P_values_long.csv", sep = ";", dec = ".", header = TRUE, encoding = "UTF-8"))
 ```
 <!-- The actual document text starts here: -->
 
@@ -128,7 +129,7 @@ In the current study a dataset of quartzite artefacts from museum collections in
 #Filter data to focus on quartzite points, point fragments and preforms made from quartz/quartzite materials
 Points2 <-
   samples %>%
-  filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
+    filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
          type == "Point" | type == "Point fragment" | type == "Preform")
 
 #Reorder factor levels
@@ -150,7 +151,7 @@ lycksele <-
 #Then filter to focus on quartz/quartzite material that are points and preforms 
 lycksele_301 <-
   lycksele %>% 
-  filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | 
+    filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | 
              material  == "Felsitic porphyric quartz", type == "Point" | type == "Point fragment" | type == "Preform")
 
 #Create vector of unique samples from site Lycksele 301
@@ -178,7 +179,7 @@ Västerbotten museum have come far in their digitization effort, making large po
  \linebreak
 
 ```{r distribution-map, fig.cap="White) Sites with measured samples in the County of Västerbotten; Black) Parish centroid for measured samples lacking site coordinates. The distribution of sampled sites is likely affected by the excavation and survey history of the region. Made with Lantmäteriet (CC0), Natural Earth, and Riksantikvarieämbetet.", fig.width=15, fig.height=15, fig.fullwidth=TRUE}
-knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/Distribution.jpeg')
+knitr::include_graphics('../figures/Distribution.jpeg', error = FALSE)
 ```
 
  \linebreak
@@ -254,14 +255,60 @@ The main explanatory power for the visual region can be found in the first two c
 
  \linebreak
 
-```{r vis-nir-pca, fig.width=18, fig.height=5, fig.fullwidth=TRUE, fig.cap="PCA score plot of 1st and 2nd components for the 400 nm – 750 nm region of the spectrum. Quartzite with a darker surface group to the right in the model, while white objects group in the bottom left quadrant."}
-knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_1_visnir_averaged_pca_p1_p2.jpg')
-```
+<!--```{r vis-nir-pca, fig.width=18, fig.height=5, fig.fullwidth=TRUE, fig.cap="PCA score plot of 1st and 2nd components for the 400 nm – 750 nm region of the spectrum. Quartzite with a darker surface group to the right in the model, while white objects group in the bottom left quadrant."}
+knitr::include_graphics('./analysis/figures/fig_4_1_visnir_averaged_pca_p1_p2.jpg')
+```-->
+```{r vis-nir-pca, fig.width=20, fig.height=8, fig.cap= "PCA score plot of 1st and 2nd components for the 400 nm – 750 nm region of the spectrum. Quartz-based material with a darker surface group to the right in the model, while those with white surface group in the bottom left quadrant. A trend of translucent material and opaque material with a beige tint grouping in the top left can also be seen."}
 
+#perform PCA with SNV normalization and mean-center
+visnir.pca <-
+  prcomp(Points.nir[,c(78:428)], center = TRUE, scale = FALSE)
+
+#prepare a basic score plot with fviz_pca_ind using PC1 and PC2
+basic_plot1 <-
+  fviz_pca_ind(visnir.pca, axes = c(1,2), label="none")
+
+#prepare labels for PCs
+pc1var <- round(summary(visnir.pca)$importance[2,1]*100, digits=1)
+pc2var <- round(summary(visnir.pca)$importance[2,2]*100, digits=1)
+pc1lab <- paste0("PC1 (",as.character(pc1var),"%)")
+pc2lab <- paste0("PC2 (",as.character(pc2var),"%)")
+
+#bind the basic fviz plot for PC 1 and 2, and use as basis for a more customizeable plot in ggpplot
+ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
+             aes(x=x, y=y, 
+                 shape = material, 
+                 fill = munsell_hue)) +
+  geom_point(size=3) +
+  theme_bw() +
+  ggtitle("Near infrared 400 - 750 nm") +
+  labs(x = pc1lab,
+       y = pc2lab) +
+  scale_shape_manual(name = "Material",
+                     values=shapes) +
+  scale_fill_manual(name = "Munsell hue",
+                    breaks = c("Translucent", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y", "7.5Y", "10Y", "5YR", "N1", "N2", "N3", "N4", "N5", "N6", "N8", "N9"),
+                    values=colors) +
+  guides(shape = guide_legend(override.aes = list(fill = "black"), 
+                              ncol=2, 
+                              title.position="top", 
+                              title.hjust = 0.5),
+         fill = guide_legend(override.aes = list(shape = 22,
+                                                 fill = colors,
+                                                 color = "black",
+                                                 size=3),
+                             title.position="top", title.hjust = 0.5))+
+  theme(plot.title = element_text(size = 12, face = "bold", colour = "black", vjust = - 10, hjust = 0.02),
+        axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
+        axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
+        legend.title = element_text(size = 12, face = "bold", colour = "black"),
+        legend.background = element_rect(linetype = "solid", color = "black"),
+        legend.position = "bottom")
+```
  \linebreak
 
 ```{r vis-nir-spectra, fig.width=15, fig.height=5, fig.fullwidth=TRUE, fig.cap="Average spectra for dark (N1), translucent (MV) and white (N1) groups in the 400 - 750 nm region. Dark material has a higher overall absorbance, whereas white and translucent material feature lower absorbance. Brecciated quartz, which is typically described as a translucent material, falls somewhere inbetween the above groups."}
-knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_2_breccie_averaged_visnir_spectra.jpg')
+knitr::include_graphics('./analysis/figures/fig_4_2_breccie_averaged_visnir_spectra.jpg')
 ```
 
  \linebreak
@@ -412,7 +459,7 @@ p2 <- ggplot(cbind(basic_plot2$data, Points.raman[, c(8,10)]),
   theme(legend.position = "none")
 
 
-combined <-
+comb <-
   p1 + p2 & theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
                   axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
                   axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
@@ -421,16 +468,16 @@ combined <-
                   legend.position = "bottom")
 
 
-combined +
+comb +
   plot_layout(nrow = 2, guides = "collect")
 ```
 
 
  \linebreak
 
-```{r raman-pca1, fig.fullheight=TRUE, fig.fullwidth=TRUE, fig.cap="PCA score plots for the raman analysis. Along the 1st component (P1) materials group based on two main features, the quartz-peak at 460 cm-1 and the D/G bands around 1300 cm-1 and 1600 cm-1. Darker materials feature more pronounced D/G band peaks while the white and more translucent materials feature only the quartz peak A) Plot of 1st and 2nd components; noisier spectra drift outwards along P2 B) Plot of 1st and 3rd components; noisier spectra are separated out from other samples, but spectra with peaks around 700-800 cm-1 are drawn towards the bottom right."}
-knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_6_raman_average_pca_p1_p2_p3.jpg')
-```
+<!--```{r raman-pca1, fig.fullheight=TRUE, fig.fullwidth=TRUE, fig.cap="PCA score plots for the raman analysis. Along the 1st component (P1) materials group based on two main features, the quartz-peak at 460 cm-1 and the D/G bands around 1300 cm-1 and 1600 cm-1. Darker materials feature more pronounced D/G band peaks while the white and more translucent materials feature only the quartz peak A) Plot of 1st and 2nd components; noisier spectra drift outwards along P2 B) Plot of 1st and 3rd components; noisier spectra are separated out from other samples, but spectra with peaks around 700-800 cm-1 are drawn towards the bottom right."}
+knitr::include_graphics('./analysis/figures/fig_4_6_raman_average_pca_p1_p2_p3.jpg')
+```-->
 
  \linebreak
 
@@ -541,9 +588,9 @@ loadings %>%
 
  \linebreak
 
-```{r xrf-score-plot-p1-p2, fig.cap="Score plot for P1 and P2, the two major groups are distinguished by lower SiO content to the left and higher to the right"}
-knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_7_xrf_pca_p1_p1.jpg')
-```
+<!--```{r xrf-score-plot-p1-p2, fig.cap="Score plot for P1 and P2, the two major groups are distinguished by lower SiO content to the left and higher to the right"}
+knitr::include_graphics('./analysis/figures/fig_4_7_xrf_pca_p1_p1.jpg')
+```-->
 
  \linebreak
 
