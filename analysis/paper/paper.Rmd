@@ -202,7 +202,6 @@ ggplot(Points2, aes(x= fct_rev(parish), fill = type)) +
   scale_fill_jco() +
   coord_flip() +
   geom_text(stat ='count', aes(group = parish, label = ..count..), hjust = -0.5)
-
 ```
 
 While parts of the collections at Västerbotten museum have been petrographically analysed by a geologist [@biornstad68; @ahman67], at this point it is difficult to say with any certainty how many (if any) of the artefacts in the current dataset were among these. It is fair to assume that the vast majority have been classified visually based on megascopic features according to a “standard” archaeological nomenclature. In the dataset the four main types of registered materials are: quartz, quartzite, brecciated quartz, and brecciated quartzite ^[Original Swedish terms are *brecciekvarts*/*brecciekvartsit* , the latter possibly a spelling mistake]. Those that had no prior material classification registered were sorted into either the quartz or quartzite category. The reason for including ‘quartz’ in the study is in order to test whether it is possible to separate quartz from quartzite using these methods, as well as a way to account for potential mistakes in the original classification.
@@ -307,9 +306,10 @@ ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
 ```
  \linebreak
 
-```{r vis-nir-spectra, fig.width=15, fig.height=5, fig.fullwidth=TRUE, fig.cap="Average spectra for dark (N1), translucent (MV) and white (N1) groups in the 400 - 750 nm region. Dark material has a higher overall absorbance, whereas white and translucent material feature lower absorbance. Brecciated quartz, which is typically described as a translucent material, falls somewhere inbetween the above groups."}
+
+<!--```{r vis-nir-spectra, fig.width=15, fig.height=5, fig.fullwidth=TRUE, fig.cap="Average spectra for dark (N1), translucent (MV) and white (N1) groups in the 400 - 750 nm region. Dark material has a higher overall absorbance, whereas white and translucent material feature lower absorbance. Brecciated quartz, which is typically described as a translucent material, falls somewhere inbetween the above groups."}
 knitr::include_graphics('./analysis/figures/fig_4_2_breccie_averaged_visnir_spectra.jpg')
-```
+```-->
 
  \linebreak
 
@@ -373,20 +373,47 @@ ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
  \linebreak
 
 ## Raman
-There are two distinctive features present in the Raman data. The first can be identified as the *quartz* peak occurring at 460 cm-1 [@gillet_etal90], which is present for all samples in the dataset. The second feature shows up as two peaks occurring at around 1 287 cm-1 and 1 598 cm-1, and dominate the spectra in terms of intensity for the darker samples. These peak positions fall within what is referred to as the D and G band respectively, and have been observed in spectroscopic studies of graphite/graphene [@cesare_maineri99]. The D band occurs as a result of disordered carbon structures whilst the G band is indicative of sp^2^ carbon networks and caused by stretching in the carbon bonds, which is common in graphite-based materials [@vollebregt_etal12; @lee_etal21]. Whereas the 2^nd^ peak falls within the typical position of the G band, the position of the D band is commonly identified as being 1 330 - 1 350 cm-1. It has, however, been documented that the dispersive behavior of the D band can cause a frequency change as a result of the energy of the incident laser [@pimenta_etal07 p.1280]. This could thus explain the discrepancy between the observed peak in the dataset and the literature.
+There are two distinctive features present in the Raman data (fig. \@ref(fig:raman-spectra)). The first can be identified as the *quartz* peak occurring at 460 cm-1 [@gillet_etal90], which is present for all samples in the dataset. The second feature shows up as two peaks occurring at around 1 287 cm-1 and 1 598 cm-1, and dominate the spectra in terms of intensity for the darker samples. These peak positions fall within what is referred to as the D and G band respectively, and have been observed in spectroscopic studies of graphite/graphene [@cesare_maineri99]. The D band occurs as a result of disordered carbon structures whilst the G band is indicative of sp^2^ carbon networks and caused by stretching in the carbon bonds, which is common in graphite-based materials [@vollebregt_etal12; @lee_etal21]. Whereas the 2^nd^ peak falls within the typical position of the G band, the position of the D band is commonly identified as being 1 330 - 1 350 cm-1. It has, however, been documented that the dispersive behavior of the D band can cause a frequency change as a result of the energy of the incident laser [@pimenta_etal07 p.1280]. This could thus explain the discrepancy between the observed peak in the dataset and the literature.
 
-A third feature, present in a small subset of the samples, appears as two peaks spaced closely together at ca. 695 cm-1 and 795 cm-1. Comparing these to reference samples from the mineral and rock collections kept at the Department of Ecology and Environmental Science at Umeå University, the same peaks turned up in measurements collected on different types of shale, as well as samples of diabase, apatite, orthoclase, and blue quartz. Studies of clay minerals [@kloprogge17]
-have identified a number of band regions in the lower wavenumbers related to Si, Al and OH vibrations, including the 700 - 800 cm-1 band which has been related to Al-O-Si vibrations for the Kaolin group. Considering the diagenesis of quartzite and the likelihood that clay minerals are present in the material it is possible that this is what generates the feature in the current dataset.
+A third feature, present in a small subset of the samples, appears as two peaks spaced closely together at ca. 695 cm-1 and 795 cm-1. Comparing these to reference samples from the mineral and rock collections kept at the Department of Ecology and Environmental Science at Umeå University, the same peaks turned up in measurements collected on different types of shale, as well as samples of diabase, apatite, orthoclase, and blue quartz. Studies of clay minerals [@kloprogge17] have identified a number of band regions in the lower wavenumbers related to Si, Al and OH vibrations, including the 700 - 800 cm-1 band which has been related to Al-O-Si vibrations for the Kaolin group. Considering the diagenesis of quartzite and the likelihood that clay minerals are present in the material it is possible that this is what generates the feature in the current dataset.
 
-The resulting PCA model (fig. \@ref(fig:nir-pca1)) shows a clear trend along the first component (81.5 %) related to the above two features. The measurements with mainly quartz peaks gravitate towards the positive side of the 1st component, and those where the graphite peaks are dominant towards the opposite side. It is also clear that the darker material feature more pronounced graphite peaks, whereas the lighter and more translucent objects mainly feature quartz peaks. As in the case of the NIR data, however, there are exceptions that break this trend, as well as a “muddled” middle group with both well-pronounced graphite and quartz peaks. 
+The resulting PCA model (fig. \@ref(fig:raman-pca)) shows a clear trend along the first component (81.5 %) related to the above two features. The measurements with mainly quartz peaks gravitate towards the positive side of the 1st component, and those where the graphite peaks are dominant towards the opposite side. It is also clear that the darker material feature more pronounced graphite peaks, whereas the lighter and more translucent objects mainly feature quartz peaks. As in the case of the NIR data, however, there are exceptions that break this trend, as well as a “muddled” middle group with both well-pronounced graphite and quartz peaks. 
 The 2nd component (6.29 %) mainly seems to differentiate spectra with a lot of noise, where the objects were difficult to sample. In contrast, along the 3rd component those samples that feature more pronounced peaks around 700 - 800 cm-1 groups up separately from the *quartz group*. 
+
+ \linebreak
+
+```{r raman-spectra, fig.width=20, fig.height=8, fig.cap="Spectra of raman measurements sampled on a dark quartzite featuring both the *quartz peak* at 460 cm-1, as well as the *graphite peaks* at 1 287  cm-1 (D band) and 1 598 cm-1 (G band)"}
+#Identify file with raman spectra and import
+file <- '../quantifyingquartzite/analysis/data/derived_data/raman_baseline_corrected_transposed_20210826.csv'
+spectra <- read.csv2(file, sep = ";", dec = ",", header = TRUE)
+
+#Prepare function for plotting spectra
+plot_multi <- function(df, x=1, y=2, cols=y,
+                       xlim=range(df[,x], na.rm = T),
+                       ylim=range(df[,y], na.rm = T),
+                       main="", xlab="", ylab="", ...){
+  # setup plot frame
+  plot(NULL,
+       xlim=xlim,
+       ylim=ylim,
+       main=main, xlab=xlab, ylab=ylab)
+
+  # plot all your y's against your x
+  pb <- sapply(seq_along(y), function(i){
+    points(df[,c(x, y[i])], col=cols[i], ...)
+  })
+}
+
+plot_multi(spectra, y=120, cols = rainbow(ncol(spectra)), type='l', lwd=3,
+           xlab = "Wavenumber (cm-1)", ylab = "Intensity")
+```
 
  \linebreak
 
 <!--```{r raman-average, fig.height=15, fig.fullwidth=TRUE, fig.cap="Average spectra of raman measurements sampled on grey-to-dark quartzite featuring both the *quartz peak* at 460 cm-1, as well as the *graphite peaks* at 1 287  cm-1 (D band) and 1 598 cm-1 (G band)"}
 knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_4_raman_spectra_dark.jpg')
 ```-->
-```{r raman-average, fig.width=20, fig.height=15, fig.cap="Average spectra of raman measurements sampled on grey-to-dark quartzite featuring both the *quartz peak* at 460 cm-1, as well as the *graphite peaks* at 1 287  cm-1 (D band) and 1 598 cm-1 (G band)"}
+```{r raman-pca, fig.width=20, fig.height=15, fig.cap="Average spectra of raman measurements sampled on grey-to-dark quartzite featuring both the *quartz peak* at 460 cm-1, as well as the *graphite peaks* at 1 287  cm-1 (D band) and 1 598 cm-1 (G band)"}
 
 #perform PCA with SNV normalization and mean-center
 raman.pca <-
@@ -471,9 +498,6 @@ comb <-
 comb +
   plot_layout(nrow = 2, guides = "collect")
 ```
-
-
- \linebreak
 
 <!--```{r raman-pca1, fig.fullheight=TRUE, fig.fullwidth=TRUE, fig.cap="PCA score plots for the raman analysis. Along the 1st component (P1) materials group based on two main features, the quartz-peak at 460 cm-1 and the D/G bands around 1300 cm-1 and 1600 cm-1. Darker materials feature more pronounced D/G band peaks while the white and more translucent materials feature only the quartz peak A) Plot of 1st and 2nd components; noisier spectra drift outwards along P2 B) Plot of 1st and 3rd components; noisier spectra are separated out from other samples, but spectra with peaks around 700-800 cm-1 are drawn towards the bottom right."}
 knitr::include_graphics('./analysis/figures/fig_4_6_raman_average_pca_p1_p2_p3.jpg')
