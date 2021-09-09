@@ -50,19 +50,21 @@ knitr::opts_chunk$set(
 ```
 
 ```{r load-packages-and-data}
-library(tidyverse)
-library(gridExtra)
-library(ggplot2)
-library(gridExtra)
-library(ggsci)
-library(prospectr)
-library(patchwork)
+library(ChemoSpec)
+library(data.table)
 library(factoextra)
 library(ggbiplot)
+library(ggplot2)
+library(ggsci)
+library(gridExtra)
+library(missMDA)
+library(patchwork)
+library(prospectr)
+library(tidyverse)
 
 #Import xrf data
 XRF.csv <-
-  read.csv2("./analysis/data/raw_data/XRF/XRF_quantitative.csv", sep = ";", dec = ".", header = TRUE)
+  read.csv2("./analysis/data/raw_data/XRF/XRF_quantitative.csv", sep = ";", dec = ".", header = TRUE, na = c("","NA","NULL"))
 
 #Import nir data, set empty fields to NA
 nir.csv <-
@@ -99,11 +101,13 @@ Points.raman <-
 #Fill the NA fields in the munsell_hue column and mark them as translucent samples
 Points.nir[8][is.na(Points.nir[8])] <- "Translucent"
 Points.raman[8][is.na(Points.raman[8])] <- "Translucent"
-Points.xrf[8][is.na(Points.xrf[8])] <- "Translucent"
+Points.xrf[20][is.na(Points.xrf[20])] <- "Translucent"
 
 #prepare color/fill and symbols for score plots
-colors <- c("#E31CFF", "#718EFF", "#0080FF", "#D5DF9E", "#C6DF39", "#FFFFC1", "#FFFFA1", "#FFFF00", "#FFFF38", "#FFB468", "#000000", "#202020", "#404040", "#606060", "#808080", "#9F9F9F", "#DFDFDF", "#FFFFFF")
-shapes <- c(24,25,23,22,21)
+pca.colors <- c("#E31CFF", "#718EFF", "#0080FF", "#D5DF9E", "#C6DF39", "#FFFFC1", "#FFFFA1", "#FFFF00", "#FFFF38", "#FFB468", "#000000", "#202020", "#404040", "#606060", "#808080", "#9F9F9F", "#DFDFDF", "#FFFFFF")
+pca.shapes <- c(24,25,23,22,21)
+pca.munsell_hue <- c("Translucent", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y", "7.5Y", "10Y", "5YR", "N1", "N2", "N3", "N4", "N5", "N6", "N8", "N9")
+
 
 #Import loadings from Evince
 loadings <-
@@ -268,10 +272,10 @@ basic_plot1 <-
   fviz_pca_ind(visnir.pca, axes = c(1,2), label="none")
 
 #prepare labels for PCs
-pc1var <- round(summary(visnir.pca)$importance[2,1]*100, digits=1)
-pc2var <- round(summary(visnir.pca)$importance[2,2]*100, digits=1)
-pc1lab <- paste0("PC1 (",as.character(pc1var),"%)")
-pc2lab <- paste0("PC2 (",as.character(pc2var),"%)")
+vis.pc1var <- round(summary(visnir.pca)$importance[2,1]*100, digits=1)
+vis.pc2var <- round(summary(visnir.pca)$importance[2,2]*100, digits=1)
+vis.pc1lab <- paste0("PC1 (",as.character(vis.pc1var),"%)")
+vis.pc2lab <- paste0("PC2 (",as.character(vis.pc2var),"%)")
 
 #bind the basic fviz plot for PC 1 and 2, and use as basis for a more customizeable plot in ggpplot
 ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
@@ -281,22 +285,23 @@ ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
   geom_point(size=3) +
   theme_bw() +
   ggtitle("Near infrared 400 - 750 nm") +
-  labs(x = pc1lab,
-       y = pc2lab) +
+  labs(x = vis.pc1lab,
+       y = vis.pc2lab) +
   scale_shape_manual(name = "Material",
-                     values=shapes) +
+                     values=pca.shapes) +
   scale_fill_manual(name = "Munsell hue",
                     breaks = c("Translucent", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y", "7.5Y", "10Y", "5YR", "N1", "N2", "N3", "N4", "N5", "N6", "N8", "N9"),
-                    values=colors) +
+                    values=pca.colors) +
   guides(shape = guide_legend(override.aes = list(fill = "black"), 
                               ncol=2, 
                               title.position="top", 
                               title.hjust = 0.5),
          fill = guide_legend(override.aes = list(shape = 22,
-                                                 fill = colors,
+                                                 fill = pca.colors,
                                                  color = "black",
                                                  size=3),
-                             title.position="top", title.hjust = 0.5))+
+                             title.position="top", 
+                             title.hjust = 0.5)) +
   theme(plot.title = element_text(size = 12, face = "bold", colour = "black", vjust = - 10, hjust = 0.02),
         axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
         axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
@@ -333,10 +338,10 @@ basic_plot1 <-
   fviz_pca_ind(nir.pca, axes = c(1,2), label="none")
 
 #prepare labels for PCs
-pc1var <- round(summary(nir.pca)$importance[2,1]*100, digits=1)
-pc2var <- round(summary(nir.pca)$importance[2,2]*100, digits=1)
-pc1lab <- paste0("PC1 (",as.character(pc1var),"%)")
-pc2lab <- paste0("PC2 (",as.character(pc2var),"%)")
+nir.pc1var <- round(summary(nir.pca)$importance[2,1]*100, digits=1)
+nir.pc2var <- round(summary(nir.pca)$importance[2,2]*100, digits=1)
+nir.pc1lab <- paste0("PC1 (",as.character(nir.pc1var),"%)")
+nir.pc2lab <- paste0("PC2 (",as.character(nir.pc2var),"%)")
 
 #bind the basic fviz plot for PC 1 and 2, and use as basis for a more customizeable plot in ggpplot
 ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
@@ -346,19 +351,19 @@ ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
   geom_point(size=3) +
   theme_bw() +
   ggtitle("Near infrared 1 000 - 2 500 nm") +
-  labs(x = pc1lab,
-       y = pc2lab) +
+  labs(x = nir.pc1lab,
+       y = nir.pc2lab) +
   scale_shape_manual(name = "Material",
-                     values=shapes) +
+                     values=pca.shapes) +
   scale_fill_manual(name = "Munsell hue",
                     breaks = c("Translucent", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y", "7.5Y", "10Y", "5YR", "N1", "N2", "N3", "N4", "N5", "N6", "N8", "N9"),
-                    values=colors) +
+                    values=pca.colors) +
   guides(shape = guide_legend(override.aes = list(fill = "black"), 
                               ncol=2, 
                               title.position="top", 
                               title.hjust = 0.5),
          fill = guide_legend(override.aes = list(shape = 22,
-                                                 fill = colors,
+                                                 fill = pca.colors,
                                                  color = "black",
                                                  size=3),
                              title.position="top", title.hjust = 0.5))+
@@ -382,8 +387,24 @@ The 2nd component (6.29 %) mainly seems to differentiate spectra with a lot of n
 
  \linebreak
 
-```{r raman-spectra, fig.width=20, fig.height=8, fig.cap="Spectra of raman measurements sampled on a dark quartzite featuring both the *quartz peak* at 460 cm-1, as well as the *graphite peaks* at 1 287  cm-1 (D band) and 1 598 cm-1 (G band)"}
-#Identify file with raman spectra and import
+```{r raman-spectra, fig.width=20, fig.height=10, fullwidth = TRUE, fig.cap="Mean spectrum of the raman data grouped by their hue. The *quartz peak* at 460 cm-1 is present in all four groups, but the *graphite peaks* at 1 287  cm-1 (D band) and 1 598 cm-1 (G band) mainly appear in the light and dark groups"}
+#Read and create new file for chemospec
+raman <-matrix2SpectraObject(
+  gr.crit = c("Translucent", "White", "Dark", "Light" ),
+  gr.cols = c("purple", "blue", "black", "yellow"),
+  freq.unit ="Wavenumber (cm-1)",
+  int.unit ="Intensity",
+  descrip ="Bifacial points measurements",
+  in.file = "./analysis/data/derived_data/raman_baseline_corrected_transposed_20210908.csv",
+  sep = ";",
+  dec = ",",
+  chk = TRUE,
+  out.file = "raman")
+
+surveySpectra(raman, by.gr = TRUE , method = "sem", main = "mean")
+
+```
+<!-- #Identify file with raman spectra and import
 file <- '../quantifyingquartzite/analysis/data/derived_data/raman_baseline_corrected_transposed_20210826.csv'
 spectra <- read.csv2(file, sep = ";", dec = ",", header = TRUE)
 
@@ -405,8 +426,7 @@ plot_multi <- function(df, x=1, y=2, cols=y,
 }
 
 plot_multi(spectra, y=120, cols = rainbow(ncol(spectra)), type='l', lwd=3,
-           xlab = "Wavenumber (cm-1)", ylab = "Intensity")
-```
+           xlab = "Wavenumber (cm-1)", ylab = "Intensity") -->
 
  \linebreak
 
@@ -427,59 +447,59 @@ basic_plot2 <-
   fviz_pca_ind(raman.pca, axes = c(1,3), label="none")
 
 #prepare labels for PCs
-pc1var <- round(summary(raman.pca)$importance[2,1]*100, digits=1)
-pc2var <- round(summary(raman.pca)$importance[2,2]*100, digits=1)
-pc3var <- round(summary(raman.pca)$importance[2,3]*100, digits=1)
-pc1lab <- paste0("PC1 (",as.character(pc1var),"%)")
-pc2lab <- paste0("PC2 (",as.character(pc2var),"%)")
-pc3lab <- paste0("PC3 (",as.character(pc3var),"%)")
+raman.pc1var <- round(summary(raman.pca)$importance[2,1]*100, digits=1)
+raman.pc2var <- round(summary(raman.pca)$importance[2,2]*100, digits=1)
+raman.pc3var <- round(summary(raman.pca)$importance[2,3]*100, digits=1)
+raman.pc1lab <- paste0("PC1 (",as.character(raman.pc1var),"%)")
+raman.pc2lab <- paste0("PC2 (",as.character(raman.pc2var),"%)")
+raman.pc3lab <- paste0("PC3 (",as.character(raman.pc3var),"%)")
 
 #bind the basic fviz plot for PC 1 and 2, and use as basis for a more customizeable plot in ggpplot
-p1 <- ggplot(cbind(basic_plot1$data, Points.raman[, c(8,10)]),
+raman.p1 <- ggplot(cbind(basic_plot1$data, Points.raman[, c(8,10)]),
        aes(x=x, y=y, 
            shape = material, 
            fill = munsell_hue)) +
   geom_point(size=3) +
   theme_bw() +
   ggtitle("Raman") +
-  labs(x = pc1lab,
-       y = pc2lab) +
+  labs(x = raman.pc1lab,
+       y = raman.pc2lab) +
   scale_shape_manual(name = "Material",
-                     values=shapes) +
+                     values=pca.shapes) +
   scale_fill_manual(name = "Munsell hue",
                     breaks = c("Translucent", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y", "7.5Y", "10Y", "5YR", "N1", "N2", "N3", "N4", "N5", "N6", "N8", "N9"),
-                    values=colors) +
+                    values=pca.colors) +
   guides(shape = guide_legend(override.aes = list(fill = "black"), 
                               ncol=2, 
                               title.position="top", 
                               title.hjust = 0.5),
          fill = guide_legend(override.aes = list(shape = 22,
-                                                 fill = colors,
+                                                 fill = pca.colors,
                                                  color = "black",
                                                  size=3),
                              title.position="top", title.hjust = 0.5))+
   theme(legend.position = "none")
 
 #bind the basic fviz plot for PC 1 and 3, and use as basis for a more customizeable plot in ggpplot
-p2 <- ggplot(cbind(basic_plot2$data, Points.raman[, c(8,10)]),
+raman.p2 <- ggplot(cbind(basic_plot2$data, Points.raman[, c(8,10)]),
        aes(x=x, y=y, 
            shape = material, 
            fill = munsell_hue)) +
   geom_point(size=3) +
   theme_bw() +
-  labs(x = pc1lab,
-       y = pc3lab) +
+  labs(x = raman.pc1lab,
+       y = raman.pc3lab) +
   scale_shape_manual(name = "Material",
-                     values=shapes) +
+                     values=pca.shapes) +
   scale_fill_manual(name = "Munsell hue",
                     breaks = c("Translucent", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y", "7.5Y", "10Y", "5YR", "N1", "N2", "N3", "N4", "N5", "N6", "N8", "N9"),
-                    values=colors) +
+                    values=pca.colors) +
   guides(shape = guide_legend(override.aes = list(fill = "black"), 
                               ncol=2, 
                               title.position="top", 
                               title.hjust = 0.5),
          fill = guide_legend(override.aes = list(shape = 22,
-                                                 fill = colors,
+                                                 fill = pca.colors,
                                                  color = "black",
                                                  size=3),
                              title.position="top", title.hjust = 0.5))+
@@ -487,13 +507,12 @@ p2 <- ggplot(cbind(basic_plot2$data, Points.raman[, c(8,10)]),
 
 
 comb <-
-  p1 + p2 & theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
-                  axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
-                  axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
-                  legend.title = element_text(size = 12, face = "bold", colour = "black"),
-                  legend.background = element_rect(linetype = "solid", color = "black"),
-                  legend.position = "bottom")
-
+  raman.p1 + raman.p2 & theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
+                              axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
+                              axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
+                              legend.title = element_text(size = 12, face = "bold", colour = "black"),
+                              legend.background = element_rect(linetype = "solid", color = "black"),
+                              legend.position = "bottom")
 
 comb +
   plot_layout(nrow = 2, guides = "collect")
@@ -548,7 +567,7 @@ Points_long <-
     ))
 
 #Prepare colors
-colors <- c("darkorange", "darkolivegreen3", "skyblue1", "lightslateblue", "salmon1", "lightgoldenrod1")
+loading.colors <- c("darkorange", "darkolivegreen3", "skyblue1", "lightslateblue", "salmon1", "lightgoldenrod1")
 
 #Lookup for element labeller
 #Ändra ordning så att de mer avvikande (Si, Mn etc) hamnar uppe till vänster
@@ -577,7 +596,7 @@ Points_long %>%
     ggplot(aes(x=Element, y=Value, fill = Group)) +
     geom_violin(trim = TRUE) +
     facet_wrap( ~ Element, scales = "free", labeller = labeller(Element = Elements)) +
-    scale_fill_manual(values=colors) +
+    scale_fill_manual(values=loading.colors) +
     theme_bw() +
     theme(
       legend.title = element_text(size = 12, face = "bold", colour = "black"),
@@ -592,14 +611,39 @@ Points_long %>%
  \linebreak
 
 ```{r xrf-loadings, fig.width=8, fig.height=8, fig.cap="The three first loading vectors (P1-P3) with scores for each loading (element)"}
-#bar graph of the loadings (P1-P3) for the XRF data  
+#select elements to include in pca, as well as columns to group by
+xrf <-
+  Points.xrf %>%
+    select(reading_no, sample_id, munsell_hue, material, X12Mg, X13Al, X14Si, X15P, X16S, X19K, X20Ca, X23V, X25Mn, X26Fe, X30Zn, X38Sr, X39Y, X40Zr, X56Ba, X81Ti)
+
+#log transform data
+xrf.log <- log(xrf[,5:20])
+
+#impute missing values
+xrf.imp <- imputePCA(xrf.log, ncp = 2, scale = FALSE, method = "Regularized", maxiter = 1000)
+
+#perform pca with mean centering and unite variance scaling
+xrf.pca <- prcomp(xrf.imp$completeObs, center = TRUE, scale.=TRUE)
+
+#Extract loadings from xrf.pca
+loadings <- as.data.frame(xrf.pca$rotation[,1:3])
+#As elements are stored as rownames, set them as first column so it can be used as a variable
+loadings <- setDT(loadings, keep.rownames = "Element")[]
+# remove inital 'X' from element names, which was introduced in initial import to R
+loadings$Element <- substring(loadings$Element, 2)
+#Melt loadings from wide to long format
+loadings.melted <- melt(loadings, id.vars="Element")
+#Set names of columns
+loadings <- setNames(loadings.melted, c("Element", "PC", "Value"))
+
+#bar graph of the loadings (P1-P3) for the XRF data
 loadings %>%
   ggplot(aes(x=fct_rev(Element), y=Value)) +
-    geom_bar(
-      stat = "identity", position = "identity",
-      color = "black", fill = "darkgrey",
-      width = 0.5) +
-  facet_wrap( ~ P, scales = "free") +
+  geom_bar(
+    stat = "identity", position = "identity",
+    color = "black", fill = "darkgrey",
+    width = 0.5) +
+  facet_wrap( ~ PC, scales = "free") +
   theme_bw() +
   theme(plot.margin = margin(10,10,10,10),
         axis.title.y = element_blank(),
@@ -607,7 +651,6 @@ loadings %>%
         axis.title.x = element_blank(),
         strip.text.x = element_text(size=14, face="bold", colour="black")) +
   coord_flip()
-
 ```
 
  \linebreak
@@ -615,6 +658,84 @@ loadings %>%
 <!--```{r xrf-score-plot-p1-p2, fig.cap="Score plot for P1 and P2, the two major groups are distinguished by lower SiO content to the left and higher to the right"}
 knitr::include_graphics('./analysis/figures/fig_4_7_xrf_pca_p1_p1.jpg')
 ```-->
+```{r xrf-pca1, fig.width=15, fullwidth=TRUE, fig.height=10, fig.cap="XRF score plot of 1^st^ and 2nd components. The smaller group to the left in the plot includes samples with higher Si content, while the larger group includes samples with Si content < 50%."}
+
+#Prepare two score plots
+ggbiplot(xrf.pca,
+         choices=c(1,2),
+         obs.scale = 1,
+         var.scale = 1,
+         group=NULL,
+         varname.size = 4,
+         labels.size=3,
+         ellipse = FALSE,
+         circle = FALSE) +
+theme_minimal() +
+geom_point(aes(shape=Points.xrf$material, 
+               fill = Points.xrf$munsell_hue), 
+           size = 3) +
+coord_cartesian() +
+scale_shape_manual(name = "Material",
+                   values=pca.shapes) +
+scale_fill_manual(name = "Munsell hue",
+                  breaks = pca.munsell_hue,
+                  values=pca.colors) +
+guides(shape = guide_legend(override.aes = list(fill = "black"),
+                            ncol=2,
+                            title.position="top",
+                            title.hjust = 0.5),
+       fill = guide_legend(override.aes = list(shape = 22,
+                                               fill = pca.colors,
+                                               color = "black",
+                                               size=3),
+                           title.position="top", title.hjust = 0.5)) +
+theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
+      axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
+      axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
+      legend.title = element_text(size = 12, face = "bold", colour = "black"),
+      legend.background = element_rect(linetype = "solid", color = "black"),
+      legend.position = "bottom")
+```
+
+ \linebreak
+
+```{r xrf-pca2, fig.width=15, fullwidth=TRUE, fig.height=10, fig.cap="XRF score plot of 1^st^ and 3rd components. The same groupings of low/high Si content remains along PC1, but PC3 seems to separate darker and light samples further in the low Si group."}
+ggbiplot(xrf.pca,
+         choices=c(1,3),
+         obs.scale = 1,
+         var.scale = 1,
+         group=NULL,
+         varname.size = 4,
+         labels.size=3,
+         ellipse = FALSE,
+         circle = FALSE) +
+theme_minimal() +
+geom_point(aes(shape=Points.xrf$material, 
+               fill = Points.xrf$munsell_hue), 
+           size = 3) +
+coord_cartesian() +
+scale_shape_manual(name = "Material",
+                   values=pca.shapes) +
+scale_fill_manual(name = "Munsell hue",
+                  breaks = pca.munsell_hue,
+                  values=pca.colors) +
+guides(shape = guide_legend(override.aes = list(fill = "black"),
+                            ncol=2,
+                            title.position="top",
+                            title.hjust = 0.5),
+       fill = guide_legend(override.aes = list(shape = 22,
+                                               fill = pca.colors,
+                                               color = "black",
+                                               title.position="top", 
+                                               title.hjust = 0.5))) +
+theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
+      axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
+      axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
+      legend.title = element_text(size = 12, face = "bold", colour = "black"),
+      legend.background = element_rect(linetype = "solid", color = "black"),
+      legend.position = "bottom")
+```
+
 
  \linebreak
 
