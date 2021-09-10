@@ -64,21 +64,21 @@ library(tidyverse)
 
 #Import xrf data
 XRF.csv <-
-  read.csv2("./analysis/data/raw_data/XRF/XRF_quantitative.csv", sep = ";", dec = ".", header = TRUE, na = c("","NA","NULL"))
+  read.csv2("./analysis/data/raw_data/XRF/XRF_quantitative.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
 
 #Import nir data, set empty fields to NA
 nir.csv <-
   read.csv2("./analysis/data/derived_data/NIR_master_averaged_20210827.csv", sep = ";",
-            dec = ",", header = TRUE, na = c("","NA","NULL",NULL))
+            dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #Import raman data, set empty fields to NA
 raman.csv <-
-  read.csv2("./analysis/data/derived_data/raman_baseline_corrected_20210826.csv", sep = ";", dec = ",", header = TRUE, na = c("","NA","NULL",NULL))
+  read.csv2("./analysis/data/derived_data/raman_baseline_corrected_20210826.csv", sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 
 #Import sample list, set empty fields to NA
 samples <-
-  read.csv2("./analysis/data/raw_data/bifacial_points.csv", sep = ";", dec = ".", header = TRUE, na.strings=c("", "NA"))
+  read.csv2("./analysis/data/raw_data/bifacial_points.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na.strings=c("", "NA"))
 
 #Filter xrf, nir and raman data to focus on points and preforms made from quartz/quartzite material 
 Points.xrf <-
@@ -111,7 +111,7 @@ pca.munsell_hue <- c("Translucent", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y"
 
 #Import loadings from Evince
 loadings <-
- as.data.frame(read.csv2("./analysis/data/raw_data/XRF/XRF_P_values_long.csv", sep = ";", dec = ".", header = TRUE, encoding = "UTF-8"))
+ as.data.frame(read.csv2("./analysis/data/raw_data/XRF/XRF_P_values_long.csv", sep = ";", dec = ".", header = TRUE,  encoding = "UTF-8"))
 ```
 <!-- The actual document text starts here: -->
 
@@ -235,7 +235,7 @@ NIR analysis was conducted with the Analytical Spectral Device (ASD) LabSpec 4, 
 ## Raman
 Raman spectroscopy shares some similarities with NIRS in that they both can be used to infer molecular structure based on their vibrational properties [@nafie01]. However, where NIRS generate overtones of molecular vibration, Raman spectroscopy is based on the *Raman scattering* effect. By exposing a molecule to radiation with a monochromatic laser it is possible to induce a dipole moment in the molecule which generates the Raman effect. The subsequent light that is scattered contains both Rayleigh scatter and Raman scatter, the former at a frequency of incident radiation and the latter at a shifted frequency [@dubessy12]. The spectrometer will measure the Raman scatter and generate a spectrum where the spectral line has shifted compared to the incident Rayleigh frequency. As the structure of a molecule will inform its vibrational mode, the point at which these shifts occur within the infrared region varies depending on the material [@smith_carabatos-nedelec01]. 
 
-The Raman instrumentation used was a portable i-Raman EX featuring a 1064 nm excitation laser. The spectral coverage of the instrumentation is 175 – 2 500 cm-1 ^[Instead of reporting Raman measurements in spectral wavelength (nm) they are typically given in wavenumber (cm-1), referred to as *Raman shift*] with a resolution of 9.5 cm-1. Access to the spectrometer was made possible by the department of Forest Biomaterials and Technology at the Swedish University of Agricultural Sciences (SLU) in Umeå. 
+The Raman instrumentation used was a portable i-Raman EX featuring a 1064 nm excitation laser. The spectral coverage of the instrumentation is 175 – 2 500 cm-1 ^[Raman shifts are typically given in wavenumber (cm-1), instead of spectral wavelength (nm)] with a resolution of 9.5 cm-1. Access to the spectrometer was made possible by the department of Forest Biomaterials and Technology at the Swedish University of Agricultural Sciences (SLU) in Umeå. 
 
 All spectra were averaged for each artefact and the resulting spectra were then baseline corrected using modified polynomial fitting in R [@Rteam17] using the ChemoSpec package [@hanson16]. The spectra were mean-centred and normalized using Standard Normal Variate [@shaver01 pp.284-285] before PCA in the Prediktera Evince software.
 
@@ -321,6 +321,76 @@ knitr::include_graphics('./analysis/figures/fig_4_2_breccie_averaged_visnir_spec
 ## NIR - near infrared range
 No distinct peaks occurred in the 600 – 1 000 nm region, and thus the analysis focused on the 1 000 – 2 500 nm region to lessen the impact of noise. The PCA demonstrates a similar pattern to the one observed in the visual region (fig. \@ref(fig:nir-pca)). Again the first two components have an eigenvalue above 1 with cumulative explained variance of ~99.9 %. While the darker materials remain closely grouped in the right side of the score plot, the *light* cluster seems to split into two separate groups. The upper left group houses the main bulk of the *brecciated quartz*, as well as the almost translucent and opaque material with a beige tint. The bottom left group instead features the majority of the white *quartz-coloured* material. In the case of NIRS most features relate to the presence of molecular water in the material [@hunt77; @sciuto_etal19], these mainly occur at around 1 400 nm and 1 900 nm. In some of the measurements peaks also occur at 2 200 nm and 2 350 nm, where the former can be related to combination vibrations of Al-OH and the latter possibly CO^3^ [@clark_etal90]. 
 The average spectra for the three groups show that the *dark* group has the highest absorbance with less distinct peaks, although they are noticeable. The absorbance in the *brecciated*/*translucent* group is slightly higher in the lower band regions than compared to the *white* group, but with decreased absorbance in the higher regions. While a fifth peak at 2 450 nm can be difficult to discern in most cases, the average spectra for both the *brecciated*/*translucent* group and *white* group feature the above mentioned four peaks.
+
+ \linebreak
+
+```{r nir-spectra, fig.width=20, fig.height=8, fig.cap= "Average NIR spectra by hue. Darker samples feature higher overall absorbance, as well as less pronounced peaks, when compared to lighter/translucent samples."}
+
+#Aggregate raw NIR data by inferred hue
+nir.agg <- 
+  aggregate(nir.csv[, 28:2178], list(nir.csv$hue), mean)
+
+#Transpose the data in preparation for working in ChemoSpec 
+# make row names unique & sorted correctly in increasing order
+# by appending numbers in running order
+nir.t <- nir.agg %>%
+  dplyr::mutate(Group.1 = paste(seq(1, n()),
+                         Group.1 ,
+                      sep = "_")) %>%
+  gather(row, value, -Group.1 ) %>% 
+  spread(Group.1 , value)
+
+# strip away the appended numbers from the newly created column names
+names(nir.t) <- sapply(strsplit(names(nir.t), "_"), function(x){x[2]})
+#Change first column name to 'freq'  
+colnames(nir.t)[1] <- "freq"
+
+#Set the first column containing frequencies to numeric
+nir.t[,1] <- sapply(nir.t[,1], as.numeric)
+#Sort dataframe by frequencies asc.
+nir.t <- nir.t[order(nir.t$freq),] 
+#Write to csv file, since ChemoSpec doesn't work with dataframes
+write.csv2(nir.t,"./analysis/data/derived_data/nir_averaged_by_hue.csv", row.names = FALSE)
+
+#Read exported csv and create new file for chemospec
+nir <-matrix2SpectraObject(
+  gr.crit = c("Translucent", "White", "Dark", "Light" ),
+  gr.cols = c("purple", "blue", "black", "red"),
+  freq.unit ="Wavelength (nm)",
+  int.unit ="Absorbance",
+  descrip ="Bifacial points measurements",
+  in.file = "./analysis/data/derived_data/NIR_averaged_by_hue.csv",
+  sep = ";",
+  dec = ",",
+  chk = TRUE,
+  out.file = "nir")
+
+#Plot spectra averaged by inferred hue
+Dark <- plotSpectra(nir,
+            which = 1,
+            yrange = c(1.05,1.2),
+            lab.pos = 0.0,
+            main = "Average spectra - Dark", font.lab = 2)
+#Plot spectra averaged by inferred hue
+Light <- plotSpectra(nir,
+            which = 2,
+            yrange = c(0.7,1),
+            lab.pos = 0.0,
+            main = "Average spectra - Dark", font.lab = 2)
+#Plot spectra averaged by inferred hue
+Translucent <- plotSpectra(nir,
+            which = 3,
+            yrange = c(1.05,1.2),
+            lab.pos = 0.0,
+            main = "Average spectra - Dark", font.lab = 2)
+#Plot spectra averaged by inferred hue
+White <- plotSpectra(nir,
+            which = 4,
+            yrange = c(1.05,1.2),
+            lab.pos = 0.0,
+            main = "Average spectra - Dark", font.lab = 2)
+grid.arrange()
+```
 
  \linebreak
 
@@ -538,11 +608,8 @@ One almost translucent sample also ends up among the darker material. Upon close
 #Prepare data in long format for violin plots
 Points_long <-
   Points.xrf %>%
-  select(X12Mg,X13Al, X14Si, X15P, X16S, X19K, X20Ca, X23V, X25Mn, X26Fe, X30Zn, X38Sr, X39Y, X40Zr, X56Ba, X81Ti) %>%
+  select(`12Mg`,`13Al`, `14Si`, `15P`, `16S`, `19K`, `20Ca`, `23V`, `25Mn`, `26Fe`, `30Zn`, `38Sr`, `39Y`, `40Zr`, `56Ba`, `81Ti`) %>%
   gather(key = "Element", value = "Value")
-
-#Remove initial X introduced by read.csv to column names
-Points_long$Element <- substring(Points_long$Element, 2)
 
 # Add column with elemental groups for visualisation
 Points_long <-
@@ -614,7 +681,7 @@ Points_long %>%
 #select elements to include in pca, as well as columns to group by
 xrf <-
   Points.xrf %>%
-    select(reading_no, sample_id, munsell_hue, material, X12Mg, X13Al, X14Si, X15P, X16S, X19K, X20Ca, X23V, X25Mn, X26Fe, X30Zn, X38Sr, X39Y, X40Zr, X56Ba, X81Ti)
+    select(reading_no, sample_id, munsell_hue, material, `12Mg`, `13Al`, `14Si`, `15P`, `16S`, `19K`, `20Ca`, `23V`, `25Mn`, `26Fe`, `30Zn`, `38Sr`, `39Y`, `40Zr`, `56Ba`, `81Ti`)
 
 #log transform data
 xrf.log <- log(xrf[,5:20])
@@ -629,8 +696,6 @@ xrf.pca <- prcomp(xrf.imp$completeObs, center = TRUE, scale.=TRUE)
 loadings <- as.data.frame(xrf.pca$rotation[,1:3])
 #As elements are stored as rownames, set them as first column so it can be used as a variable
 loadings <- setDT(loadings, keep.rownames = "Element")[]
-# remove inital 'X' from element names, which was introduced in initial import to R
-loadings$Element <- substring(loadings$Element, 2)
 #Melt loadings from wide to long format
 loadings.melted <- melt(loadings, id.vars="Element")
 #Set names of columns
