@@ -61,6 +61,7 @@ library(missMDA)
 library(patchwork)
 library(prospectr)
 library(tidyverse)
+library(spectrolab)
 
 #Import xrf data
 XRF.csv <-
@@ -68,13 +69,12 @@ XRF.csv <-
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2("./analysis/data/derived_data/NIR_master_averaged_20210827.csv", sep = ";",
+  read.csv2("./analysis/data/derived_data/NIR_master_averaged_20210914.csv", sep = ";",
             dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #Import raman data, set empty fields to NA
 raman.csv <-
   read.csv2("./analysis/data/derived_data/raman_baseline_corrected_20210826.csv", sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
-
 
 #Import sample list, set empty fields to NA
 samples <-
@@ -86,12 +86,10 @@ Points.xrf <-
     filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
          type == "Point" | type == "Point fragment" | type == "Preform")
 
-
 Points.nir <-
   nir.csv %>%
     filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
          type == "Point" | type == "Point fragment" | type == "Preform")
-
 
 Points.raman <-
   raman.csv %>%
@@ -174,7 +172,7 @@ sample_uniq <-
  \linebreak
  \linebreak
 
-The current study is based on spectroscopic surface measurements on quartzite points found within the County of Västerbotten, Sweden. A dataset of `r length(sample_uniq)` points, point fragments and preforms made from quartz/quartzite material stored at the collections at Västerbotten and Skellefteå museums were analysed using three different spectroscopic instrumentations (Appendix XX). The colour of the material has a mainly black (N1-N3), grey or white (N9) hue, as well as opaque and almost translucent material with a beige tint. A number of these points have, according to prior classifications, been worked using bifacial technology. While there currently is no local chronology available for this artefact type in the North Swedish region, previous research suggest they were in use during the 4 000 – 2 000 BP period [@forsberg85; @forsberg89; @mjaerum12]. Similarly, early studies of raw material use at sites dating to this period seems to indicate an increase in the use of quartzite compared to previous periods [@baudou78]. 
+The current study is based on spectroscopic surface measurements on quartzite points found within the County of Västerbotten, Sweden. A dataset of `r length(sample_uniq)` points, point fragments and preforms made from quartz/quartzite material stored at the collections at Västerbotten and Skellefteå museums were analysed using three different spectroscopic instrumentations (Appendix XX). The colour of the material has a mainly black (N1-N3), grey or white (N9) hue, as well as opaque and almost translucent material with a beige tint. The colour of the material has been classified both according to the munsell system, as well as sorted into general categories of hue (*dark* ~ N1-N4, *light* ~ N5-N8, *translucent*, *white* ~ N9). A number of these points have, according to prior classifications, been worked using bifacial technology. While there currently is no local chronology available for this artefact type in the North Swedish region, previous research suggest they were in use during the 4 000 – 2 000 BP period [@forsberg85; @forsberg89; @mjaerum12]. Similarly, early studies of raw material use at sites dating to this period seems to indicate an increase in the use of quartzite compared to previous periods [@baudou78]. 
 
 A large portion of the collections stored at North Swedish museums were recovered from excavations and surveys performed in conjunction with the river regulations during the 1940s – 1980s [@biornstad06; @janson_hvarfner60], as well as subsequent follow-up survey projects [e.g. @andersson15]. This has likely had a contributing factor to the distribution pattern of the artefacts observed in fig. \@ref(fig:distribution-map) as the known sites with finds of points and preforms are concentrated around the parishes of Dorotea, Lycksele, Vilhelmina and Tärnaby. This can be seen more clearly in fig. \@ref(fig:distribution-by-parish) with the four parishes accounting for almost ¾ of the total no. of samples. 
 
@@ -182,13 +180,13 @@ Västerbotten museum have come far in their digitization effort, making large po
 
  \linebreak
 
-```{r distribution-map, fig.cap="White) Sites with measured samples in the County of Västerbotten; Black) Parish centroid for measured samples lacking site coordinates. The distribution of sampled sites is likely affected by the excavation and survey history of the region. Made with Lantmäteriet (CC0), Natural Earth, and Riksantikvarieämbetet.", fig.width=15, fig.height=15, fig.fullwidth=TRUE}
+```{r distribution-map, fig.width=15, fig.height=15, fig.fullwidth=TRUE, fig.cap="White) Sites with measured samples in the County of Västerbotten; Black) Parish centroid for measured samples lacking site coordinates. The distribution of sampled sites is likely affected by the excavation and survey history of the region. Made with Lantmäteriet (CC0), Natural Earth, and Riksantikvarieämbetet."}
 knitr::include_graphics('../figures/Distribution.jpeg', error = FALSE)
 ```
 
  \linebreak
 
-```{r distribution-by-parish, fig.cap= paste("Distribution of the", length(sample_uniq), "points and preforms across the parishes in Västerbotten, Sweden. Note that while Lycksele feature a large number of samples", length(lycksele_301), "of these are from the site of Lycksele 301"), fig.width=12, fig.height=10, fig.fullwidth=TRUE}
+```{r distribution-by-parish, fig.width=12, fig.height=10, fig.fullwidth=TRUE, fig.cap= paste("Distribution of the", length(sample_uniq), "points and preforms across the parishes in Västerbotten, Sweden. Note that while Lycksele feature a large number of samples", length(lycksele_301), "of these are from the site of Lycksele 301")}
 
 #Stacked bar chart with counts of samples per parish and type
 ggplot(Points2, aes(x= fct_rev(parish), fill = type)) +
@@ -218,10 +216,9 @@ Another reason for keeping a *quartz* category is the group referred to as *brec
 
  \linebreak
  \linebreak
+All measurements were performed at the Environmental Archaeology Lab at Umeå University using three different instrumentations; NIRS, Raman scattering, and XRF. The analysis was conducted in a dark room in order to minimize light pollution, with the main light sources in the room being the computer screens. Each artefact was measured twice on different sides, with additional measurements in cases where sampling was difficult. The only exception to this was the XRF, where due to time constraints one measurement was collected as a rule apart from a few exceptions. This lowers the statistical reliability of the XRF analysis and inferences of the results should be evaluated with this in mind. The size of the dataset alleviates some of these issues, as for the larger sites there are multiple objects that may be of the same material, however, for the smaller sites there still remains some uncertainties.  
 
-All measurements were performed at the Environmental Archaeology Lab at Umeå University using three different instrumentations; NIRS, Raman scattering, and XRF. The analysis was conducted in a dark room in order to minimize light pollution, with the main light sources in the room being the computer screens. Each artefact was measured twice on different sides, with additional measurements in cases where sampling was difficult. The only exception to this was the XRF, where due to time constraints one measurement was collected as a rule apart from a few exceptions. This lowers the statistical reliability of the XRF analysis and inferences of the results should be evaluated with this in mind. The size of the dataset alleviates some of these issues, as for the larger sites there are multiple objects that likely were made from the same material, however, for the smaller sites there still remains some uncertainties.  
-
-Pre-processing of the spectra is different for each instrumentation and based on relevant literature. After pre-processing the data was modelled using PCA, which is an unsupervised exploratory technique for reducing the dimensionality of the dataset (Geladi and Linderholm, 2020). PCA modelling was performed using the Prediktera Evince software (www.prediktera.com), which uses the NIPALS algorithm [@bertils19 pp.9-10].  
+Pre-processing of the spectra is different for each instrumentation and based on relevant literature. After pre-processing the data was modelled using PCA, which is an unsupervised exploratory technique for reducing the dimensionality of the dataset (Geladi and Linderholm, 2020). PCA modelling was performed using the base R *prcomp()* method [@Rteam17].   
 
  \linebreak
 
@@ -237,13 +234,12 @@ Raman spectroscopy shares some similarities with NIRS in that they both can be u
 
 The Raman instrumentation used was a portable i-Raman EX featuring a 1064 nm excitation laser. The spectral coverage of the instrumentation is 175 – 2 500 cm-1 ^[Raman shifts are typically given in wavenumber (cm-1), instead of spectral wavelength (nm)] with a resolution of 9.5 cm-1. Access to the spectrometer was made possible by the department of Forest Biomaterials and Technology at the Swedish University of Agricultural Sciences (SLU) in Umeå. 
 
-All spectra were averaged for each artefact and the resulting spectra were then baseline corrected using modified polynomial fitting in R [@Rteam17] using the ChemoSpec package [@hanson16]. The spectra were mean-centred and normalized using Standard Normal Variate [@shaver01 pp.284-285] before PCA in the Prediktera Evince software.
+After averaging the spectra for each artefact the results were baseline corrected in order to detrend the data. This was achieved using modified polynomial fitting in R [@Rteam17] with the ChemoSpec package [@hanson16]. The spectra were then mean-centred and normalized using Standard Normal Variate [@shaver01 pp.284-285] before PCA. 
 
  \linebreak
 
 ## X-Ray Fluourescence
-XRF measurements were collected using a Thermo Scientific Niton XL5 Analyzer, connected to a Thermo ScientificTM portable test stand. The reference calibration used for element quantification was *mining*. Sampling with this setting takes 2 minutes in order for the instrument to cycle through all of the filters (main, low, high, light). Due to time constraints and the number of objects in the current dataset it was only possible to collect one measurement on each object, apart from some exceptions. For materials that featured high heterogeneity the sample point was focused, as much as possible, on the surrounding matrix. 
-The XRF data was pre-processed using mean-centering, univariate scaling, and log-transformation in the Prediktera Evince software before PCA modelling. 
+XRF measurements were collected using a Thermo Scientific Niton XL5 Analyzer, connected to a Thermo ScientificTM portable test stand. The reference calibration used for element quantification was set to *mining* mode. Sampling with this setting takes 2 minutes in order for the instrument to cycle through all of the filters (main, low, high, light). Due to time constraints and the number of objects in the current dataset it was only possible to collect one measurement on each object, apart from some exceptions. For materials that featured high heterogeneity the sample point was focused, as much as possible, on the surrounding matrix. The XRF data was log-transformed, mean-centered and scaled to unit variance before PCA modelling. As the resulting dataset also features values below the Limit of Detection (LOD), these were treated as NULL, or missing values, during PCA. Since missing values are not permitted during PCA these had to imputed before the analysis, which was performed using the *missMDA* package [@josse_husson16] developed for datasets with incomplete data. Two methods for imputation can be implemented, iterative or regularized, since the former suffers when there are a large number of missing values the latter was chosen. 
 
  \linebreak
 
@@ -254,14 +250,17 @@ The XRF data was pre-processed using mean-centering, univariate scaling, and log
 
 ## NIR - visual range
 
-The main explanatory power for the visual region can be found in the first two components, featuring eigenvalues above 1 with a cumulative explained variance of 99.9 %. Plotting these in the score plot there is a clear trend along the first component with darker materials being grouped together to the right of the plot and light/white material to the left (fig. \@ref(fig:vis-nir-pca)). Average spectra of these groups  demonstrate a higher absorbance for the dark group, with both of the light groups featuring higher absorbance in the violet region (fig. \@ref(fig:vis-nir-spectra)). Despite this trend there are exceptions, and while some of these may be material that exist within the muddled greyscale, there are measurements on dark surfaces (N1-N2) that end up closer to the light group (fig.X). There are also instances where the measurements on different sides of an artefact end up in different groups in the PCA. Artefact 403 and 502 both have a sample taken on one side in the ‘dark’ group and the other in the ‘greyish’ middle. This is most likely due to the heterogeneous character of the material and natural variations on the surface possibly related to weathering. The ‘greyish’ middle group is largely made up of ‘quartz coloured’ opaque material with a beige/grey tint (fig.X). 
+The main explanatory power for the visual region can be found in the first component with an explained variance of 98.4 %. In the PCA (fig. \@ref(fig:vis-nir-pca)) there is a clear trend along PC1 with darker materials being grouped together to the right of the plot and light/translucent/white material to the left. Examining the average spectra of these groups (fig. \@ref(fig:vis-nir-spectra)), as expected, the darker material feature higher absorbance of light than the other groups. No other distinctive features can be seen in the visual band, that could potentially be used to distinguish the groups. It is, however, apparent that while the more extreme hues of *dark* and *white* material can be isolated more clearly based on their spectra, there also exists a wider greyscale of material that does not conform as easily to these broader groups. 
+
+A number of artefacts also breaks the observed trend in the PCA, with dark/black (N1-N2) samples ending up closer to the light and translucent group in the PCA. There are also instances where the measurements on different sides of an artefact end up in different groups in the PCA. In examination of the non-averaged data artefact 403 and 502 both have a sample taken on one side in the *dark* group and the other in the *greyish* middle. This is most likely due to the heterogeneous character of the material and natural variations on the surface possibly related to weathering. The *greyish* middle group in the PCA is otherwise largely made up of *quartz coloured* opaque material with a beige/grey tint. 
 
  \linebreak
 
 <!--```{r vis-nir-pca, fig.width=18, fig.height=5, fig.fullwidth=TRUE, fig.cap="PCA score plot of 1st and 2nd components for the 400 nm – 750 nm region of the spectrum. Quartzite with a darker surface group to the right in the model, while white objects group in the bottom left quadrant."}
 knitr::include_graphics('./analysis/figures/fig_4_1_visnir_averaged_pca_p1_p2.jpg')
 ```-->
-```{r vis-nir-pca, fig.width=20, fig.height=8, fig.cap= "PCA score plot of 1st and 2nd components for the 400 nm – 750 nm region of the spectrum. Quartz-based material with a darker surface group to the right in the model, while those with white surface group in the bottom left quadrant. A trend of translucent material and opaque material with a beige tint grouping in the top left can also be seen."}
+
+```{r vis-nir-pca, fig.width=20, fig.height=8, fig.cap="PCA score plot of PC1 and PC2 for the 400 nm – 750 nm band of the spectrum. Quartz-based material with a darker surface group to the right in the model, while those with white surface group in the bottom left quadrant. The strong trend along PC1 also makes it difficult to separate out the muddled grayscale in the middle."}
 
 #perform PCA with SNV normalization and mean-center
 visnir.pca <-
@@ -309,8 +308,53 @@ ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
         legend.background = element_rect(linetype = "solid", color = "black"),
         legend.position = "bottom")
 ```
+
  \linebreak
 
+```{r vis-nir-spectra, fig.width=20, fig.height=15, fig.cap="Average NIR spectra by hue. Darker samples feature higher overall absorbance with white material absorbing the least amount of light."}
+
+#Filter NIR data to focus on the material with a dark hue 
+#and select the NIR range 1 000 - 2 500 nm
+vis.dark <- Points.nir %>% 
+  filter(hue == "Dark") %>% 
+  select(c(1:27),c(78:428))
+
+spec.vd <- 
+      as_spectra(vis.dark, name_idx = 1, meta_idxs = 2:27)
+
+vis.light <- Points.nir %>% 
+  filter(hue == "Light") %>% 
+  select(c(1:27),c(78:428))
+
+spec.vl <- 
+  as_spectra(vis.light, name_idx = 1, meta_idxs = 2:27)
+
+vis.translucent <- Points.nir %>% 
+  filter(hue == "Translucent") %>% 
+  select(c(1:27),c(78:428))
+
+spec.vt <- 
+  as_spectra(vis.translucent, name_idx = 1, meta_idxs = 2:27)
+
+
+vis.white <- Points.nir %>% 
+  filter(hue == "White") %>% 
+  select(c(1:27),c(78:428))
+
+spec.vw <- 
+  as_spectra(vis.white, name_idx = 1, meta_idxs = 2:27)
+
+
+par(mfrow=c(4,1))
+
+plot(mean(spec.vd), lwd = 1.2, col = "black", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - Dark")
+
+plot(mean(spec.vl), lwd = 1.2, col = "red", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - Light")
+
+plot(mean(spec.vt), lwd = 1.2, col = "purple", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - Translucent")
+
+plot(mean(spec.vw), lwd = 1.2, col = "blue", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - White")
+```
 
 <!--```{r vis-nir-spectra, fig.width=15, fig.height=5, fig.fullwidth=TRUE, fig.cap="Average spectra for dark (N1), translucent (MV) and white (N1) groups in the 400 - 750 nm region. Dark material has a higher overall absorbance, whereas white and translucent material feature lower absorbance. Brecciated quartz, which is typically described as a translucent material, falls somewhere inbetween the above groups."}
 knitr::include_graphics('./analysis/figures/fig_4_2_breccie_averaged_visnir_spectra.jpg')
@@ -319,84 +363,64 @@ knitr::include_graphics('./analysis/figures/fig_4_2_breccie_averaged_visnir_spec
  \linebreak
 
 ## NIR - near infrared range
-No distinct peaks occurred in the 600 – 1 000 nm region, and thus the analysis focused on the 1 000 – 2 500 nm region to lessen the impact of noise. The PCA demonstrates a similar pattern to the one observed in the visual region (fig. \@ref(fig:nir-pca)). Again the first two components have an eigenvalue above 1 with cumulative explained variance of ~99.9 %. While the darker materials remain closely grouped in the right side of the score plot, the *light* cluster seems to split into two separate groups. The upper left group houses the main bulk of the *brecciated quartz*, as well as the almost translucent and opaque material with a beige tint. The bottom left group instead features the majority of the white *quartz-coloured* material. In the case of NIRS most features relate to the presence of molecular water in the material [@hunt77; @sciuto_etal19], these mainly occur at around 1 400 nm and 1 900 nm. In some of the measurements peaks also occur at 2 200 nm and 2 350 nm, where the former can be related to combination vibrations of Al-OH and the latter possibly CO^3^ [@clark_etal90]. 
-The average spectra for the three groups show that the *dark* group has the highest absorbance with less distinct peaks, although they are noticeable. The absorbance in the *brecciated*/*translucent* group is slightly higher in the lower band regions than compared to the *white* group, but with decreased absorbance in the higher regions. While a fifth peak at 2 450 nm can be difficult to discern in most cases, the average spectra for both the *brecciated*/*translucent* group and *white* group feature the above mentioned four peaks.
+No distinct peaks occurred in the 600 – 1 000 nm band, and thus the analysis focused on the 1 000 – 2 500 nm band to lessen the impact of noise. In the case of NIRS most features relate to the presence of molecular water in the material [@hunt77; @sciuto_etal19], these mainly occur at around 1 400 nm and 1 900 nm and can be seen in the average spectra (fig. \@ref(fig:nir-spectra)). Peaks also occur at 2 200 nm and 2 350 nm, where the former has been related to combination vibrations of Al-OH and the latter could possibly be related to CO^3^ [@clark_etal90]. While the dark group features a higher overall absorbance the peaks are less distinct. The same can be said for the translucent and white group, where the water peak at 1 900 nm is the most pronounced. The absorbance in the translucent group is slightly higher in the lower band regions than compared to the white group, but with decreased absorbance in the higher regions. While a fifth peak at 2 450 nm can be difficult to discern in most cases....
 
- \linebreak
-
-```{r nir-spectra, fig.width=20, fig.height=8, fig.cap= "Average NIR spectra by hue. Darker samples feature higher overall absorbance, as well as less pronounced peaks, when compared to lighter/translucent samples."}
-
-#Aggregate raw NIR data by inferred hue
-nir.agg <- 
-  aggregate(nir.csv[, 28:2178], list(nir.csv$hue), mean)
-
-#Transpose the data in preparation for working in ChemoSpec 
-# make row names unique & sorted correctly in increasing order
-# by appending numbers in running order
-nir.t <- nir.agg %>%
-  dplyr::mutate(Group.1 = paste(seq(1, n()),
-                         Group.1 ,
-                      sep = "_")) %>%
-  gather(row, value, -Group.1 ) %>% 
-  spread(Group.1 , value)
-
-# strip away the appended numbers from the newly created column names
-names(nir.t) <- sapply(strsplit(names(nir.t), "_"), function(x){x[2]})
-#Change first column name to 'freq'  
-colnames(nir.t)[1] <- "freq"
-
-#Set the first column containing frequencies to numeric
-nir.t[,1] <- sapply(nir.t[,1], as.numeric)
-#Sort dataframe by frequencies asc.
-nir.t <- nir.t[order(nir.t$freq),] 
-#Write to csv file, since ChemoSpec doesn't work with dataframes
-write.csv2(nir.t,"./analysis/data/derived_data/nir_averaged_by_hue.csv", row.names = FALSE)
-
-#Read exported csv and create new file for chemospec
-nir <-matrix2SpectraObject(
-  gr.crit = c("Translucent", "White", "Dark", "Light" ),
-  gr.cols = c("purple", "blue", "black", "red"),
-  freq.unit ="Wavelength (nm)",
-  int.unit ="Absorbance",
-  descrip ="Bifacial points measurements",
-  in.file = "./analysis/data/derived_data/NIR_averaged_by_hue.csv",
-  sep = ";",
-  dec = ",",
-  chk = TRUE,
-  out.file = "nir")
-
-#Plot spectra averaged by inferred hue
-Dark <- plotSpectra(nir,
-            which = 1,
-            yrange = c(1.05,1.2),
-            lab.pos = 0.0,
-            main = "Average spectra - Dark", font.lab = 2)
-#Plot spectra averaged by inferred hue
-Light <- plotSpectra(nir,
-            which = 2,
-            yrange = c(0.7,1),
-            lab.pos = 0.0,
-            main = "Average spectra - Dark", font.lab = 2)
-#Plot spectra averaged by inferred hue
-Translucent <- plotSpectra(nir,
-            which = 3,
-            yrange = c(1.05,1.2),
-            lab.pos = 0.0,
-            main = "Average spectra - Dark", font.lab = 2)
-#Plot spectra averaged by inferred hue
-White <- plotSpectra(nir,
-            which = 4,
-            yrange = c(1.05,1.2),
-            lab.pos = 0.0,
-            main = "Average spectra - Dark", font.lab = 2)
-grid.arrange()
-```
+The PCA demonstrates a similar pattern to the one observed in the visual band (fig. \@ref(fig:nir-pca)). Again the first two components explain most of the variance in the model, ~ 99.9 %. While the darker materials remain closely grouped in the right side of the score plot, the *light* cluster seems to split into two separate groups. The upper left group houses the main bulk of the *brecciated quartz*, as well as the almost translucent and opaque material with a beige tint. The bottom left group instead features the majority of the white *quartz-coloured* material. 
 
  \linebreak
 
 <!--```{r nir-pca, fig.width=18, fig.height=5, fig.fullwidth=TRUE, fig.cap="PCA score plot of 1st and 2nd components for the 1 000 nm – 2 500 nm region of the #spectrum. Quartz-based material with a darker surface group to the right in the model, while those with white surface group in the bottom left quadrant. A trend #of translucent material and opaque material with a beige tint grouping in the top left can also be seen."}
 #knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_3_nir_averaged_pca_p1_p2.jpg')
 ``` -->
+
+```{r nir-spectra, fig.width=20, fig.height=15, fig.cap="Average NIR spectra by hue. Darker samples feature higher overall absorbance, as well as less pronounced peaks, when compared to lighter/translucent samples."}
+
+#Filter NIR data to focus on the material with a dark hue 
+#and select the NIR range 1 000 - 2 500 nm
+dark <- Points.nir %>% 
+  filter(hue == "Dark") %>% 
+  select(c(1:27),c(678:2178))
+
+#create a spectra object for the dark material, and then repeat for light, white and translucent groups
+spec.d <- 
+  as_spectra(dark, name_idx = 1, meta_idxs = 2:27)
+
+light <- Points.nir %>% 
+  filter(hue == "Light") %>% 
+  select(c(1:27),c(678:2178))
+
+spec.l <- 
+  as_spectra(light, name_idx = 1, meta_idxs = 2:27)
+
+translucent <- Points.nir %>% 
+  filter(hue == "Translucent") %>% 
+  select(c(1:27),c(678:2178))
+
+spec.t <- 
+  as_spectra(translucent, name_idx = 1, meta_idxs = 2:27)
+
+white <- Points.nir %>% 
+  filter(hue == "White") %>% 
+  select(c(1:27),c(678:2178))
+
+spec.w <- 
+  as_spectra(white, name_idx = 1, meta_idxs = 2:27)
+
+#Prepare a layout with 1 column and four rows
+par(mfrow=c(4,1))
+#Plot the mean spectrum for each spectra group above
+plot(mean(spec.d), lwd = 1.2, col = "black", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - Dark")
+
+plot(mean(spec.l), lwd = 1.2, col = "red", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - Light")
+
+plot(mean(spec.t), lwd = 1.2, col = "purple", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - Translucent")
+
+plot(mean(spec.w), lwd = 1.2, col = "blue", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - White")
+
+```
+
+ \linebreak
+
 ```{r nir-pca, fig.width=20, fig.height=8, fig.cap= "PCA score plot of 1st and 2nd components for the 1 000 nm – 2 500 nm region of the spectrum. Quartz-based material with a darker surface group to the right in the model, while those with white surface group in the bottom left quadrant. A trend of translucent material and opaque material with a beige tint grouping in the top left can also be seen."}
 
 #perform PCA with SNV normalization and mean-center
@@ -457,53 +481,65 @@ The 2nd component (6.29 %) mainly seems to differentiate spectra with a lot of n
 
  \linebreak
 
-```{r raman-spectra, fig.width=20, fig.height=10, fullwidth = TRUE, fig.cap="Mean spectrum of the raman data grouped by their hue. The *quartz peak* at 460 cm-1 is present in all four groups, but the *graphite peaks* at 1 287  cm-1 (D band) and 1 598 cm-1 (G band) mainly appear in the light and dark groups"}
+```{r raman-spectra, fig.width=20, fig.height=15, fullwidth = TRUE, fig.cap="Mean spectrum of the raman data grouped by their hue. The *quartz peak* at 460 cm-1 is present in all four groups, but the *graphite peaks* at 1 287  cm-1 (D band) and 1 598 cm-1 (G band) mainly appear in the dark group"}
 #Read and create new file for chemospec
-raman <-matrix2SpectraObject(
-  gr.crit = c("Translucent", "White", "Dark", "Light" ),
-  gr.cols = c("purple", "blue", "black", "yellow"),
-  freq.unit ="Wavenumber (cm-1)",
-  int.unit ="Intensity",
-  descrip ="Bifacial points measurements",
-  in.file = "./analysis/data/derived_data/raman_baseline_corrected_transposed_20210908.csv",
-  sep = ";",
-  dec = ",",
-  chk = TRUE,
-  out.file = "raman")
+#raman <-matrix2SpectraObject(
+  #gr.crit = c("Translucent", "White", "Dark", "Light" ),
+  #gr.cols = c("purple", "blue", "black", "yellow"),
+  #freq.unit ="Wavenumber (cm-1)",
+  #int.unit ="Intensity",
+  #descrip ="Bifacial points measurements",
+  #in.file = "./analysis/data/derived_data/raman_baseline_corrected_transposed_20210908.csv",
+  #sep = ";",
+  #dec = ",",
+ # chk = TRUE,
+ # out.file = "raman")
 
-surveySpectra(raman, by.gr = TRUE , method = "sem", main = "mean")
+#surveySpectra(raman, by.gr = TRUE , method = "sem", main = "mean")
 
+r.dark <- Points.raman %>% 
+  filter(hue == "Dark")
+
+spec.rd <- 
+  as_spectra(r.dark, name_idx = 1, meta_idxs = 2:28)
+
+r.light <- Points.raman %>% 
+  filter(hue == "Light")
+
+spec.rl <- 
+  as_spectra(r.light, name_idx = 1, meta_idxs = 2:28)
+
+r.translucent <- Points.raman %>% 
+  filter(hue == "Translucent")
+
+spec.rt <- 
+  as_spectra(r.translucent, name_idx = 1, meta_idxs = 2:28)
+
+r.white <- Points.raman %>% 
+  filter(hue == "White")
+
+spec.rw <- 
+  as_spectra(r.white, name_idx = 1, meta_idxs = 2:28)
+
+
+par(mfrow=c(4,1))
+
+plot(mean(spec.rd), lwd = 1.2, col = "black", ylab = "Intensity", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavenumber (cm-1)", main = "Average - Dark")
+
+plot(mean(spec.rl), lwd = 1.2, col = "red", ylab = "Intensity", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavenumber (cm-1)", main = "Average - Light")
+
+plot(mean(spec.rt), lwd = 1.2, col = "purple", ylab = "Intensity", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavenumber (cm-1)", main = "Average - Translucent")
+
+plot(mean(spec.rw), lwd = 1.2, col = "blue", ylab = "Intensity", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavenumber (cm-1)", main = "Average - White")
 ```
-<!-- #Identify file with raman spectra and import
-file <- '../quantifyingquartzite/analysis/data/derived_data/raman_baseline_corrected_transposed_20210826.csv'
-spectra <- read.csv2(file, sep = ";", dec = ",", header = TRUE)
-
-#Prepare function for plotting spectra
-plot_multi <- function(df, x=1, y=2, cols=y,
-                       xlim=range(df[,x], na.rm = T),
-                       ylim=range(df[,y], na.rm = T),
-                       main="", xlab="", ylab="", ...){
-  # setup plot frame
-  plot(NULL,
-       xlim=xlim,
-       ylim=ylim,
-       main=main, xlab=xlab, ylab=ylab)
-
-  # plot all your y's against your x
-  pb <- sapply(seq_along(y), function(i){
-    points(df[,c(x, y[i])], col=cols[i], ...)
-  })
-}
-
-plot_multi(spectra, y=120, cols = rainbow(ncol(spectra)), type='l', lwd=3,
-           xlab = "Wavenumber (cm-1)", ylab = "Intensity") -->
 
  \linebreak
 
 <!--```{r raman-average, fig.height=15, fig.fullwidth=TRUE, fig.cap="Average spectra of raman measurements sampled on grey-to-dark quartzite featuring both the *quartz peak* at 460 cm-1, as well as the *graphite peaks* at 1 287  cm-1 (D band) and 1 598 cm-1 (G band)"}
 knitr::include_graphics('C:/Users/masj0062/Documents/DOKTORANDSPROJEKT/VERSION CONTROL/MethodPaper/analysis/figures/fig_4_4_raman_spectra_dark.jpg')
 ```-->
-```{r raman-pca, fig.width=20, fig.height=15, fig.cap="Average spectra of raman measurements sampled on grey-to-dark quartzite featuring both the *quartz peak* at 460 cm-1, as well as the *graphite peaks* at 1 287  cm-1 (D band) and 1 598 cm-1 (G band)"}
+
+```{r raman-pca, fig.width=20, fig.height=15, fig.cap="PCA score plots for the raman spectra. The main explanatory power can be found in the 1^st^ component, which groups the data based on the quartz and D/G bands. As these are the main features in the data, the other components mainly describe the remaining noise, producing the arch-shape in the PCA. The 3^rd^ component does, however, also separate out the few samples that feature peaks at 700-800 cm-1 that may result from Al, Si and OH vibrations."}
 
 #perform PCA with SNV normalization and mean-center
 raman.pca <-
