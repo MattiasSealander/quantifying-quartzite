@@ -425,11 +425,11 @@ plot(mean(spec.w), lwd = 1.2, col = "blue", ylab = "Absorbance", cex.lab = 1.5, 
 
  \linebreak
 
-```{r nir-pca, fig.width=20, fig.height=8, fig.cap= "PCA score plot of 1st and 2nd components for the 1 000 nm – 2 500 nm region of the spectrum. Quartz-based material with a darker surface group to the right in the model, while those with white surface group in the bottom left quadrant. A trend of translucent material and opaque material with a beige tint grouping in the top left can also be seen."}
+```{r nir-pca, fig.width=20, fig.height=8, fig.cap= "PCA score plot of 1st and 2nd components for the 1 000 nm – 2 500 nm region of the spectrum. Quartz-based material with a darker surface group to the right in the model, while those with white surface group in the bottom left quadrant. A trend of translucent material and opaque material with a beige tint grouping in the top left can also be seen. Three black samples at the top, from different sites, all feature no distinguishing peaks in their spectra thus separating them from the other samples in the dataset."}
 
 #perform PCA with SNV normalization and mean-center
 nir.pca <-
-  prcomp(Points.nir[,c(679:2179)], center = TRUE, scale = FALSE)
+  prcomp(Points.nir[,c(680:2179)], center = TRUE, scale = FALSE)
 
 #prepare a basic score plot with fviz_pca_ind using PC1 and PC2
 basic_plot1 <-
@@ -442,10 +442,10 @@ nir.pc1lab <- paste0("PC1 (",as.character(nir.pc1var),"%)")
 nir.pc2lab <- paste0("PC2 (",as.character(nir.pc2var),"%)")
 
 #NIR LOADING LINES
-#par(mfrow=c(3,1))
-#sapply(1:3, function(comp){
-#  plot(1000:2500, nir.pca$rotation[,comp], type='l', lwd=2,
-#      main=paste("PC", comp), xlab="Wavelength (nm)", ylab="", cex.lab = 1.2, xaxp=c(1000,2500,6))}) 
+par(mfrow=c(3,1))
+sapply(1:3, function(comp){
+  plot(1001:2500, nir.pca$rotation[,comp], type='l', lwd=2,
+      main=paste("PC", comp), xlab="Wavelength (nm)", ylab="", cex.lab = 1.2, xaxp=c(1001,2500,6))}) 
 
 #bind the basic fviz plot for PC 1 and 2, and use as basis for a more customizeable plot in ggpplot
 ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
@@ -482,11 +482,11 @@ ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
  \linebreak
 
 ## Raman
-There are two distinctive features present in the Raman data (fig. \@ref(fig:raman-spectra)). The first can be identified as the *quartz* peak occurring at 460 cm-1 [@gillet_etal90], which is present for all samples in the dataset. The second feature shows up as two peaks occurring at around 1 287 cm-1 and 1 598 cm-1, and dominate the spectra in terms of intensity for the darker samples. These peak positions fall within what is referred to as the *D* and *G* band respectively, and have been observed in spectroscopic studies of graphite/graphene [@cesare_maineri99]. The D band occurs as a result of disordered C structures whilst the G band is indicative of sp^2^ C networks and caused by stretching in the C bonds, which is common in graphite-based materials [@vollebregt_etal12; @lee_etal21]. Whereas the 2^nd^ peak falls within the typical position of the G band, the position of the D band is commonly identified as being 1 330 - 1 350 cm-1. It has, however, been documented that the dispersive behavior of the D band can cause a frequency change as a result of the energy of the incident laser [@pimenta_etal07 p.1280]. This could thus explain the discrepancy between the observed peak in the dataset and the literature.
+There are two distinctive features present in the Raman data (fig. \@ref(fig:raman-spectra)). The first are three peaks in the 100 cm-1 - 500 cm-1 band that are typical for SiO~2~ and quartz-based materials, with the strongest occuring at 460 cm-1 [@gillet_etal90]. These peaks are present for all samples in the dataset. The second feature shows up as two peaks occurring at around 1 287 cm-1 and 1 598 cm-1, and dominate the spectra in terms of intensity for the darker samples. These peak positions fall within what is referred to as the *D* and *G* band respectively, and have been observed in spectroscopic studies of graphite/graphene [@cesare_maineri99]. The D band occurs as a result of disordered C structures whilst the G band is indicative of sp^2^ C networks and caused by stretching in the C bonds, which is common in graphite-based materials [@vollebregt_etal12; @lee_etal21]. Whereas the 2^nd^ peak falls within the typical position of the G band, the position of the D band is commonly identified as being in the 1 330 - 1 350 cm-1 region. It has, however, been documented that the dispersive behavior of the D band can cause a frequency change as a result of the energy of the incident laser [@pimenta_etal07 p.1280]. This could thus explain the discrepancy between the observed peak in the dataset and the literature.
 
 A third feature, present in a small subset of the samples, appears as two peaks spaced closely together at ca. 695 cm-1 and 795 cm-1. Comparing these to reference samples from the mineral and rock collections kept at the Department of Ecology and Environmental Science at Umeå University, the same peaks are present in measurements collected on, among others, albite, apatite, diabase and shale. Studies of clay minerals [@kloprogge17] have identified a number of band regions in the lower wavenumbers related to Si, Al and OH vibrations, including the 700 - 800 cm-1 band which has been related to Al-O-Si vibrations for the Kaolin group. Considering the petrogenesis of quartzite and the likelihood that clay minerals are present in the material it is possible that this is what generates the feature in the current dataset.
 
-The resulting PCA model (fig. \@ref(fig:raman-pca)) shows a clear trend along PC 1 (81.5 %) related to the quartz and D/G peaks. PC 2 and PC 3, however, mainly describes the remaining noise left in the spectra after preprocessing. Interestingly, PC 4 does catch the Al-O-Si peaks around the  700 cm-1 - 800 cm-1 band, which helps in separating out those samples where this feature is present. The measurements with mainly quartz peaks gravitates towards the positive side of the PC 1, and those where the graphite peaks are dominant towards the opposite side. It is also clear that the darker material feature more pronounced graphite peaks, whereas the lighter and more translucent objects mainly feature quartz peaks. As in the case of the NIR data, however, there are exceptions that break this trend, as well as a “muddled” middle group with both well-pronounced graphite and quartz peaks. When PC 4 is added the samples with quartz and Al-O-Si peaks gravitate towards the bottom left, separating themselves from the *quartz* group.
+The resulting PCA model (fig. \@ref(fig:raman-pca)) shows a clear trend along PC 1 (81.5 %) related to the quartz and D/G peaks. PC 2 and PC 3, however, mainly describes the remaining noise left in the spectra after detrending and preprocessing the data. Interestingly, the loading for PC 4 does catch the Al-O-Si peaks around the  700 cm-1 - 800 cm-1 band, which helps in separating out those samples where this feature is present. The measurements with mainly quartz peaks gravitates towards the negative side of the PC 1, and those where the graphite peaks are dominant towards the opposite side. It is also clear that the darker material feature more pronounced graphite peaks, whereas the lighter and more translucent objects mainly feature quartz peaks. As in the case of the NIR data, however, there are exceptions that break this trend, as well as a “muddled” middle group with both well-pronounced graphite and quartz peaks. When PC 4 is added the samples with quartz and Al-O-Si peaks gravitate towards the bottom left, separating themselves from the *quartz* group.
 
  \linebreak
 
@@ -517,7 +517,7 @@ spec.rw <-
   as_spectra(r.white, name_idx = 1, meta_idxs = 2:29)
 
 
-par(mfrow=c(4,1))
+par(mfrow=c(2,2))
 
 plot(mean(spec.rd), lwd = 1.2, col = "black", ylab = "Intensity", cex.lab = 1.5, cex.main = 1.5,
      xlab = "Wavenumber (cm-1)", main = "Average - Dark")
@@ -600,7 +600,7 @@ raman.p2 <- ggplot(cbind(basic_plot2$data, Points.raman[, c(8,10)]),
   geom_point(size=3) +
   theme_bw() +
   labs(x = raman.pc1lab,
-       y = raman.pc3lab) +
+       y = raman.pc4lab) +
   scale_shape_manual(name = "Material",
                      values=pca.shapes) +
   scale_fill_manual(name = "Munsell hue",
@@ -852,13 +852,26 @@ theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
  \linebreak
  \linebreak
 
-The results demonstrate clearly that all three instrumentations are capable of characterizing some aspect of the quartz and quartzite, however, none of them are capable of providing a detailed fingerprint on their own based solely on surface measurements. Taken together they do provide a more in-depth understanding of the characteristic and structure of the material. The most easily recognizable megascopic feature of the material is its colour, and the results of all three instrumentations demonstrate that there is some truth to this. However, a large group of the material, which features different hues of grey, does not conform as easily. In each of the PCA models there is a *greyish* middle that makes classification difficult.   
+ The structures seen in the NIRS PCA are 
+
+However, a large group of the material that feature different hues of grey, does not conform as easily. In each of the PCA models there is a *greyish* middle of samples that fall in between the extremes of the observable trends that make classification difficult. 
+
+
 
 Interestingly the ‘brecciated quartz’ remains relatively grouped together in all of the models demonstrating some consistency in the original classification. There are exceptions, however, and it would be advisable to follow up with a more directed analysis focused around this group of material……
 
  \linebreak
 
 # Conclusion
+
+The results demonstrate clearly that all three instrumentations are capable of characterizing some aspect of the quartz and quartzite, however, taken on their own they lack the resolution needed to provide a detailed enough fingerprint on their own based solely on surface measurements. Taken together, however, they do provide a more in-depth understanding of the characteristic and structure of the material. 
+
+The most easily recognizable megascopic feature of the material is its colour, and this has been one of the main means of describing quartzite in Northern Sweden (e.g. [@forsberg85], []). The overall structure in the spectroscopic results for each of the instrumentations, and especially the NIRS, groups samples of similar color (given as munsell hue) together, however, the presence of samples that break these trends demonstrate the presence of structural and compositional features that do not necessarily align with the perceived color of a material.  
+
+In the case of the raman data the PCA is somewhat lacking in exploratory and descriptive power. Apart from the 700 cm-1 - 800 cm-1 band peaks the major features in the data are explained by PC 1. Intensity in raman spectroscopy is not a direct quantitative indicator, thus making it difficult to group materials along the PC 1, apart from presence/absence of the *graphite peaks*.     
+
+The metamorphic background of quartzite makes it a complex rock for characterization, but that is not to say that there aren't potential markers that may be used for fingerprinting. The presence of sp^2^-C and AlOH peaks are worthwhile to follow up.
+
 
  \linebreak
  \linebreak
