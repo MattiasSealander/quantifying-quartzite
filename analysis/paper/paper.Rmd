@@ -93,8 +93,7 @@ Points.nir <-
 
 Points.raman <-
   raman.csv %>%
-    filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
-         type == "Point" | type == "Point fragment" | type == "Preform")
+    filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz", type == "Point" | type == "Point fragment" | type == "Preform")
 
 #Fill the NA fields in the munsell_hue column and mark them as translucent samples
 Points.nir[8][is.na(Points.nir[8])] <- "Translucent"
@@ -852,25 +851,21 @@ theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
  \linebreak
  \linebreak
 
- The structures seen in the NIRS PCA are 
 
-However, a large group of the material that feature different hues of grey, does not conform as easily. In each of the PCA models there is a *greyish* middle of samples that fall in between the extremes of the observable trends that make classification difficult. 
+The most easily recognizable megascopic feature of petrographic material is its colour, a feature that has been one of the main means of grouping quartzite in North Swedish archaeological research (e.g. [@forsberg85] p.60-64, [@kaeck09] p. 53-55). While it is true that some inference can be made based on colour, such as ^26^Fe-bearing minerals contributing to a darker colour, this becomes increasingly difficult with heterogeneous material. Should a quartzite where the matrix is mainly light gray in colour, but streaked with black mineral veins, be considered a *light* or *dark* quartzite? The results above echoes this complexity. While the overall structure in the spectroscopic results for each of the instrumentations, and especially the NIRS, groups samples of similar colour (given as *munsell hue*) together, there are samples that break these trends and thus demonstrate the presence of structural and compositional features that do not necessarily align with the perceived colour of a material. 
 
-
+In the case of the raman data the PCA is somewhat lacking in exploratory and descriptive power. Apart from the few samples that feature the 700 cm-1 - 800 cm-1 band peaks the major features in the data are all explained by the first component. As the intensity in raman spectroscopy is not a direct quantitative indicator this makes it difficult to group materials based on the intensity of the D/G bands, making more of a binary separation of presence/absence of the *graphite peaks*. That is not to say that it is not possible to attempt quantification using raman spectroscopy, but rather that this would demand a different experimental setup. That said, the presence of the *graphite peaks* may represent an important clue in determining the potential geological origin for the material. The presence of the C structures suggest the petrogenesis included sediments enriched with organic material, providing a good filter for continued research.
 
 Interestingly the ‘brecciated quartz’ remains relatively grouped together in all of the models demonstrating some consistency in the original classification. There are exceptions, however, and it would be advisable to follow up with a more directed analysis focused around this group of material……
+
+
 
  \linebreak
 
 # Conclusion
 
-The results demonstrate clearly that all three instrumentations are capable of characterizing some aspect of the quartz and quartzite, however, taken on their own they lack the resolution needed to provide a detailed enough fingerprint on their own based solely on surface measurements. Taken together, however, they do provide a more in-depth understanding of the characteristic and structure of the material. 
+The results demonstrate clearly that all three instrumentations are capable of characterizing some aspect of the quartz and quartzite, however, taken on their own they lack the resolution needed to provide a detailed enough fingerprint based solely on surface measurements. Nevertheless they do provide a more in-depth understanding of the composition and structure of the material, and combining these results may be the key to more robust non-destructive characterization of petrographic material. 
 
-The most easily recognizable megascopic feature of the material is its colour, and this has been one of the main means of describing quartzite in Northern Sweden (e.g. [@forsberg85], []). The overall structure in the spectroscopic results for each of the instrumentations, and especially the NIRS, groups samples of similar color (given as munsell hue) together, however, the presence of samples that break these trends demonstrate the presence of structural and compositional features that do not necessarily align with the perceived color of a material.  
-
-In the case of the raman data the PCA is somewhat lacking in exploratory and descriptive power. Apart from the 700 cm-1 - 800 cm-1 band peaks the major features in the data are explained by PC 1. Intensity in raman spectroscopy is not a direct quantitative indicator, thus making it difficult to group materials along the PC 1, apart from presence/absence of the *graphite peaks*.     
-
-The metamorphic background of quartzite makes it a complex rock for characterization, but that is not to say that there aren't potential markers that may be used for fingerprinting. The presence of sp^2^-C and AlOH peaks are worthwhile to follow up.
 
 
  \linebreak
