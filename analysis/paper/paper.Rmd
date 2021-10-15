@@ -45,7 +45,7 @@ knitr::opts_chunk$set(
   echo = FALSE,
   comment = "#>",
   fig.path = "../figures/",
-  dpi = 300
+  dpi = 600
 )
 ```
 
@@ -63,7 +63,7 @@ library(prospectr)
 library(tidyverse)
 library(spectrolab)
 
-#Import xrf data
+#Import xrf data, set empty fields to NA
 XRF.csv <-
   read.csv2("./analysis/data/raw_data/XRF/XRF_quantitative.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
 
@@ -105,21 +105,18 @@ pca.colors <- c("#E31CFF", "#718EFF", "#0080FF", "#D5DF9E", "#C6DF39", "#FFFFC1"
 pca.shapes <- c(24,25,23,22,21)
 pca.munsell_hue <- c("Translucent", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y", "7.5Y", "10Y", "5YR", "N1", "N2", "N3", "N4", "N5", "N6", "N8", "N9")
 
-
-#Import loadings from Evince
-loadings <-
- as.data.frame(read.csv2("./analysis/data/raw_data/XRF/XRF_P_values_long.csv", sep = ";", dec = ".", header = TRUE,  encoding = "UTF-8"))
 ```
 <!-- The actual document text starts here: -->
 
 # Introduction
 
-In European archaeology provenience studies and petrographic characterization has for some time favoured flint and obsidian over other geological materials [@prieto_etal20 p.32]. However, in regions where local flint and obsidian sources are non-existent other materials have taken on the dominant role. In Northern Fennoscandia these include quartz, quartzite and slate  [@baudou78; @rankama_etal06; @olausson_etal12], and while both quartz and quartzite technology have been the target of a number of studies over the years there have been less development in the petrographic characterization and provenience studies of these same materials [@broadbent79; @callahan_etal92; @knutsson_etal16; @tallavaara_etal10].
+In regions where local flint and obsidian sources are non-existent, such as Northern Fennoscandia, other materials like quartz, quartzite and slate have been the primary target for lithic production^[This is not to say that flint was not available or used in this region] [@baudou78; @rankama_etal06; @olausson_etal12]. Non-flint lithics and raw material studies in  European archaeology have seen a steady increase during the last decades, providing much needed development in a previously neglected field [@blomme_etal12; @dalpra_pitblado16; @prieto_etal19; -@prieto_etal20; -@prieto_etal21; @ramacciotti_etal19]. With the lack of any natural geological source of flint in Northern Sweden both quartz and quartzite are instrumental for the inference of settlement and mobility within the region. While quartz and quartzite technology have been the target of a number of studies over the years, there have been less development in the petrographic characterization and provenience studies of these same materials [@broadbent79; @callahan_etal92; @knutsson_etal16; @tallavaara_etal10].
 
-One reason for the lack of methodological development could be the geological background of the region and the abundance of moraine formations [@bargel03; @stephens_bergmanweihed20; @stroeven_etal16]. The degree to which geological materials have been mixed and transported means that considerable effort is needed in order to reconstruct the events that have formed the modern day landscape. Both quartz and quartzite could potentially have been sourced by local prehistoric groups from exposed veins in the bedrock, or as loose rocks and pebbles in the numerous moraine formations [@rankama_etal06]. Due to this ambigous nature of availability of raw materials it is difficult to model sourcing strategies for groups that were based within this region. 
-Prieto et al. [-@prieto_etal19 p.15; -@prieto_etal20 p.32] notes that ‘quartzite’ represents a somewhat ambiguous term in archaeology, where it is often used interchangeably between sedimentary orthoquartzite and metamorphic quartzite. This issue has been discussed in geology as well [@howard05], and the definition hence varies somewhat between authors. Visual characterization of quartzite on a megascopic level is typically unreliable, and microscopic analysis is recommended for identification of subtypes based on metamorphic grade, but Howard  also emphasises the need for field-based methodologies. 
+One reason for the lack of methodological development could be the complex geological background of the region and the abundance of moraine formations [@bargel03; @stephens_bergmanweihed20; @stroeven_etal16]. The degree to which geological materials have been mixed and transported demands considerable effort in order to reconstruct the events that have formed the modern day landscape. While tentaive interpretations of lithic material sourcing tends to describe strategies leaning towards direct procurement from the mountain zone [@forsberg85; -@forsberg12], both quartz and quartzite could potentially have been sourced locally from exposed veins in the bedrock, or as loose rocks and pebbles in the numerous moraine formations as part of a strategy leaning more towards an embedded adaptation [@binford79; @rankama_etal06]. Due to this ambigous nature of availability of raw materials lprovenience studies are increasingly complex and fraught with uncertainty. 
 
-In recent years there has been increased development of petrographic characterization of quartzite using destructive methods [e.g. @blomme_etal12; @cnudde_etal12; @dalpra_pitblado16; @prieto_etal19; @prieto_etal20]. These have had success in distinguishing between different groups of quartzite types, allowing for more meaningful studies into quartzite-based resource management strategies. In archaeology there are times, however, when destructive techniques simply are not applicable. Artefact collections (museum, private, etc.) represent a valuable resource, as well as one of the easier ways of gaining access to large datasets with some geographical distribution. While destructive methods may prohibit access to such material there are still non-destructive methods that can generate valuable information. The use of spectroscopy in petrographic characterization is not new, but it is often applied in conjunction with thin-section analysis [e.g. @blomme_etal12; @prieto_etal20]. A major advantage of spectroscopy, however, is that it is both non-destructive and feature fast measurements, making it an attractive alternative for field-based screening purposes. While X-Ray Fluorescence (XRF) is the go-to spectroscopic technique for petrographic characterization [@shackley11; @tykot03], due to its capability of quantifying the elemental content of a material, there are other instrumentations that may provide a deeper insight into the structural properties. Near Infrared spectroscopy (NIRS) goes almost as far back as the XRF [@hunt77], and there is an impressive body of work dedicated to the fingerprinting of geological materials [@linderholm_geladi14a; @linderholm_geladi14b; @sciuto19]. The same can be said for Raman spectroscopy, which also has been applied extensively in the Cultural Heritage sector and the analysis of artwork and manuscripts [@vandenabeele12].   
+The defintition for what constitutes a *quartzite* is not so stratightforward. Prieto et al. [-@prieto_etal19 p.15; -@prieto_etal20 p.32] notes that the usage of the term *quartzite* in archaeology has been somewhat ambiguous, often used interchangeably between sedimentary orthoquartzite and metamorphic quartzite. The defintion of quartzite has been a topic of discussion in geology as well [@howard05], and the definition hence varies somewhat between authors. Visual characterization of quartzite on a megascopic level is typically unreliable, and microscopic analysis is recommended for the identification of metamorphic structures, but Howard also emphasises the need for field-based methodologies.
+
+In recent years there has been increased development of petrographic characterization of quartzite using a combination of destructive methods and spectroscopy [e.g. @blomme_etal12; @cnudde_etal12; @dalpra_pitblado16; @prieto_etal19; @prieto_etal20]. These have had success in distinguishing between different groups of quartzite types, allowing for more meaningful studies into quartzite-based resource management strategies. In archaeology there are times, however, when destructive techniques simply are not applicable. Artefact collections (museum, private, etc.) represent a valuable resource, as well as one of the easier ways of gaining access to large datasets with some geographical distribution. While destructive methods may prohibit access to such material there are still non-destructive methods that can generate valuable information. Aside from being non-destructive spectroscopic instrumentation feature fast measurements, making it an attractive alternative for field-based screening purposes. While X-Ray Fluorescence (XRF) is the go-to spectroscopic technique for petrographic characterization [@shackley11; @tykot03], due to its capability of providing compositional data of the elemental content of a material, there are other instrumentations that may provide a deeper insight into the structural properties. Near Infrared spectroscopy (NIRS) goes almost as far back as the XRF [@hunt77], and there is an impressive body of work dedicated to the fingerprinting of geological materials [@linderholm_geladi14a; @linderholm_geladi14b; @sciuto19]. The same can be said for Raman spectroscopy, which has been applied extensively in the Cultural Heritage sector and the analysis of artwork and manuscripts [@vandenabeele12].   
 
 In the current study a dataset of quartzite artefacts from museum collections in Västerbotten, Sweden, have been analysed using the three above mentioned spectroscopic instrumentations (NIRS, Raman, XRF). They all provide different information on the structure and composition of the material and will thus be evaluated in regards to the different features they record in the quartz/quartzite. This will be achieved via Principal Component Analysis (PCA) where the observed groupings of the material will be related to the spectral features. Lastly, the potential for combining the results of the analyses in order to study joint relations will be discussed. 
 
@@ -127,7 +124,7 @@ In the current study a dataset of quartzite artefacts from museum collections in
 
 # Material
 ```{r select-point-data}
-#Filter data to focus on quartzite points, point fragments and preforms made from quartz/quartzite materials
+#Filter data to focus on points, point fragments and preforms made from quartz/quartzite materials
 Points2 <-
   samples %>%
     filter(material == "Quartz" | material == "Quartzite" | material == "Breccie quartz" | material == "Breccie quartzite" | material  == "Felsitic porphyric quartz",
@@ -205,7 +202,7 @@ ggplot(Points2, aes(x= fct_rev(parish), fill = type)) +
   geom_text(stat ='count', aes(group = parish, label = ..count..), hjust = -0.5)
 ```
 
-While parts of the collections at Västerbotten museum have been petrographically analysed by a geologist [@biornstad68; @ahman67], at this point it is difficult to say with any certainty how many (if any) of the artefacts in the current dataset were among these. It is fair to assume that the vast majority have been classified visually based on megascopic features according to a “standard” archaeological nomenclature. In the dataset the four main types of registered materials are: quartz, quartzite, brecciated quartz, and brecciated quartzite ^[Original Swedish terms are *brecciekvarts*/*brecciekvartsit* , the latter possibly a spelling mistake]. Those that had no prior material classification registered were sorted into either the quartz or quartzite category. The reason for including ‘quartz’ in the study is in order to test whether it is possible to separate quartz from quartzite using these methods, as well as a way to account for potential mistakes in the original classification.
+While parts of the collections at Västerbotten museum have been petrographically analysed by a geologist [@biornstad68; @ahman67], at this point it is difficult to say with any certainty how many (if any) of the artefacts in the current dataset were among these. It is fair to assume that the vast majority have been classified visually based on megascopic features according to a “standard” archaeological nomenclature. In the dataset the four main types of registered materials are: quartz, quartzite, brecciated quartz^[Original Swedish terms are *brecciekvarts*/*brecciekvartsit* , the latter possibly a spelling mistake], and brecciated quartzite. Those that had no prior material classification registered were sorted into either the quartz or quartzite category. The reason for including ‘quartz’ in the study is in order to test whether it is possible to separate quartz from quartzite using these methods, as well as a way to account for potential mistakes in the original classification.
 
 Another reason for keeping a *quartz* category is the group referred to as *brecciated quartz*. In a petrographic study of the artefacts recovered along the Ume river valley Åhman (1967:8) briefly touches upon the definition of *brecciated quartz*, also referring to it as a *mylonite quartz*. Åhman describes the material as having formed from a quartz vein which has fractured due to movements in the mountain massives and recrystallized via pressure. While the translucent material may give the impression of an unusually pure quartzite, Åhman states that the thin-section analysis reveals the fragmented configuration of quartz. *Brecciated quartz* is a somewhat common term used in North Swedish archaeology, and has typically been used to identify a certain translucent type of fine-grained, quartz-rich material [e.g. @holm91].  
 
@@ -407,9 +404,13 @@ spec.w <-
 
 #Prepare a layout with 1 column and four rows
 par(mfrow=c(4,1))
-#Plot the mean spectrum for each spectra group above
+#Plot the mean spectrum for each spectra group above with text annotations for the peaks in the first dark spectra
 plot(mean(spec.d), lwd = 1.2, col = "black", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xaxp=c(1000,2500,6),
      xlab = "Wavelength (nm)", main = "Average - Dark")
+text(x=1405, y=1.098, labels="OH", font=2, cex = 1.5)
+text(x=1935, y=1.123, labels="OH", font=2, cex = 1.5)
+text(x=2215, y=1.130, labels="AlOH", font=2, cex = 1.5)
+text(x=2350, y=1.130, labels="CO3", font=2, cex = 1.5)
 
 plot(mean(spec.l), lwd = 1.2, col = "red", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xaxp=c(1000,2500,6),
      xlab = "Wavelength (nm)", main = "Average - Light")
@@ -441,10 +442,10 @@ nir.pc1lab <- paste0("PC1 (",as.character(nir.pc1var),"%)")
 nir.pc2lab <- paste0("PC2 (",as.character(nir.pc2var),"%)")
 
 #NIR LOADING LINES
-par(mfrow=c(3,1))
-sapply(1:3, function(comp){
-  plot(1001:2500, nir.pca$rotation[,comp], type='l', lwd=2,
-      main=paste("PC", comp), xlab="Wavelength (nm)", ylab="", cex.lab = 1.2, xaxp=c(1001,2500,6))}) 
+#par(mfrow=c(3,1))
+#sapply(1:3, function(comp){
+#  plot(1001:2500, nir.pca$rotation[,comp], type='l', lwd=2,
+#      main=paste("PC", comp), xlab="Wavelength (nm)", ylab="", cex.lab = 1.2, xaxp=c(1001,2500,6))}) 
 
 #bind the basic fviz plot for PC 1 and 2, and use as basis for a more customizeable plot in ggpplot
 ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
@@ -515,11 +516,17 @@ r.white <- Points.raman %>%
 spec.rw <- 
   as_spectra(r.white, name_idx = 1, meta_idxs = 2:29)
 
-
+#Prepare a layout with 2 columns and 2 rows
 par(mfrow=c(2,2))
 
+#Plot the mean spectrum for each spectra group above with text annotations for the peaks in the first dark spectra
 plot(mean(spec.rd), lwd = 1.2, col = "black", ylab = "Intensity", cex.lab = 1.5, cex.main = 1.5,
      xlab = "Wavenumber (cm-1)", main = "Average - Dark")
+text(x=120, y=2900, labels="SiO", font=2, cex = 1.5)
+text(x=200, y=4300, labels="SiO", font=2, cex = 1.5)
+text(x=460, y=9250, labels="SiO", font=2, cex = 1.5)
+text(x=1285, y=6300, labels="D", font=2, cex = 2.0)
+text(x=1600, y=4000, labels="G", font=2, cex = 2.0)
 
 plot(mean(spec.rl), lwd = 1.2, col = "red", ylab = "Intensity", cex.lab = 1.5, cex.main = 1.5,
      xlab = "Wavenumber (cm-1)", main = "Average - Light")
@@ -852,12 +859,13 @@ theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
  \linebreak
 
 
-The most easily recognizable megascopic feature of petrographic material is its colour, a feature that has been one of the main means of grouping quartzite in North Swedish archaeological research (e.g. [@forsberg85] p.60-64, [@kaeck09] p. 53-55). While it is true that some inference can be made based on colour, such as ^26^Fe-bearing minerals contributing to a darker colour, this becomes increasingly difficult with heterogeneous material. Should a quartzite where the matrix is mainly light gray in colour, but streaked with black mineral veins, be considered a *light* or *dark* quartzite? The results above echoes this complexity. While the overall structure in the spectroscopic results for each of the instrumentations, and especially the NIRS, groups samples of similar colour (given as *munsell hue*) together, there are samples that break these trends and thus demonstrate the presence of structural and compositional features that do not necessarily align with the perceived colour of a material. 
+The most easily recognizable megascopic feature of petrographic material is its colour, a feature that has been one of the main means of grouping quartzite in North Swedish archaeological research (e.g. @forsberg85 p.60-64, @kaeck09 p. 53-55). While it is true that some inference can be made based on colour, such as ^26^Fe-bearing minerals contributing to a darker colour, this becomes increasingly difficult with heterogeneous material. Should a quartzite where the matrix is mainly light gray in colour, but streaked with black mineral veins, be considered a *light* or *dark* quartzite? The results above echoes this complexity. While the overall structure in the spectroscopic results for each of the instrumentations, and especially the NIRS, groups samples of similar colour (given as *munsell hue*) together, there are samples that break these trends and thus demonstrate the presence of structural and compositional features that do not necessarily align with the perceived colour of a material. 
 
 In the case of the raman data the PCA is somewhat lacking in exploratory and descriptive power. Apart from the few samples that feature the 700 cm-1 - 800 cm-1 band peaks the major features in the data are all explained by the first component. As the intensity in raman spectroscopy is not a direct quantitative indicator this makes it difficult to group materials based on the intensity of the D/G bands, making more of a binary separation of presence/absence of the *graphite peaks*. That is not to say that it is not possible to attempt quantification using raman spectroscopy, but rather that this would demand a different experimental setup. That said, the presence of the *graphite peaks* may represent an important clue in determining the potential geological origin for the material. The presence of the C structures suggest the petrogenesis included sediments enriched with organic material, providing a good filter for continued research.
 
-Interestingly the ‘brecciated quartz’ remains relatively grouped together in all of the models demonstrating some consistency in the original classification. There are exceptions, however, and it would be advisable to follow up with a more directed analysis focused around this group of material……
+Interestingly the *brecciated quartz* remains relatively grouped together in all of the models demonstrating some consistency with the original classification. As the material does group with other similarly semi-translucent material it does not seem to distinguish itself enough in the models in order to consider it its own group. The original classification by @ahman67 refers to the microscopic fragmented configuration of the quartz crystals as being the main distinguishing feature, and while it is possible to discern the presence of SiO structure through non-destructive spectroscopy, there have been no other discernible features related to this group.  
 
+Keeping in mind the 
 
 
  \linebreak
