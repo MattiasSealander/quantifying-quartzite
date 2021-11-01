@@ -43,7 +43,7 @@ knitr::opts_chunk$set(
   echo = FALSE,
   comment = "#>",
   fig.path = "../figures/",
-  dpi = 600
+  dpi = 300
 )
 ```
 
@@ -97,7 +97,7 @@ Points.raman <-
   raman.csv %>%
     filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz", type == "Point" | type == "Point fragment" | type == "Preform")
 
-#Fill the NA fields in the munsell_hue column and mark them as translucent samples
+#Fill the NA fields in the munsell_hue column and mark them as colourless samples
 Points.nir[8][is.na(Points.nir[8])] <- "Colourless"
 Points.raman[8][is.na(Points.raman[8])] <- "Colourless"
 Points.xrf[20][is.na(Points.xrf[20])] <- "Colourless"
@@ -198,7 +198,7 @@ ggplot(Points2, aes(x= fct_rev(parish), fill = type)) +
   geom_text(stat ='count', aes(group = parish, label = ..count..), hjust = -0.5)
 ```
 
-While parts of the collections at Västerbotten museum have been petrographically analysed by a geologist [@biornstad68; @ahman67], at this point it is difficult to say with any certainty how many (if any) of the artefacts in the current dataset were among these. It is fair to assume that the vast majority have been classified visually based on megascopic features according to a “standard” archaeological nomenclature. In the dataset the four main types of registered materials are: quartz, quartzite, brecciated quartz^[Original Swedish terms are *brecciekvarts*/*brecciekvartsit* , the latter possibly a spelling mistake], and brecciated quartzite. Those that had no prior material classification registered were sorted into either the quartz or quartzite category. The reason for including *quartz* in the study is in order to test whether it is possible to separate quartz from quartzite using these methods, as well as a way to account for potential mistakes in the original classification.
+While parts of the collections at Västerbotten museum have been petrographically analysed by a geologist [@biornstad68; @ahman67], at this point it is difficult to say with any certainty how many (if any) of the artefacts in the current dataset were among these. It is fair to assume that the vast majority have been classified visually based on megascopic features according to a “standard” archaeological nomenclature. In the dataset the four main types of registered materials are: quartz, quartzite, brecciated quartz and brecciated quartzite^[Original Swedish terms are *brecciekvarts*/*brecciekvartsit*]. Those that had no prior material classification registered were sorted into either the quartz or quartzite category. The reason for including *quartz* in the study is in order to test whether it is possible to separate quartz from quartzite using these methods, as well as a way to account for potential mistakes in the original classification.
 
 Another reason for keeping a *quartz* category is the group referred to as *brecciated quartz*. In a petrographic study of the artefacts recovered along the Ume river valley Åhman (1967:8) briefly touches upon the definition of *brecciated quartz*, also referring to it as a *mylonite quartz*. Åhman describes the material as having formed from a quartz vein which has fractured due to movements in the mountain massives and recrystallized via pressure. While the translucent material may give the impression of an unusually pure quartzite, Åhman states that the thin-section analysis reveals the fragmented configuration of quartz. *Brecciated quartz* is a somewhat common term used in North Swedish archaeology, and has typically been used to identify a certain translucent type of fine-grained, quartz-rich material [e.g. @holm91].  
 
@@ -224,14 +224,14 @@ NIR analysis was conducted with the Analytical Spectral Device (ASD) LabSpec 4, 
 ## Raman
 Raman spectroscopy shares some similarities with NIRS in that they both can be used to infer molecular structure based on their vibrational properties [@nafie01]. However, where NIRS generate overtones of molecular vibration, Raman spectroscopy is based on the *Raman scattering* effect. By exposing a molecule to radiation with a monochromatic laser it is possible to induce a dipole moment in the molecule which generates the Raman effect. The subsequent light that is scattered contains both Rayleigh scatter and Raman scatter, the former at a frequency of incident radiation and the latter at a shifted frequency [@dubessy12]. The spectrometer will measure the Raman scatter and generate a spectrum where the spectral line has shifted compared to the incident Rayleigh frequency. As the structure of a molecule will inform its vibrational mode, the point at which these shifts occur within the infrared region varies depending on the material [@smith_carabatos-nedelec01]. 
 
-The Raman instrumentation used was a portable i-Raman EX featuring a 1064 nm excitation laser. The spectral coverage of the instrumentation is 175 cm-1 – 2 500 cm-1 ^[Raman shifts are typically given in wavenumber (cm-1), instead of spectral wavelength (nm)] with a resolution of 9.5 cm-1. Access to the spectrometer was made possible by the department of Forest Biomaterials and Technology at the Swedish University of Agricultural Sciences (SLU) in Umeå. 
+The Raman instrumentation used was a portable i-Raman EX featuring a 1064 nm excitation laser. The spectral coverage of the instrumentation is 175 cm^-1^ – 2 500 cm^-1^ ^[Raman shifts are typically given in wavenumber (cm^-1^), instead of spectral wavelength (nm)] with a resolution of 9.5 cm^-1^. Access to the spectrometer was made possible by the department of Forest Biomaterials and Technology at the Swedish University of Agricultural Sciences (SLU) in Umeå. 
 
 After averaging the spectra for each artefact the results were baseline corrected in order to detrend the data. This was achieved using modified polynomial fitting in R [@Rteam17] with the ChemoSpec package [@hanson16]. The spectra were then mean-centred and normalized using Standard Normal Variate [@shaver01 pp.284-285] before PCA. 
 
  \linebreak
 
 ## X-Ray Fluourescence
-XRF measurements were collected using a Thermo Scientific Niton XL5 Analyzer, connected to a portable test stand. The reference calibration used for element quantification was set to *mining* mode. Sampling with this setting takes 2 minutes in order for the instrument to cycle through all of the filters (main, low, high, light). Due to time constraints and the number of objects in the current dataset it was only possible to collect one measurement on each object, apart from some exceptions. The XRF data was log-transformed, mean-centered and scaled to unit variance before PCA modelling. As the resulting dataset also features values below the Limit of Detection (LOD), these were treated as NULL, or missing values, during PCA. Since missing values are not permitted during PCA these had to imputed before the analysis, which was performed using the *missMDA* R package [@josse_husson16] developed for datasets with incomplete data. Two methods for imputation can be implemented, iterative or regularized, since the former suffers when there are a large number of missing values the latter was used. 
+XRF measurements were collected using a Thermo Scientific Niton XL5 Analyzer, connected to a portable test stand. The reference calibration used for element quantification was set to *mining* mode. Sampling with this setting takes 2 minutes in order for the instrument to cycle through all of the filters (main, low, high, light). Due to time constraints and the number of objects in the current dataset it was only possible to collect one measurement on each object, apart from some exceptions. The XRF data was log-transformed, mean-centered and scaled to unit variance before PCA modelling. As the resulting dataset also features values below the Limit of Detection (LOD), these were treated as NULL, or missing values, during PCA. Since missing values are not permitted during PCA these had to imputed before the analysis, which was performed using the *missMDA* R package [@josse_husson16] developed for datasets with incomplete data. Two methods for imputation can be implemented, iterative or regularized, and since the former suffers when there is a large number of missing values the latter was used. 
 
  \linebreak
 
@@ -242,13 +242,13 @@ XRF measurements were collected using a Thermo Scientific Niton XL5 Analyzer, co
 
 ## NIR - visual range
 
-The main explanatory power for the visual region can be found in the first component with an explained variance of 98.4 %. In the PCA (fig. \@ref(fig:vis-nir-pca)) there is a clear trend along PC1 with darker materials being grouped together to the right of the plot and light/translucent/white material to the left. Examining the average spectra of these groups (fig. \@ref(fig:vis-nir-spectra)), as expected, the darker material feature higher absorbance of light than the other groups. No other distinctive features can be seen in the visual band, that could potentially be used to distinguish the groups. It is, however, apparent that while the more extreme hues of *dark* and *white* material can be isolated more clearly based on their spectra, there also exists a wider greyscale of material that does not conform as easily to these broader groups. 
+The main explanatory power for the visual region can be found in the first component with an explained variance of 98.4 %. In the PCA (fig. \@ref(fig:vis-nir-pca)) there is a clear trend along PC1 with darker materials being grouped together to the right of the plot and light/colourless/white material to the left. Examining the average spectra of these groups, as expected, the darker material feature higher absorbance of light than the other groups. No other distinctive features can be seen in the visual band, that could potentially be used to distinguish the groups. It is, however, apparent that while the more extreme hues of *dark* and *white* material can be isolated more clearly based on their spectra, there also exists a wider greyscale of material that does not conform as easily to these broader groups. There are also a number of artefacts with a dark hue that gravitate closer to the lighter material in the PCA. While the small size of these artefacts could be an explanation for the placement of these within the model, there are plenty of similarly sized artefacts that do not follow the same trend. 
 
-A number of artefacts also breaks the observed trend in the PCA, with dark/black (N1-N2) samples ending up closer to the light and translucent group in the PCA. There are also instances where the measurements on different sides of an artefact end up in different groups in the PCA. In examination of the non-averaged data artefact 403 and 502 both have a sample taken on one side in the *dark* group and the other in the *greyish* middle. This is most likely due to the heterogeneous character of the material and natural variations on the surface possibly related to weathering. The *greyish* middle group in the PCA is otherwise largely made up of *quartz coloured* opaque material with a beige/grey tint. 
+There are also instances where the measurements on different sides of an artefact end up in different groups in the PCA. In examination of the non-averaged data artefact 403 and 502 both have a sample taken on one side in the *dark* group and the other in the *greyish* middle. This is most likely due to the heterogeneous character of the material and natural variations on the surface possibly related to weathering. The *greyish* middle group in the PCA is otherwise largely made up of opaque material with a beige/grey tint. 
 
  \linebreak
 
-```{r vis-nir-pca, fig.width=20, fig.height=8, fig.cap="PCA score plot of PC1 and PC2 for the 400 nm – 750 nm band of the spectrum. Quartz-based material with a darker surface group to the right in the model, while those with white surface group in the bottom left quadrant. The strong trend along PC1 also makes it difficult to separate out the muddled grayscale in the middle."}
+```{r vis-nir-pca, fig.width=20, fig.height=12, fig.cap="PCA score plot of PC1 and PC2 for the 400 nm – 750 nm band of the spectrum. Quartz-based material with a darker surface group to the right in the model, while those with white surface group in the bottom left quadrant. The strong trend along PC1 also makes it difficult to separate out the muddled grayscale in the middle."}
 
 #perform PCA with SNV normalization and mean-center
 visnir.pca <-
@@ -257,15 +257,26 @@ visnir.pca <-
 #prepare a basic score plot with fviz_pca_ind using PC1 and PC2
 basic_plot1 <-
   fviz_pca_ind(visnir.pca, axes = c(1,2), label="none")
+basic_plot2 <-
+  fviz_pca_ind(visnir.pca, axes = c(1,3), label="none")
 
 #prepare labels for PCs
 vis.pc1var <- round(summary(visnir.pca)$importance[2,1]*100, digits=1)
 vis.pc2var <- round(summary(visnir.pca)$importance[2,2]*100, digits=1)
+vis.pc3var <- round(summary(visnir.pca)$importance[2,3]*100, digits=1)
 vis.pc1lab <- paste0("PC1 (",as.character(vis.pc1var),"%)")
 vis.pc2lab <- paste0("PC2 (",as.character(vis.pc2var),"%)")
+vis.pc3lab <- paste0("PC3 (",as.character(vis.pc3var),"%)")
+
+#VISNIR LOADING LINES
+#par(mfrow=c(3,1))
+#sapply(1:3, function(comp){
+#  plot(400:750, visnir.pca$rotation[,comp], type='l', lwd=2,
+#      main=paste("PC", comp), xlab="Wavelength (nm)", ylab="", cex.lab = 1.2, xaxp=c(400,750,6))}) 
 
 #bind the basic fviz plot for PC 1 and 2, and use as basis for a more customizeable plot in ggpplot
-ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
+visnir.p1 <-
+  ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
              aes(x=x, y=y, 
                  shape = material, 
                  fill = munsell_hue)) +
@@ -289,12 +300,45 @@ ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
                                                  size=3),
                              title.position="top", 
                              title.hjust = 0.5)) +
-  theme(plot.title = element_text(size = 12, face = "bold", colour = "black", vjust = - 10, hjust = 0.02),
-        axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
-        axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
-        legend.title = element_text(size = 12, face = "bold", colour = "black"),
-        legend.background = element_rect(linetype = "solid", color = "black"),
-        legend.position = "bottom")
+  theme(legend.position = "none")
+
+visnir.p2 <-
+  ggplot(cbind(basic_plot2$data, Points.nir[, c(8,10)]),
+             aes(x=x, y=y, 
+                 shape = material, 
+                 fill = munsell_hue)) +
+  geom_point(size=3) +
+  theme_bw() +
+  ggtitle("Near infrared 400 - 750 nm") +
+  labs(x = vis.pc1lab,
+       y = vis.pc3lab) +
+  scale_shape_manual(name = "Material",
+                     values=pca.shapes) +
+  scale_fill_manual(name = "Munsell hue",
+                    breaks = c("Colourless", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y", "7.5Y", "10Y", "5YR", "N1", "N2", "N3", "N4", "N5", "N6", "N8", "N9"),
+                    values=pca.colors) +
+  guides(shape = guide_legend(override.aes = list(fill = "black"), 
+                              ncol=2, 
+                              title.position="top", 
+                              title.hjust = 0.5),
+         fill = guide_legend(override.aes = list(shape = 22,
+                                                 fill = pca.colors,
+                                                 color = "black",
+                                                 size=3),
+                             title.position="top", 
+                             title.hjust = 0.5)) +
+  theme(legend.position = "none")
+
+comb1 <-
+  visnir.p1 + visnir.p2 & theme(plot.title = element_text(size = 12, face = "bold", colour = "black", vjust = - 10, hjust = 0.02),
+                              axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
+                              axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
+                              legend.title = element_text(size = 12, face = "bold", colour = "black"),
+                              legend.background = element_rect(linetype = "solid", color = "black"),
+                              legend.position = "bottom")
+
+comb1 +
+  plot_layout(nrow = 2, guides = "collect")
 ```
 
  \linebreak
@@ -317,12 +361,12 @@ vis.light <- Points.nir %>%
 spec.vl <- 
   as_spectra(vis.light, name_idx = 1, meta_idxs = 2:28)
 
-vis.translucent <- Points.nir %>% 
+vis.colourless <- Points.nir %>% 
   filter(hue == "Colourless") %>% 
   select(c(1:28),c(79:429))
 
 spec.vt <- 
-  as_spectra(vis.translucent, name_idx = 1, meta_idxs = 2:28)
+  as_spectra(vis.colourless, name_idx = 1, meta_idxs = 2:28)
 
 
 vis.white <- Points.nir %>% 
@@ -344,44 +388,45 @@ plot(mean(spec.vt), lwd = 1.2, col = "purple", ylab = "Absorbance", cex.lab = 1.
 plot(mean(spec.vw), lwd = 1.2, col = "blue", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - White"); vps4 <- do.call(vpStack, baseViewports())
 ```
 
+
  \linebreak
 
 ## NIR - near infrared range
 In the case of NIRS similar features can be observed in the average spectra for all four colour groups, with darker materials exhibiting higher absorbance and the light group the most distinct peaks. The presence of molecular water can be seen in the peaks at 1 400 nm and 1 900 nm  [@hunt77; @sciuto_etal19] (fig. \@ref(fig:nir-spectra)). Peaks also occur at 2 200 nm and 2 350 nm, where the former has been related to combination vibrations of Al-OH and the latter falls within one of the stronger CO^3^ bands [@clark_etal90]. Inspection of individual spectra for the *light* group, however, also reveals a 5th peak for some samples at 2 450 nm. Comparisons to spectra collected on muscovite ([@clark_etal90] p.12 675) shows similar peaks located at 2 200 nm, 2 350 nm, and 2 450 nm. It is therefore possible that the 2 350 nm band in some cases corresponds to CO^3^ vibrations and in other samples Al-OH. 
 
-The PCA shows a strong trend along PC 1 that seems to correlate with the colour of the material(fig. \@ref(fig:nir-pca)). Darker quartzite cluster to the right with white and translucent samples grouping to the opposite side. While the white samples seem to gravitate to the bottom left of the model the samples that are somewhat translucent, such as the *brecciated quartz*, seem to cluster towards the top-left. A small set of 3 black samples at the top of the model separate themselves clearly from the rest of the data points. These three samples come from different sites and exhibit no peaks in their spectra, making them an interesting set of outliers. 
+The PCA shows a strong trend along PC 1 that seems to correlate with the colour of the material(fig. \@ref(fig:nir-pca)). Darker quartzite cluster to the right with white and colourless samples grouping to the opposite side. While the white samples seem to gravitate to the bottom left of the model the samples that are somewhat translucent, such as the *brecciated quartz*, seem to cluster towards the top-left. A small set of 3 black samples at the top of the model separate themselves clearly from the rest of the data points. These three samples come from different sites and exhibit no peaks in their spectra, making them an interesting set of outliers. 
 
  \linebreak
 
-```{r nir-spectra, fig.width=20, fig.height=15, fig.cap="Average NIR spectra by hue. Darker samples feature higher overall absorbance, as well as less pronounced peaks, when compared to lighter/translucent samples."}
+```{r nir-spectra, fig.width=20, fig.height=15, fig.cap="Average NIR spectra by hue. Darker samples feature higher overall absorbance, as well as less pronounced peaks, when compared to lighter/colourless samples."}
 
 #Filter NIR data to focus on the material with a dark hue 
 #and select the NIR range 1 000 - 2 500 nm
 dark <- Points.nir %>% 
   filter(hue == "Dark") %>% 
-  select(c(1:28),c(679:2179))
+  select(c(1:28),c(680:2179))
 
-#create a spectra object for the dark material, and then repeat for light, white and translucent groups
+#create a spectra object for the dark material, and then repeat for light, white and colourless groups
 spec.d <- 
   as_spectra(dark, name_idx = 1, meta_idxs = 2:28)
 
 light <- Points.nir %>% 
   filter(hue == "Light") %>% 
-  select(c(1:28),c(679:2179))
+  select(c(1:28),c(680:2179))
 
 spec.l <- 
   as_spectra(light, name_idx = 1, meta_idxs = 2:28)
 
-translucent <- Points.nir %>% 
+colourless <- Points.nir %>% 
   filter(hue == "Colourless") %>% 
-  select(c(1:28),c(679:2179))
+  select(c(1:28),c(680:2179))
 
 spec.t <- 
-  as_spectra(translucent, name_idx = 1, meta_idxs = 2:28)
+  as_spectra(colourless, name_idx = 1, meta_idxs = 2:28)
 
 white <- Points.nir %>% 
   filter(hue == "White") %>% 
-  select(c(1:28),c(679:2179))
+  select(c(1:28),c(680:2179))
 
 spec.w <- 
   as_spectra(white, name_idx = 1, meta_idxs = 2:28)
@@ -495,15 +540,15 @@ ggplot(cbind(basic_plot1$data, Points.nir[, c(8,10)]),
  \linebreak
 
 ## Raman
-There are two distinctive features present in the Raman data (fig. \@ref(fig:raman-spectra)). The first are three peaks in the 100 cm-1 - 500 cm-1 band that are typical for SiO~2~ and quartz-based materials, with the strongest peak occuring at 460 cm-1 [@gillet_etal90]. These peaks are present for all samples in the dataset. The second feature shows up as two peaks occurring at around 1 287 cm-1 and 1 598 cm-1, and dominate the spectra in terms of intensity for the darker samples. These peak positions fall within what is referred to as the *D* and *G* band respectively, and have been observed in spectroscopic studies of graphite/graphene [@cesare_maineri99]. The D band occurs as a result of disordered carbon (C) structures whilst the G band is indicative of sp^2^ carbon networks and caused by stretching in the carbon bonds, which is common in graphite-based materials [@vollebregt_etal12; @lee_etal21]. Whereas the 2^nd^ peak falls within the typical position of the G band, the position of the D band is commonly identified as being in the 1 330 - 1 350 cm-1 region. It has, however, been documented that the dispersive behavior of the D band can cause a frequency change as a result of the energy of the incident laser [@pimenta_etal07 p.1280]. This could thus explain the discrepancy between the observed peak in the dataset and the literature.
+There are two distinctive features present in the Raman data (fig. \@ref(fig:raman-spectra)). The first are three peaks in the 100 cm^-1^ - 500 cm^-1^ band that are typical for SiO~2~ and quartz-based materials, with the strongest peak occuring at 460 cm^-1^ [@gillet_etal90]. These peaks are present for all samples in the dataset. The second feature shows up as two peaks occurring at around 1 287 cm^-1^ and 1 598 cm^-1^, and dominate the spectra in terms of intensity for the darker samples. These peak positions fall within what is referred to as the *D* and *G* band respectively, and have been observed in spectroscopic studies of graphite/graphene [@cesare_maineri99]. The D band occurs as a result of disordered carbon (C) structures whilst the G band is indicative of sp^2^ carbon networks and caused by stretching in the carbon bonds, which is common in graphite-based materials [@vollebregt_etal12; @lee_etal21]. Whereas the 2^nd^ peak falls within the typical position of the G band, the position of the D band is commonly identified as being in the 1 330 - 1 350 cm^-1^ region. It has, however, been documented that the dispersive behavior of the D band can cause a frequency change as a result of the energy of the incident laser [@pimenta_etal07 p.1280]. This could thus explain the discrepancy between the observed peak in the dataset and the literature.
 
-A third feature, present in a small subset of the samples, appears as two peaks spaced closely together at ca. 695 cm-1 and 795 cm-1. Comparing these to reference samples from the mineral and rock collections kept at the Department of Ecology and Environmental Science at Umeå University, the same peaks are present in measurements collected on, among others, albite, apatite, diabase and shale. Studies of clay minerals [@kloprogge17] have identified a number of band regions in the lower wavenumbers related to Si, Al and OH vibrations, including the 700 - 800 cm-1 band which has been related to Al-O-Si vibrations for the Kaolin group. Considering the petrogenesis of quartzite and the likelihood that clay minerals are present in the material it is possible that this is what generates the feature in the current dataset.
+A third feature, present in a small subset of the samples, appears as two peaks spaced closely together at ca. 695 cm^-1^ and 795 cm^-1^. Comparing these to reference samples from the mineral and rock collections kept at the Department of Ecology and Environmental Science at Umeå University, the same peaks are present in measurements collected on, among others, albite, apatite, diabase and shale. Studies of clay minerals [@kloprogge17] have identified a number of band regions in the lower wavenumbers related to Si, Al and OH vibrations, including the 700 - 800 cm^-1^ band which has been related to Al-O-Si vibrations for the Kaolin group. Considering the petrogenesis of quartzite and the likelihood that clay minerals are present in the material it is possible that this is what generates the feature in the current dataset.
 
-The resulting PCA model (fig. \@ref(fig:raman-pca)) shows a clear trend along PC 1 (81.5 %) related to the quartz and D/G peaks. PC 2 and PC 3, however, mainly describes the remaining noise left in the spectra after detrending and preprocessing the data. Interestingly, the loading for PC 4 does catch the Al-O-Si peaks around the  700 cm-1 - 800 cm-1 band, which helps in separating out those samples where this feature is present. The measurements with mainly quartz peaks gravitates towards the negative side of the PC 1, and those where the graphite peaks are dominant towards the opposite side. It is also clear that the darker material feature more pronounced graphite peaks, whereas the lighter and more translucent objects mainly feature quartz peaks. As in the case of the NIR data, however, there are exceptions that break this trend, as well as a “muddled” middle group with both well-pronounced graphite and quartz peaks. When PC 4 is added the samples with quartz and Al-O-Si peaks gravitate towards the bottom left, separating themselves from the *quartz* group.
+The resulting PCA model (fig. \@ref(fig:raman-pca)) shows a clear trend along PC 1 (81.5 %) related to the quartz and D/G peaks. PC 2 and PC 3, however, mainly describes the remaining noise left in the spectra after detrending and preprocessing the data. Interestingly, the loading for PC 4 does catch the Al-O-Si peaks around the  700 cm^-1^ - 800 cm^-1^ band, which helps in separating out those samples where this feature is present. The measurements with mainly quartz peaks gravitates towards the negative side of the PC 1, and those where the graphite peaks are dominant towards the opposite side. It is also clear that the darker material feature more pronounced graphite peaks, whereas the lighter and more colourless objects mainly feature quartz peaks. As in the case of the NIR data, however, there are exceptions that break this trend, as well as a “muddled” middle group with both well-pronounced graphite and quartz peaks. When PC 4 is added the samples with quartz and Al-O-Si peaks gravitate towards the bottom left, separating themselves from the *quartz* group.
 
  \linebreak
 
-```{r raman-spectra, fig.width=20, fig.height=15, fullwidth = TRUE, fig.cap="Mean spectrum of the raman data grouped by their hue. The *quartz peak* at 460 cm-1 is present in all four groups, but the *graphite peaks* at 1 287  cm-1 (D band) and 1 598 cm-1 (G band) mainly appear in the dark group"}
+```{r raman-spectra, fig.width=20, fig.height=15, fullwidth = TRUE, fig.cap="Mean spectrum of the raman data grouped by their hue. The *quartz peak* at 460 cm^-1^ is present in all four groups, but the *graphite peaks* at 1 287  cm^-1^ (D band) and 1 598 cm^-1^ (G band) mainly appear in the dark group"}
 
 r.dark <- Points.raman %>% 
   filter(hue == "Dark")
@@ -517,11 +562,11 @@ r.light <- Points.raman %>%
 spec.rl <- 
   as_spectra(r.light, name_idx = 1, meta_idxs = 2:29)
 
-r.translucent <- Points.raman %>% 
+r.colourless <- Points.raman %>% 
   filter(hue == "Colourless")
 
 spec.rt <- 
-  as_spectra(r.translucent, name_idx = 1, meta_idxs = 2:29)
+  as_spectra(r.colourless, name_idx = 1, meta_idxs = 2:29)
 
 r.white <- Points.raman %>% 
   filter(hue == "White")
@@ -534,7 +579,7 @@ par(mfrow=c(2,2))
 
 #Plot the mean spectrum for each spectra group above with text annotations for the peaks in the first dark spectra
 plot(mean(spec.rd), lwd = 1.2, col = "black", ylab = "Intensity", cex.lab = 1.5, cex.main = 1.5,
-     xlab = "Wavenumber (cm-1)", main = "Average - Dark")
+     xlab = "Wavenumber (cm^-1^)", main = "Average - Dark")
 text(x=120, y=2900, labels="SiO", font=2, cex = 1.5)
 text(x=200, y=4300, labels="SiO", font=2, cex = 1.5)
 text(x=460, y=9250, labels="SiO", font=2, cex = 1.5)
@@ -542,18 +587,18 @@ text(x=1285, y=6300, labels="D", font=2, cex = 2.0)
 text(x=1600, y=4000, labels="G", font=2, cex = 2.0)
 
 plot(mean(spec.rl), lwd = 1.2, col = "red", ylab = "Intensity", cex.lab = 1.5, cex.main = 1.5,
-     xlab = "Wavenumber (cm-1)", main = "Average - Light")
+     xlab = "Wavenumber (cm^-1^)", main = "Average - Light")
 
 plot(mean(spec.rt), lwd = 1.2, col = "purple", ylab = "Intensity", cex.lab = 1.5, cex.main = 1.5,
-     xlab = "Wavenumber (cm-1)", main = "Average - Colourless")
+     xlab = "Wavenumber (cm^-1^)", main = "Average - Colourless")
 
 plot(mean(spec.rw), lwd = 1.2, col = "blue", ylab = "Intensity", cex.lab = 1.5, cex.main = 1.5,
-     xlab = "Wavenumber (cm-1)", main = "Average - White")
+     xlab = "Wavenumber (cm^-1^)", main = "Average - White")
 ```
 
  \linebreak
 
-```{r raman-pca, fig.width=20, fig.height=15, fig.cap="PCA score plots for the raman spectra. The main explanatory power can be found in the 1^st^ component, which groups the data based on the quartz and D/G bands. As these are the main features in the data, the other components mainly describe the remaining noise, producing the arch-shape in the PCA. The 3^rd^ component does, however, also separate out the few samples that feature peaks at 700-800 cm-1 that may result from Al, Si and OH vibrations."}
+```{r raman-pca, fig.width=20, fig.height=15, fig.cap="PCA score plots for the raman spectra. The main explanatory power can be found in the 1^st^ component, which groups the data based on the quartz and D/G bands. As these are the main features in the data, the other components mainly describe the remaining noise, producing the arch-shape in the PCA. The 3^rd^ component does, however, also separate out the few samples that feature peaks at 700-800 cm^-1^ that may result from Al, Si and OH vibrations."}
 
 #perform PCA with SNV normalization and mean-center
 raman.pca <-
@@ -650,20 +695,20 @@ comb +
 ## XRF
 The XRF spectrometer is not capable of detecting all of the common elements, and the software therefore calculates a balance (Bal), which represents the remaining unquantifiable elements in a sample. The elements represented in this unquantifiable group are all those with an atomic number lower than ^12^Mg (REF). Univariate analysis shows that SiO^2^ makes up the main bulk of the composition of the material, and two major groups can be distinguished based on this content (fig. \@ref(fig:xrf-violin-plot)). The majority of the readings resulted in a SiO^2^ content of less than 50%, and about ¼ of the readings (~ 27%) featured a SiO^2^ content closer to 90 %. The “low” SiO^2^ group also feature a Bal between 40 – 70 %. 
 
-The three first components of the PCA have an eigenvalue above 1 and the cumulative explained variance is ~ 84.7%. The loadings of the three components can be seen in figure \@ref(fig:xrf-loadings). In the score plot of PC 1 and PC 2, two large clusters can be seen (fig. \@ref(fig:xrf-score-plot-p1-p2)). Interestingly, the smaller cluster on the left side in the model includes the samples with a SiO^2^ content higher than 50%, whilst the larger cluster includes those with lower SiO^2^ content. It is not ^14^Si that is responsible for this clustering, however, but rather ^26^Fe and ^40^Zr that drives this. The “low ^14^Si” cluster shows a trend along PC 2 of quartzite with a darker hue grouping towards the bottom. This may indicate a possible relation to the ^26^Fe content of the material as ^26^Fe-bearing minerals such as hematite can contribute to the dark colour in quartzite ([@howard05] p.711). The *brecciated quartz* samples largely group together at the top of the “low ^14^Si” cluster, with a couple ending up towards closer to the “high ^14^Si” cluster. The white (N9) material is somewhat evenly distributed within the right cluster. 
+The two first components of the PCA have an eigenvalue above 1 and the cumulative explained variance is ~ 81.3%. The loadings can be be seen in figure \@ref(fig:xrf-loadings). In the score plot of PC 1 and PC 2 two large clusters can be seen (fig. \@ref(fig:xrf-score-plot-p1-p2)). Interestingly, the smaller cluster on the left side in the model includes the samples with a SiO^2^ content higher than 50%, whilst the larger cluster includes those with lower SiO^2^ content. It does not seem to be ^14^Si that is responsible for this clustering, however, but rather ^26^Fe and ^40^Zr. The “low ^14^Si” cluster shows a trend along PC 2 of quartzite with a darker hue grouping towards the bottom. This may indicate a possible relation to the ^26^Fe content of the material as ^26^Fe-bearing minerals such as hematite can contribute to the dark colour in quartzite [@howard05 p.711]. The *brecciated quartz* samples largely group together at the top of the “low ^14^Si” cluster, with a couple ending up closer towards the “high ^14^Si” cluster. The white (N9) material is fairly evenly distributed within the right cluster. 
 
 The group of measurements that are somewhat separated from the “low ^14^Si” cluster at the bottom are all but one from the rock painting site of *Finnforsberget*, which is located next to the Skellefte river. The *Finnforsberget* artefacts were sampled twice with object 491 having one measurement closer to the “low ^14^Si” group and the other the “high ^14^Si” group with ^13^Al estimated at 25 %. This artefact was sampled twice on each side, resulting in similar results both times.
 
-One almost translucent sample also ends up in the "high ^14^Si" cluster among the darker material. Upon closer inspection this sample is small, ~ 3 by 1 mm, and also feature inclusions of dark particles. Both of these factors may have contributed to its placement in the model.
+One of the *colourless* samples also ends up in the "high ^14^Si" cluster among the darker material. Upon closer inspection this sample is small, ~ 3 by 1 mm, and also feature inclusions of dark particles. Both of these factors may have contributed to its placement in the model.
 
  \linebreak
 
 ```{r xrf-violin-plot, fig.width=15, fig.height=15, fig.fullwidth=TRUE, fig.cap="Violin plot of element content in quartzite samples measured using pXRF. **n** represents no. of measurements above Limit of Detection (LOD) for that element out of a total of 478 measurements. Note the bimodal distribution of Si measurements, these groups are reflected in the score plot of the PCA"}
 #Prepare data in long format for violin plots
 Points_long <-
-  Points.xrf %>%
-  select(`12Mg`,`13Al`, `14Si`, `15P`, `16S`, `19K`, `20Ca`, `23V`, `25Mn`, `26Fe`, `30Zn`, `38Sr`, `39Y`, `40Zr`, `56Ba`, `81Ti`) %>%
-  gather(key = "Element", value = "Value")
+  drop_na(Points.xrf %>%
+    select(`12Mg`,`13Al`, `14Si`, `15P`, `16S`, `19K`, `20Ca`, `23V`, `25Mn`, `26Fe`, `30Zn`, `38Sr`, `39Y`, `40Zr`, `56Ba`, `81Ti`) %>%
+    gather(key = "Element", value = "Value"))
 
 # Add column with elemental groups for visualisation
 Points_long <-
@@ -686,6 +731,13 @@ Points_long <-
       endsWith(Element, "Ba") ~ "Alkaline Earth",
       endsWith(Element, "Ti") ~ "Transition Metal",
     ))
+
+#Calculate and add value equal to 95% of the value range for each element, this is in preparation for 
+#text annotations in final plot where a text will be positioned at this values height in each plot
+Points_long <- 
+  Points_long %>% 
+  group_by(Element) %>% 
+    mutate(ypos = min(Value)+0.95*diff(range(Value)))  
 
 #Prepare colors
 loading.colors <- c("darkorange", "darkolivegreen3", "skyblue1", "lightslateblue", "salmon1", "lightgoldenrod1")
@@ -711,14 +763,45 @@ Elements <- c(
   '81Ti' = "Ti"
   )
 
-#Violin plot of elemental content, trimmed, with fill based on elemental groups
+#Prepare data frame with elements for annotating facets in final plot
+na_values <- 
+  data.frame("Element" = unique(Points_long$Element))
+
+#Calculate and add number of missing values for each element             
+na_values <- 
+  na_values %>% 
+    mutate(na_values = c(
+      paste("n = ", length(which(!is.na(Points.xrf$`12Mg`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`13Al`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`14Si`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`15P`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`16S`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`19K`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`20Ca`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`23V`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`25Mn`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`26Fe`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`30Zn`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`38Sr`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`39Y`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`40Zr`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`56Ba`)))),
+      paste("n = ", length(which(!is.na(Points.xrf$`81Ti`)))))
+    )
+
+#Merge na_values and Points_long data frames in order to get the y position that the text annotation should be displayed
+#in for each element facet in final plot
+na_values <- 
+  merge(na_values, unique(Points_long[,c("Element", "ypos")]), by = "Element", all.x = TRUE)
+
+#Violin plot of elemental content, trimmed, with fill based on elemental groups and number of values under LOD as text annotation
 Points_long %>%
-  drop_na(Value) %>%
     ggplot(aes(x=Element, y=Value, fill = Group)) +
     geom_violin(trim = TRUE) +
     facet_wrap( ~ Element, scales = "free", labeller = labeller(Element = Elements)) +
     scale_fill_manual(values=loading.colors) +
     theme_bw() +
+    geom_text(data=na_values, aes(x=0.2, y=ypos, label=na_values, fontface = "bold"), nudge_x = 0.4, inherit.aes = FALSE) +
     theme(
       legend.title = element_text(size = 12, face = "bold", colour = "black"),
       strip.text.x = element_text(size = 12, face = "bold", colour = "black"),
@@ -731,7 +814,7 @@ Points_long %>%
 
  \linebreak
 
-```{r xrf-loadings, fig.width=8, fig.height=8, fig.cap="The three first loading vectors (P1-P3) with scores for each loading (element)"}
+```{r xrf-loadings, fig.width=8, fig.height=8, fig.cap="Loading vectors (P1-P2) with scores for each loading (element)"}
 #select elements to include in pca, as well as columns to group by
 xrf <-
   Points.xrf %>%
@@ -747,7 +830,7 @@ xrf.imp <- imputePCA(xrf.log, ncp = 2, scale = FALSE, method = "Regularized", ma
 xrf.pca <- prcomp(xrf.imp$completeObs, center = TRUE, scale.=TRUE)
 
 #Extract loadings from xrf.pca
-loadings <- as.data.frame(xrf.pca$rotation[,1:3])
+loadings <- as.data.frame(xrf.pca$rotation[,1:2])
 #As elements are stored as rownames, set them as first column so it can be used as a variable
 loadings <- setDT(loadings, keep.rownames = "Element")[]
 #Melt loadings from wide to long format
@@ -755,7 +838,7 @@ loadings.melted <- melt(loadings, id.vars="Element")
 #Set names of columns
 loadings <- setNames(loadings.melted, c("Element", "PC", "Value"))
 
-#bar graph of the loadings (P1-P3) for the XRF data
+#bar graph of the loadings (P1-P2) for the XRF data
 loadings %>%
   ggplot(aes(x=fct_rev(Element), y=Value)) +
   geom_bar(
@@ -776,7 +859,7 @@ loadings %>%
 
 ```{r xrf-pca1, fig.width=15, fullwidth=TRUE, fig.height=10, fig.cap="XRF score plot of 1^st^ and 2nd components. The smaller group to the left in the plot includes samples with higher Si content, while the larger group includes samples with Si content < 50%."}
 
-#Prepare two score plots
+#XRF score plot
 ggbiplot(xrf.pca,
          choices=c(1,2),
          obs.scale = 1,
@@ -814,7 +897,7 @@ theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
 ```
 
  \linebreak
-
+<!--
 ```{r xrf-pca2, fig.width=15, fullwidth=TRUE, fig.height=10, fig.cap="XRF score plot of 1^st^ and 3rd components. The same groupings of low/high Si content remains along PC1, but PC3 seems to separate darker and light samples further in the low Si group."}
 ggbiplot(xrf.pca,
          choices=c(1,3),
@@ -851,9 +934,7 @@ theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
       legend.background = element_rect(linetype = "solid", color = "black"),
       legend.position = "bottom")
 ```
-
-
- \linebreak
+-->
 
 # Discussion
 
@@ -861,20 +942,24 @@ theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
  \linebreak
 
 
-The most easily recognizable megascopic feature of petrographic material is its colour, a feature that has been one of the main means of grouping quartzite in North Swedish archaeological research (e.g. @forsberg85 p.60-64, @kaeck09 p. 53-55). While it is true that some inference can be made based on colour, such as ^26^Fe-bearing minerals contributing to a darker colour, this becomes increasingly difficult with heterogeneous material. Should a quartzite where the matrix is mainly light gray in colour, but streaked with black mineral veins, be considered a *light* or *dark* quartzite? The results above echoes this complexity. While the overall structure in the spectroscopic results for each of the instrumentations, and especially the NIRS, groups samples of similar colour (given as *munsell hue*) together, there are samples that break these trends and thus demonstrate the presence of structural and compositional features that do not necessarily align with the perceived colour of a material. 
+The most easily recognizable megascopic feature of petrographic material is its colour, a feature that has been one of the main means of grouping quartzite in North Swedish archaeological research [e.g. @forsberg85 p.60-64; @kaeck09 p. 53-55]. While it is true that some inference can be made based on colour, such as ^26^Fe-bearing minerals contributing to a darker colour, this becomes increasingly difficult with heterogeneous material. Should a quartzite where the matrix is mainly light gray in colour, but streaked with black mineral veins, be considered a *light* or *dark* quartzite? The results above echoes this complexity. While the overall structure in the spectroscopic results for each of the instrumentations, and especially the NIRS, groups samples of similar colour (given as *Munsell hue*) together, there are samples that break these trends and thus demonstrate the presence of structural and compositional features that do not necessarily align with the perceived colour of a material. 
 
-In the case of the raman data the PCA is somewhat lacking in exploratory and descriptive power. Apart from the few samples that feature the 700 cm-1 - 800 cm-1 band peaks the major features in the data are all explained by the first component. As the intensity in raman spectroscopy is not a direct quantitative indicator this makes it difficult to group materials based on the intensity of the D/G bands, making more of a binary separation of presence/absence of the *graphite peaks*. That is not to say that it is not possible to attempt quantification using raman spectroscopy, but rather that this would demand a different experimental setup. That said, the presence of the *graphite peaks* may represent an important clue in determining the potential geological origin for the material. The presence of the C structures suggest the petrogenesis included sediments enriched with organic material, providing a good filter for continued research.
+Rather than assigning color based on how it is perceived visually it can be approached in a more systematic manner [e.g. @fairchild13]. 
 
-Interestingly the *brecciated quartz* remains relatively grouped together in all of the models demonstrating some consistency with the original classification. As the material does group with other similarly semi-translucent material it does not seem to distinguish itself enough in the models in order to consider it its own group. The original classification by @ahman67 refers to the microscopic fragmented configuration of the quartz crystals as being the main distinguishing feature, and while it is possible to discern the presence of SiO structure through non-destructive spectroscopy, there have been no other discernible features related to this group.  
+In the case of the Raman data the PCA is somewhat lacking in exploratory and descriptive power. Apart from the few samples that feature the 700 cm^-1^ - 800 cm^-1^ band peaks the major features in the data are all explained by the first component. As the intensity in Raman spectroscopy is not a direct quantitative indicator this makes it difficult to group materials based on the intensity of the D/G bands, making more of a binary separation of presence/absence of the *graphite peaks*. That is not to say that it is not possible to attempt quantification using Raman spectroscopy, but rather that this would necessitate a different experimental setup. That said, the presence of the *graphite peaks* may present an important clue in determining the potential geological origin for the material. Mentions of *graphitic quartzite* can be found in an early 20th century description of an excursion to Storfjället, Tärna parish, by the Geological Society [@motet25], but otherwise does not seem to be a frequently used term in the modern day. 
 
-Keeping in mind the 
+The Raman data is also a good example of the potential value of PCA components with a low degree of explained variance. While the typical statistical approach is to disregard components with an eigenvalue below 1, in the case of spectral data there may still be meaningful features explained by those very same components. The eigenvalue of the 4^th^ component in the Raman PCA is below 1, but amidst the noise there were still meaningful features that may be used for characterization.
+
+Interestingly the *brecciated quartz* remains relatively grouped together in all of the models demonstrating some consistency with the original classification. As the material does group with other similarly semi-translucent material it does not seem to distinguish itself enough in the models in order to consider it its own group. The original classification by @ahman67 refers to the microscopic fragmented configuration of the quartz crystals as being the main distinguishing feature, and while it is possible to discern the presence of SiO structure through non-destructive spectroscopy, there have been no other discernible features related to this group at this stage. The question remains whether the material classified as *brecciated quartzite*
 
 
  \linebreak
 
 # Conclusion
 
-The results demonstrate clearly that all three instrumentations are capable of characterizing some aspect of the quartz and quartzite, however, taken on their own they lack the resolution needed to provide a detailed enough fingerprint based solely on surface measurements. Nevertheless they do provide a more in-depth understanding of the composition and structure of the material, and combining these results may be the key to more robust non-destructive characterization of petrographic material. 
+The results demonstrate clearly that all three instrumentations are capable of characterizing some aspect of the quartz and quartzite, however, taken on their own they lack the resolution needed to provide a detailed enough fingerprint based solely on surface measurements. Nevertheless they do provide a more in-depth understanding of the composition and structure of the material as well as the complexity which exists in quartz and quartzite materials. The study represents a good example of an exploratory approach in the characterization of petrographic material, where there is an absence of reference material. With a large enough dataset exploratory multivariate statistics can be used in order to discern groupings based on the spectral features, taking advantage of the short integration 
+
+and combining these results may be the key to more robust non-destructive characterization of petrographic material. 
 
 
 
@@ -882,6 +967,8 @@ The results demonstrate clearly that all three instrumentations are capable of c
  \linebreak
 
 # Acknowledgements
+
+I would like to thank my supervisors, Philip I. Buckland and Johan Linderholm, for valuable comments on previous versions of this paper. 
 
  \linebreak
  \linebreak
