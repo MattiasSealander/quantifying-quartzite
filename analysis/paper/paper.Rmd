@@ -55,6 +55,7 @@ library(data.table)
 library(factoextra)
 library(ggbiplot)
 library(ggplot2)
+library(ggh4x)
 library(ggsci)
 library(grid)
 library(gridBase)
@@ -725,33 +726,33 @@ Points_long <-
 Points_long <-
   Points_long %>%
     mutate(Group = case_when(
-      endsWith(Element, "Mg") ~ "Alkaline Earth",
-      endsWith(Element, "Al") ~ "Basic metal",
-      endsWith(Element, "Si") ~ "Semimetal",
-      endsWith(Element, "P") ~ "Nonmetal",
-      endsWith(Element, "S") ~ "Nonmetal",
-      endsWith(Element, "K") ~ "Alkali Metal",
-      endsWith(Element, "Ca") ~ "Alkaline Earth",
-      endsWith(Element, "V") ~ "Transition Metal",
-      endsWith(Element, "Mn") ~ "Transition Metal",
-      endsWith(Element, "Fe") ~ "Transition Metal",
-      endsWith(Element, "Zn") ~ "Transition Metal",
-      endsWith(Element, "Sr") ~ "Alkaline Earth",
-      endsWith(Element, "Y") ~ "Transition Metal",
-      endsWith(Element, "Zr") ~ "Transition Metal",
-      endsWith(Element, "Ba") ~ "Alkaline Earth",
-      endsWith(Element, "Ti") ~ "Transition Metal",
+      endsWith(Element, "Mg") ~ "Lithophile",
+      endsWith(Element, "Al") ~ "Lithophile",
+      endsWith(Element, "Si") ~ "Lithophile",
+      endsWith(Element, "P") ~ "Lithophile",
+      endsWith(Element, "S") ~ "Chalcophile",
+      endsWith(Element, "K") ~ "Lithophile",
+      endsWith(Element, "Ca") ~ "Lithophile",
+      endsWith(Element, "V") ~ "Lithophile",
+      endsWith(Element, "Mn") ~ "Siderophile",
+      endsWith(Element, "Fe") ~ "Siderophile",
+      endsWith(Element, "Zn") ~ "Chalcophile",
+      endsWith(Element, "Sr") ~ "Lithophile",
+      endsWith(Element, "Y") ~ "Lithophile",
+      endsWith(Element, "Zr") ~ "Lithophile",
+      endsWith(Element, "Ba") ~ "Lithophile",
+      endsWith(Element, "Ti") ~ "Chalcophile",
     ))
 
-#Calculate and add value equal to 95% of the value range for each element, this is in preparation for 
+#Calculate and add value equal to 90% of the value range for each element, this is in preparation for 
 #text annotations in final plot where a text will be positioned at this values height in each plot
 Points_long <- 
   Points_long %>% 
-  group_by(Element) %>% 
-    mutate(ypos = min(Value)+0.95*diff(range(Value)))  
+    group_by(Element) %>% 
+    dplyr::mutate(ypos = quantile(Value, 0.95))  
 
 #Prepare colors
-loading.colors <- c("darkorange", "darkolivegreen3", "skyblue1", "lightslateblue", "salmon1", "lightgoldenrod1")
+loading.colors <- c("lightgoldenrod1", "darkorange", "lightpink1")
 
 #Lookup for element labeller
 #Ändra ordning så att de mer avvikande (Si, Mn etc) hamnar uppe till vänster
@@ -805,12 +806,40 @@ na_values <-
 na_values <- 
   merge(na_values, unique(Points_long[,c("Element", "ypos")]), by = "Element", all.x = TRUE)
 
+
+#Prepare ylimits for each group in order to exclude extreme outliers in the violin plot graphic
+ylims <- Points_long %>%
+  group_by(Element) %>% 
+  dplyr::summarise(y1 = 0, y2 = quantile(Value, 0.95))
+
+#Prepare a list with formula for setting new ylimits for each group in ggh4x package "facetted_pos_scales() which makes it possible to work with facet_wrap()
+scales <- c(
+  Element == '12Mg' ~ scale_y_continuous(limits = c(as.vector(t(ylims[1,2:3])))),
+  Element == '13Al' ~ scale_y_continuous(limits = c(as.vector(t(ylims[2,2:3])))),
+  Element == '14Si' ~ scale_y_continuous(limits = c(as.vector(t(ylims[3,2:3])))),
+  Element == '15P' ~ scale_y_continuous(limits = c(as.vector(t(ylims[4,2:3])))),
+  Element == '16S' ~ scale_y_continuous(limits = c(as.vector(t(ylims[5,2:3])))),
+  Element == '19K' ~ scale_y_continuous(limits = c(as.vector(t(ylims[6,2:3])))),
+  Element == '20Ca' ~ scale_y_continuous(limits = c(as.vector(t(ylims[7,2:3])))),
+  Element == '23V' ~ scale_y_continuous(limits = c(as.vector(t(ylims[8,2:3])))),
+  Element == '25Mn' ~ scale_y_continuous(limits = c(as.vector(t(ylims[9,2:3])))),
+  Element == '26Fe' ~ scale_y_continuous(limits = c(as.vector(t(ylims[10,2:3])))),
+  Element == '30Zn' ~ scale_y_continuous(limits = c(as.vector(t(ylims[11,2:3])))),
+  Element == '38Sr' ~ scale_y_continuous(limits = c(as.vector(t(ylims[12,2:3])))),
+  Element == '39Y' ~ scale_y_continuous(limits = c(as.vector(t(ylims[13,2:3])))),
+  Element == '40Zr' ~ scale_y_continuous(limits = c(as.vector(t(ylims[14,2:3])))),
+  Element == '56Ba' ~ scale_y_continuous(limits = c(as.vector(t(ylims[15,2:3])))),
+  Element == '81Ti' ~ scale_y_continuous(limits = c(as.vector(t(ylims[16,2:3]))))
+)
+
+
 #Violin plot of elemental content, trimmed, with fill based on elemental groups and number of values under LOD as text annotation
 Points_long %>%
     ggplot(aes(x=Element, y=Value, fill = Group)) +
     geom_violin(trim = TRUE) +
     facet_wrap( ~ Element, scales = "free", labeller = labeller(Element = Elements)) +
     scale_fill_manual(values=loading.colors) +
+    facetted_pos_scales(y = scales) +
     theme_bw() +
     geom_text(data=na_values, aes(x=0.2, y=ypos, label=na_values, fontface = "bold"), nudge_x = 0.4, inherit.aes = FALSE) +
     theme(
