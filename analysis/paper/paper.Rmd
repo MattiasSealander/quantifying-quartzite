@@ -72,8 +72,7 @@ XRF.csv <-
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2("./analysis/data/derived_data/NIR_master_averaged_20210914.csv", sep = ";",
-            dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2("./analysis/data/derived_data/NIR_master_averaged_20210914.csv", sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #Import raman data, set empty fields to NA
 raman.csv <-
@@ -87,16 +86,17 @@ samples <-
 Points.xrf <-
   XRF.csv %>%
     filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz",
-         type == "Point" | type == "Point fragment" | type == "Preform")
+           type == "Point" | type == "Point fragment" | type == "Preform")
 
 Points.nir <-
   nir.csv %>%
     filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz",
-         type == "Point" | type == "Point fragment" | type == "Preform")
+           type == "Point" | type == "Point fragment" | type == "Preform")
 
 Points.raman <-
   raman.csv %>%
-    filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz", type == "Point" | type == "Point fragment" | type == "Preform")
+    filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz", 
+           type == "Point" | type == "Point fragment" | type == "Preform")
 
 #Fill the NA fields in the munsell_hue column and mark them as colourless samples
 Points.nir[8][is.na(Points.nir[8])] <- "Colourless"
@@ -108,6 +108,10 @@ pca.colors <- c("#E31CFF", "#718EFF", "#0080FF", "#D5DF9E", "#C6DF39", "#FFFFC1"
 pca.shapes <- c(24,25,23,22,21)
 pca.munsell_hue <- c("Colourless", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y", "7.5Y", "10Y", "5YR", "N1", "N2", "N3", "N4", "N5", "N6", "N8", "N9")
 
+#If including references
+#pca.colors <- c("#E31CFF", "#718EFF", "#0080FF", "#D5DF9E", "#C6DF39", "#FFFFC1", "#FFFFA1", "#FFFF00", "#FFFF38", "#DF5555", "#FFB468", "#000000", "#202020", "#404040", "#606060", "#808080", "#9F9F9F", "#BFBFBF", "#DFDFDF", "#FFFFFF")
+#pca.munsell_hue <- c("Colourless", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y", "7.5Y", "10Y", "2.5YR", "5YR", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9")
+
 ```
 
 # Introduction
@@ -118,6 +122,21 @@ Prieto et al. [-@prieto_etal19 p.15; -@prieto_etal20 p.32] notes that the usage 
 
 In the current study a dataset of quartz and quartzite artefacts from museum collections in Västerbotten, Sweden, have been analysed using the three above mentioned spectroscopic instrumentations (NIRS, Raman, XRF). The aim is to evaluate their viability for fingerprinting quartz and quartzite material in the North Swedish region, where there currently is a lack of reference material as well as a complex geological setting. This will be achieved via Principal Component Analysis (PCA), where the observed groupings of the material in the model will be related to their spectral features. 
  \linebreak
+
+# Study region
+
+ \linebreak
+ \linebreak
+
+```{r geo-map, fig.width=15, fig.height=15, fig.fullwidth=TRUE, fig.cap="Geological map of Västerbotten County, Sweden, showing both the tectonic units of the mountains and the widely distributed moraine. Made with Lantmäteriet (CC0), Natural Earth, and Sveriges Geologiska Undersökning (SGU)"}
+knitr::include_graphics('../figures/geo_map2.png', error = FALSE)
+```
+
+ \linebreak
+
+The effects of the last glacial on the landscape is visible in the widely distributed moraine formations and glaciofluvial deposits (fig. \@ref(fig:distribution-map)). In Västerbotten the Köli Nappe complex exhibits greensschist - amphibolite facies metamorphism, overlying the Seve Nappe complex where High Pressure (HP) and Ultra High Pressure (UHP) metamoprhism has been detected in a number of localities. 
+
+In 1925 the Geological Society arranged an exursion to Södra Storfjället in Västerbotten. In the description of the regional stratigraphy it is noted that the lower parts are made up of, among others, "*...dark schists and graphitic quartzite...*" [@geologiska25 p.147]. Apart from these quartzite with little impurities and Alum shale are also noted. 
 
 # Material
 ```{r select-point-data}
@@ -165,7 +184,7 @@ sample_uniq <-
  \linebreak
  \linebreak
 
-The current study is based on spectroscopic surface measurements collected on quartz and quartzite points recovered from sites within the County of Västerbotten, Sweden. A dataset of `r length(sample_uniq)` points, point fragments and preforms made from quartz and quartzite material stored at the collections at Västerbotten (www.vbm.se) and Skellefteå (www.skellefteamuseum.se) museums were analysed using NIRS, raman and XRF spectroscopy. The material features a mainly black, grey or white hue, as well as a subset of semi-translucent material with a beige tint to almost fully translucent. The colour of the material has been classified both according to the Munsell system, as well as sorted into general categories of hue for visualization purposes: *dark* (~ N1-N4), *light* (~ N5-N8), *white* (~ N9), *colourless* (lack of colour, opaque to translucent). A number of these points have, according to prior classifications, been worked using bifacial technology. While there currently is no local chronology available for this artefact type in the North Swedish region, previous research suggest they were in use during the 4 000 – 2 000 BP period [@forsberg85; @forsberg89; @mjaerum12]. Similarly, early studies of raw material use at sites dating to this period seems to indicate an increase in the use of quartzite compared to previous periods [@baudou78]. 
+The current study is based on spectroscopic surface measurements collected on quartz and quartzite points recovered from sites within the County of Västerbotten, Sweden. A dataset of `r length(sample_uniq)` points, point fragments and preforms made from quartz and quartzite material stored at the collections at Västerbotten (www.vbm.se) and Skellefteå (www.skellefteamuseum.se) museums were analysed using NIRS, raman and XRF spectroscopy. The material features a mainly black, grey or white hue, as well as a subset of semi-translucent material with a beige tint to almost fully translucent. The colour of the material has been classified both according to the Munsell system, as well as sorted into general categories of hue for visualization purposes: *dark* (~ N1-N4), *light* (~ N5-N8), *white* (~ N9), *colourless* (lack of colour, opaque to translucent). A number of these points have, according to prior classifications, been worked using bifacial technology. While there currently is no local chronology available for this artefact type in the North Swedish region^[For comparison, Mjæreum -@mjaerum12 has put forth a chronology for bifacial points in southwestern Norway], there have been attempts[@baudou92 p.99; @forsberg85 p.5; @forsberg89]. Taken together the research suggests a period of use that falls between ca. 3 800 - 2 000 BP [@kaeck09 p.60]. Similarly, studies of raw material use at sites dating to this period seems to indicate an increase in the use of quartzite [@baudou78]. 
 
 A large portion of the collections stored at North Swedish museums were recovered from excavations and surveys performed in conjunction with the river regulations during the 1940s – 1980s [@biornstad06; @janson_hvarfner60], as well as subsequent follow-up survey projects [e.g. @andersson15]. This has likely had a contributing factor to the distribution pattern of the artefacts observed in fig. \@ref(fig:distribution-map) as the known sites with finds of points and preforms are concentrated around the parishes of Dorotea, Lycksele^[In this case the majority of the samples from Lycksele are from the rock painting site of Lycksele 301], Vilhelmina and Tärnaby. This can be seen more clearly in fig. \@ref(fig:distribution-by-parish) with the four parishes accounting for almost ¾ of the total no. of samples. 
 
