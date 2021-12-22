@@ -95,7 +95,7 @@ Points.nir <-
 
 Points.raman <-
   raman.csv %>%
-    filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz", 
+    filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz",
            type == "Point" | type == "Point fragment" | type == "Preform")
 
 #Fill the NA fields in the munsell_hue column and mark them as colourless samples
@@ -120,10 +120,17 @@ In regions where local flint and obsidian sources are non-existent, such as Nort
 
 Prieto et al. [-@prieto_etal19 p.15; -@prieto_etal20 p.32] notes that the usage of the term *quartzite* in archaeology has been somewhat ambiguous, often used interchangeably between sedimentary orthoquartzite and metamorphic quartzite. It is difficult to provide a comprehensive definition of quartzite, owing much to its metamorphic nature, and different researchers have thus emphasized different features as being characteristic of the material [@howard05]. Visual characterization on a megascopic level is typically unreliable, and microscopic analysis is recommended for the identification of metamorphic structures, but Howard [-@howard05 p.708] also emphasises the need for field-based methodologies. In the case of archaeological research it is worth considering situations where destructive techniques simply are not applicable. Artefact collections (museum, private, etc.) represent a valuable resource and asset, with easy access to large datasets with a wide geographical distribution. While destructive methods may prohibit access to such material there are still non-destructive alternatives that can generate valuable information. Aside from being non-destructive spectroscopic instrumentation feature fast measurements, making it an attractive option for field-based screening purposes. While X-Ray Fluorescence (XRF) is the go-to spectroscopic technique for petrographic characterization [@shackley11a; @tykot03], due to its capability of providing compositional data, there are other instrumentations that may provide a deeper insight into the structural properties. The use of near-infrared spectroscopy (NIRS) goes almost as far back as the XRF [@hunt77], and there is an impressive body of work dedicated to the fingerprinting of geological materials [@linderholm_geladi14a; @linderholm_geladi14b; @sciuto19]. The same can be said for Raman spectroscopy, which has been applied extensively in the Cultural Heritage sector and in the analysis of artwork and manuscripts [@vandenabeele12].   
 
-In the current study a dataset of quartz and quartzite artefacts from museum collections in Västerbotten, Sweden, have been analysed using the three above mentioned spectroscopic instrumentations (NIRS, Raman, XRF). The aim is to evaluate their viability for fingerprinting quartz and quartzite material in the North Swedish region, where there currently is a lack of reference material as well as a complex geological setting. This will be achieved via Principal Component Analysis (PCA), where the observed groupings of the material in the model will be related to their spectral features. 
+##Aims
+
+In the current study a dataset of quartz and quartzite artefacts from museum collections in Västerbotten, Sweden, have been analysed using the three above mentioned spectroscopic instrumentations (NIRS, Raman, XRF). The aim of the study is to evaluate their viability for fingerprinting quartz and quartzite material in the North Swedish region, where there currently is a lack of reference material as well as a complex geological setting. The study is a part of a larger project wherein models of settlement and mobility are being evaluated and developed in regards to raw material procurement and use. As flint is a non-local material to Northern Sweden it follows that any find of this material within the region most likely have been brought there through anthropogenic activity. In contrast, determining the degree to which the distribution pattern of quartz and quartzite have been influenced by cultural and/or environmental factors however, is far more difficult. While there is a good understanding of the geological makeup of the Scandes [@stephens_bergmanweihed20], the quartzite itself remains largely uncharacterized, with few reference samples available for comparison. The glacial impact on the landscape further compounds the issue as geological material has been transported and deposited by glacial movements, as well as subsequent postglacial processes. Although models for settlement and mobility can be used to test ideas of material distribution as influenced by cultural processes [e.g. @forsberg85], it is also necessary to attempt to estimate the degree of environmental impact on this pattern. 
+
+This will be achieved via Principal Component Analysis (PCA), where the observed groupings of the material in the model will be related to their spectral features. 
+
+
+
  \linebreak
 
-# Study region
+<!--# Study region
 
  \linebreak
  \linebreak
@@ -137,7 +144,7 @@ knitr::include_graphics('../figures/geo_map2.png', error = FALSE)
 The effects of the last glacial on the landscape is visible in the widely distributed moraine formations and glaciofluvial deposits (fig. \@ref(fig:distribution-map)). In Västerbotten the Köli Nappe complex exhibits greensschist - amphibolite facies metamorphism, overlying the Seve Nappe complex where High Pressure (HP) and Ultra High Pressure (UHP) metamoprhism has been detected in a number of localities. 
 
 In 1925 the Geological Society arranged an exursion to Södra Storfjället in Västerbotten. In the description of the regional stratigraphy it is noted that the lower parts are made up of, among others, "*...dark schists and graphitic quartzite...*" [@geologiska25 p.147]. Apart from these quartzite with little impurities and Alum shale are also noted. 
-
+-->
 # Material
 ```{r select-point-data}
 #Filter data to focus on points, point fragments and preforms made from quartz/quartzite materials
