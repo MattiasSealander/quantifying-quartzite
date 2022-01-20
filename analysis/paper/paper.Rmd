@@ -68,19 +68,19 @@ library(spectrolab)
 
 #Import xrf data, set empty fields to NA
 XRF.csv <-
-  read.csv2("./analysis/data/raw_data/XRF/XRF_quantitative.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
+  read.csv2("C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/raw_data/XRF/XRF_quantitative.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2("./analysis/data/derived_data/NIR_master_averaged_20210914.csv", sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2("C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/derived_data/NIR_master_averaged_20220119.csv", sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #Import raman data, set empty fields to NA
 raman.csv <-
-  read.csv2("./analysis/data/derived_data/raman_baseline_corrected_20210826.csv", sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2("C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/derived_data/raman_baseline_corrected_20220119.csv", sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #Import sample list, set empty fields to NA
 samples <-
-  read.csv2("./analysis/data/raw_data/bifacial_points.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na.strings=c("", "NA"))
+  read.csv2("C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/raw_data/bifacial_points.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na.strings=c("", "NA"))
 
 #Filter xrf, nir and raman data to focus on points and preforms made from quartz/quartzite material 
 Points.xrf <-
@@ -116,15 +116,17 @@ pca.munsell_hue <- c("Colourless", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y",
 
 # Introduction
 
-In regions where local flint and obsidian sources are non-existent, such as Northern Fennoscandia, other materials have been the primary target for lithic production^[This is not to say that flint was not available or used in these regions] [@baudou78; @rankama_etal06; @olausson_etal12]. The last decades have seen an increase in interest for non-flint lithics and raw material studies in  European archaeology, providing much needed development in a previously neglected field [@blomme_etal12; @dalpra_pitblado16; @prieto_etal19; @prieto_etal20; @prieto_etal21; @ramacciotti_etal19]. With the lack of any natural geological source of flint in Northern Sweden both quartz and quartzite are instrumental for the inference of settlement and mobility within the region. While quartz and quartzite technology have been part of a number of studies over the years, there have been less development in the petrographic characterization and provenience studies of these same materials [@broadbent79; @callahan_etal92; @knutsson_etal16; @tallavaara_etal10]. One reason for the lack of methodological development in North Swedish research could be the complex geological background of the region and the abundance of moraine formations [@bargel03; @stephens_bergmanweihed20; @stroeven_etal16]. The degree to which geological materials have been mixed and transported demands considerable effort in order to reconstruct the events that have formed the modern day landscape. While tentaive interpretations of lithic material sourcing tends to describe strategies leaning towards direct procurement from the mountain zone [@forsberg85; -@forsberg12], both quartz and quartzite could potentially have been sourced locally from exposed veins in the bedrock, or as loose rocks and pebbles in the numerous moraine formations, as part of a strategy leaning more towards an embedded adaptation [@binford79; @rankama_etal06 pp.249-250]. Due to this ambiguous nature of availability of raw materials provenience studies are complex and fraught with uncertainty. 
+The last decades have seen an increase in the interest for non-flint lithics and raw material studies in European archaeology, providing much needed development in a previously neglected field [@blomme_etal12; @dalpra_pitblado16; @prieto_etal19; @prieto_etal20; @prieto_etal21; @ramacciotti_etal19]. In regions where local flint and obsidian sources are non-existent, such as Northern Fennoscandia, other materials have been the primary target for lithic production^[This is not to say that flint was not available or used in these regions] (e.g. quartz, quartzite, slate) [@baudou78; @rankama_etal06; @olausson_etal12]. With the lack of any natural geological source of flint in Northern Sweden both quartz and quartzite are instrumental for the inference of settlement and mobility within the region. While quartz and quartzite technology have been part of a number of studies over the years, there have been less development in the petrographic characterization and provenience studies of these same materials [@broadbent79; @callahan_etal92; @knutsson_etal16; @tallavaara_etal10]. One reason for the lack of methodological development in North Swedish research could be the complex geological background of the region and the abundance of moraine formations [@bargel03; @stephens_bergmanweihed20; @stroeven_etal16]. The degree to which geological materials have been mixed and transported demands considerable effort in order to reconstruct the events that have formed the modern day landscape. While tentaive interpretations of lithic material sourcing tends to describe strategies leaning towards direct procurement from the mountain zone [@forsberg85; -@forsberg12], both quartz and quartzite could potentially have been sourced locally from exposed veins in the bedrock, or as loose rocks and pebbles in the numerous moraine formations, as part of a strategy leaning more towards an embedded adaptation [@binford79; @rankama_etal06 pp.249-250]. Due to this ambiguous nature of availability of raw materials provenience studies are complex and fraught with uncertainty. 
 
 Prieto et al. [-@prieto_etal19 p.15; -@prieto_etal20 p.32] notes that the usage of the term *quartzite* in archaeology has been somewhat ambiguous, often used interchangeably between sedimentary orthoquartzite and metamorphic quartzite. It is difficult to provide a comprehensive definition of quartzite, owing much to its metamorphic nature, and different researchers have thus emphasized different features as being characteristic of the material [@howard05]. Visual characterization on a megascopic level is typically unreliable, and microscopic analysis is recommended for the identification of metamorphic structures, but Howard [-@howard05 p.708] also emphasises the need for field-based methodologies. In the case of archaeological research it is worth considering situations where destructive techniques simply are not applicable. Artefact collections (museum, private, etc.) represent a valuable resource and asset, with easy access to large datasets with a wide geographical distribution. While destructive methods may prohibit access to such material there are still non-destructive alternatives that can generate valuable information. Aside from being non-destructive spectroscopic instrumentation feature fast measurements, making it an attractive option for field-based screening purposes. While X-Ray Fluorescence (XRF) is the go-to spectroscopic technique for petrographic characterization [@shackley11a; @tykot03], due to its capability of providing compositional data, there are other instrumentations that may provide a deeper insight into the structural properties. The use of near-infrared spectroscopy (NIRS) goes almost as far back as the XRF [@hunt77], and there is an impressive body of work dedicated to the fingerprinting of geological materials [@linderholm_geladi14a; @linderholm_geladi14b; @sciuto19]. The same can be said for Raman spectroscopy, which has been applied extensively in the Cultural Heritage sector and in the analysis of artwork and manuscripts [@vandenabeele12].   
 
-##Aims
+ \linebreak
 
-In the current study a dataset of quartz and quartzite artefacts from museum collections in Västerbotten, Sweden, have been analysed using the three above mentioned spectroscopic instrumentations (NIRS, Raman, XRF). The aim of the study is to evaluate their viability for fingerprinting quartz and quartzite material in the North Swedish region, where there currently is a lack of reference material as well as a complex geological setting. The study is a part of a larger project wherein models of settlement and mobility are being evaluated and developed in regards to raw material procurement and use. As flint is a non-local material to Northern Sweden it follows that any find of this material within the region most likely have been brought there through anthropogenic activity. In contrast, determining the degree to which the distribution pattern of quartz and quartzite have been influenced by cultural and/or environmental factors however, is far more difficult. While there is a good understanding of the geological makeup of the Scandes [@stephens_bergmanweihed20], the quartzite itself remains largely uncharacterized, with few reference samples available for comparison. The glacial impact on the landscape further compounds the issue as geological material has been transported and deposited by glacial movements, as well as subsequent postglacial processes. Although models for settlement and mobility can be used to test ideas of material distribution as influenced by cultural processes [e.g. @forsberg85], it is also necessary to attempt to estimate the degree of environmental impact on this pattern. 
+## Aims
 
-This will be achieved via Principal Component Analysis (PCA), where the observed groupings of the material in the model will be related to their spectral features. 
+In the current study a dataset of quartz and quartzite artefacts from museum collections in Västerbotten, Sweden, have been analysed using the three above mentioned spectroscopic instrumentations (NIRS, Raman and XRF). The aim of the study is to evaluate their viability for fingerprinting quartz and quartzite material in the North Swedish region based on surface measurements. The study is a part of a larger project wherein models of settlement and mobility are being evaluated and developed in regards to raw material procurement and use. As flint is a non-local material to Northern Sweden it follows that any find of this material within the region most likely have been brought there through anthropogenic activity. In contrast, determining the degree to which cultural and/or environmental factors have influenced the distribution pattern of quartz and quartzite artefacts, however, is far more difficult. While there is a good understanding of the geological makeup of the Scandes [@stephens_bergmanweihed20], the quartzite itself remains largely uncharacterized, with few reference samples available for spectral comparison. The glacial impact on the landscape further compounds the issue as geological material has been transported and deposited by glacial movements, as well as subsequent postglacial processes. Although models for settlement and mobility can be used to test ideas of material distribution as influenced by cultural processes [e.g. @forsberg85], it is also necessary to attempt to estimate the degree of environmental impact on this pattern. 
+
+In order to engage in any meaningful analysis, however, it is first necessary to distinguish between different quartz and quartzite groups. Principal Component Analysis (PCA) has been used to model the spectral data in order to discern material groupings related to different spectral features and their contributions to the Principal Components (PC). The results form the basis of a discussion of the viability of using non-destructive spectroscopy in petrographic characterization of quartz and quartzite material, and thus future efforts of developing models for raw material sourcing in Northern Sweden.  
 
 
 
@@ -153,9 +155,13 @@ Points2 <-
     filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz",
          type == "Point" | type == "Point fragment" | type == "Preform")
 
-#Reorder factor levels
+#Reorder type factor levels
 Points2$type <-
   factor(Points2$type, levels=c("Preform", "Point fragment", "Point"))
+
+#Reorder parish factor levels
+Points2$parish <- 
+  factor(Points2$parish, levels = c("Bjurholm","Bureå","Burträsk", "Bygdeå", "Degerfors", "Dorotea", "Lycksele", "Norsjö", "Skellefteå", "Sorsele", "Stensele", "Tärna", "Umeå", "Vännäs", "Vilhelmina", "Åsele"))
 ```
 
 ```{r sample-count, results='hide'}
@@ -191,7 +197,7 @@ sample_uniq <-
  \linebreak
  \linebreak
 
-The current study is based on spectroscopic surface measurements collected on quartz and quartzite points recovered from sites within the County of Västerbotten, Sweden. A dataset of `r length(sample_uniq)` points, point fragments and preforms made from quartz and quartzite material stored at the collections at Västerbotten (www.vbm.se) and Skellefteå (www.skellefteamuseum.se) museums were analysed using NIRS, raman and XRF spectroscopy. The material features a mainly black, grey or white hue, as well as a subset of semi-translucent material with a beige tint to almost fully translucent. The colour of the material has been classified both according to the Munsell system, as well as sorted into general categories of hue for visualization purposes: *dark* (~ N1-N4), *light* (~ N5-N8), *white* (~ N9), *colourless* (lack of colour, opaque to translucent). A number of these points have, according to prior classifications, been worked using bifacial technology. While there currently is no local chronology available for this artefact type in the North Swedish region^[For comparison, Mjæreum -@mjaerum12 has put forth a chronology for bifacial points in southwestern Norway], there have been attempts[@baudou92 p.99; @forsberg85 p.5; @forsberg89]. Taken together the research suggests a period of use that falls between ca. 3 800 - 2 000 BP [@kaeck09 p.60]. Similarly, studies of raw material use at sites dating to this period seems to indicate an increase in the use of quartzite [@baudou78]. 
+The current study is based on spectroscopic surface measurements collected on quartz and quartzite points recovered from sites within the County of Västerbotten, Sweden. A dataset of `r length(sample_uniq)` points, point fragments and preforms made from quartz and quartzite material stored at the collections at Västerbotten (www.vbm.se) and Skellefteå (www.skellefteamuseum.se) museums were analysed using NIRS, raman and XRF spectroscopy. The material features a mainly black, grey or white hue, as well as a subset of semi-translucent material with a beige tint to almost fully translucent. The colour of the material has been classified both according to the Munsell system, as well as sorted into general categories of hue for visualization purposes: *dark* (~ N1-N4), *light* (~ N5-N8), *white* (~ N9), *colourless* (lack of colour, opaque to translucent). A number of these points have, according to prior classifications, been worked using bifacial technology. While there currently is no local chronology available for this artefact type in the North Swedish region^[For comparison, Mjæreum -@mjaerum12 has put forth a chronology for bifacial points in southwestern Norway], there have been attempts [@baudou92 p.99; @forsberg85 p.5; @forsberg89]. Previous research suggests a period of use that falls between ca. 3 800 - 2 000 BP [@kaeck09 p.60]. Similarly, studies of raw material use at sites dating to this period seems to indicate an increase in the use of quartzite [@baudou78]. 
 
 A large portion of the collections stored at North Swedish museums were recovered from excavations and surveys performed in conjunction with the river regulations during the 1940s – 1980s [@biornstad06; @janson_hvarfner60], as well as subsequent follow-up survey projects [e.g. @andersson15]. This has likely had a contributing factor to the distribution pattern of the artefacts observed in fig. \@ref(fig:distribution-map) as the known sites with finds of points and preforms are concentrated around the parishes of Dorotea, Lycksele^[In this case the majority of the samples from Lycksele are from the rock painting site of Lycksele 301], Vilhelmina and Tärnaby. This can be seen more clearly in fig. \@ref(fig:distribution-by-parish) with the four parishes accounting for almost ¾ of the total no. of samples. 
 
@@ -225,6 +231,8 @@ ggplot(Points2, aes(x= fct_rev(parish), fill = type)) +
   geom_text(stat ='count', aes(group = parish, label = ..count..), hjust = -0.5)
 ```
 
+ \linebreak
+
 While parts of the collections at Västerbotten museum have been petrographically analysed by a geologist [@biornstad68; @ahman67], at this point it is difficult to say with any certainty how many (if any) of the artefacts in the current dataset were among these. It is fair to assume that the vast majority have been classified visually based on megascopic features according to a “standard” archaeological nomenclature. In the dataset the four main types of registered materials are: quartz, quartzite, brecciated quartz and brecciated quartzite^[Original Swedish terms are *brecciekvarts*/*brecciekvartsit*]. Those that had no prior material classification registered were sorted into either the quartz or quartzite category. The reason for including quartz in the study is in order to test whether it is possible to separate quartz from quartzite using these methods, as well as a way to account for potential mistakes in the original classification.
 
 Another reason for keeping a quartz category is the group referred to as *brecciated quartz*. In a petrographic study of the artefacts recovered along the Ume river valley Åhman [-@ahman67 p.8] briefly touches upon the definition of *brecciated quartz*, also referring to it as a *mylonite quartz*. Åhman describes the material as having formed from a quartz vein which has fractured due to movements in the mountain massives and recrystallized via pressure. While the translucent material may give the impression of an unusually pure quartzite, Åhman states that the thin-section analysis reveals the fragmented configuration of quartz. *Brecciated quartz* is a somewhat common term used in North Swedish archaeology, and has typically been used to identify a certain translucent type of fine-grained, quartz-rich material [e.g. @holm91 p.24].  
@@ -239,8 +247,6 @@ Another reason for keeping a quartz category is the group referred to as *brecci
 All measurements were performed at the Environmental Archaeology Lab at Umeå University^[www.umu.se/forskning/infrastruktur/mal/]. The analysis was conducted in a dark room in order to minimize light pollution, with the main light sources in the room being the computer screens. Each artefact was measured twice, on different sides, with additional measurements in cases where sampling was difficult. The only exception to this was the XRF, where due to time constraints one measurement was collected as a rule apart from a few exceptions. This lowers the statistical reliability of the XRF analysis and inferences of the results should be evaluated with this in mind. The size of the dataset alleviates some of these issues, as for the larger sites there are multiple objects that may be of the same material, however, for the smaller sites there still remains some uncertainties. For materials that featured high heterogeneity the sample point was focused, as much as possible, on the surrounding matrix.   
 
 Pre-processing of the spectra is different for each instrumentation and based on relevant literature. After pre-processing the data was modelled using PCA, which is an unsupervised exploratory technique for reducing the dimensionality of the dataset [@geladi_linderholm20]. PCA modelling was performed using the base R *prcomp()* function [@Rteam17; @rcoreteam21].   
-
- \linebreak
 
 ## Near Infrared
 NIRS measures the absorbance of light within the near infrared region (780 nm – 2 500 nm) of the electromagnetic spectrum. Based on the theory of molecular vibration and excitation [@hunt77], by exposing a geological material to electromagnetic radiation it is possible to generate overtone vibrations which can be related to certain molecular groups. The most common group capable of generating these overtones is the OH group, which in quartz-based materials typically relates to molecular water [@hunt77 p.508]. 
@@ -263,9 +269,9 @@ XRF spectroscopy, and its capabilities for quantifying chemical elements in diff
 
 XRF measurements were collected using a Thermo Scientific Niton XL5 Analyzer, connected to a portable test stand. The reference calibration used for element quantification was set to *mining* mode. Sampling with this setting takes 2 minutes in order for the instrument to cycle through all of the filters (main, low, high, light). Due to time constraints and the number of objects in the current dataset it was only possible to collect one measurement on each object, apart from some exceptions. 
 
-The XRF data was log-transformed, mean-centered and scaled to unit variance before PCA modelling. As the resulting dataset also features values below the Limit of Detection (LOD), these were treated as NULL (or "missing values"), during PCA. Since missing values are not permitted during PCA these had to imputed before the analysis, which was performed using the *missMDA* R package [@josse_husson16] developed for datasets with incomplete data. Two methods for imputation can be implemented, iterative or regularized, and since the former suffers when there is a large number of missing values the latter was used. 
+The XRF data was log-transformed, mean-centered and scaled to unit variance before PCA modelling. As the resulting dataset also features values below the Limit of Detection (LOD), these were treated as NULL (or "missing values"), during PCA. Since missing values are not permitted during PCA these had to be imputed before the analysis, which was performed using the *missMDA* R package [@josse_husson16] developed for datasets with incomplete data. Two methods for imputation can be implemented, iterative or regularized, and since the former suffers when there is a large number of missing values the latter was used. 
 
- \linebreak
+\pagebreak
 
 # Results
 
@@ -281,11 +287,64 @@ While the overall structure of the model seems to group colourless and white mat
 
  \linebreak
 
-```{r vis-nir-pca, fig.width=20, fig.height=12, fig.cap="PCA score plots for the 400 nm – 750 nm band of the NIR data. Top: PC 1 and PC 2, bottom: PC 1 and PC 3 PC 1 seems to group dark-light material on opposite sides of the plots while PC 2 does little to change the strucure. PC 3 seems to position material with a blue-gray tint towards the top of the score plot."}
+```{r vis-nir-loadings, fig.width=20, fig.height=15, fig.cap="Loading lines for PC 1 - 3. The two first components mainly describes features with a linear increase in absorbance across the visual spectrum, but the 3rd component demonstrates more variation, with lower absorbance within the blue-yellow region. "}
 
 #perform PCA with SNV normalization and mean-center
 visnir.pca <-
   prcomp(Points.nir[,c(78:428)], center = TRUE, scale = FALSE)
+
+#Filter NIR data to focus on the material with a dark hue 
+#and select the NIR range 1 000 - 2 500 nm
+#vis.dark <- Points.nir %>% 
+#  filter(hue == "Dark") %>% 
+#  select(c(1:28),c(79:429))
+
+#spec.vd <- 
+#      as_spectra(vis.dark, name_idx = 1, meta_idxs = 2:28)
+
+#vis.light <- Points.nir %>% 
+#  filter(hue == "Light") %>% 
+#  select(c(1:28),c(79:429))
+
+#spec.vl <- 
+#  as_spectra(vis.light, name_idx = 1, meta_idxs = 2:28)
+
+#vis.colourless <- Points.nir %>% 
+#  filter(hue == "Colourless") %>% 
+#  select(c(1:28),c(79:429))
+
+#spec.vt <- 
+#  as_spectra(vis.colourless, name_idx = 1, meta_idxs = 2:28)
+
+
+#vis.white <- Points.nir %>% 
+#  filter(hue == "White") %>% 
+#  select(c(1:28),c(79:429))
+
+#spec.vw <- 
+#  as_spectra(vis.white, name_idx = 1, meta_idxs = 2:28)
+
+#VISNIR LOADING LINES
+#For some reason invisible() has to be used to prevent console output showing up in knitted document
+par(mfrow=c(3,1))
+invisible(sapply(1:3, function(comp){
+  plot(400:750, visnir.pca$rotation[,comp], type='l', lwd=2,
+      main=paste("PC", comp), xlab="Wavelength (nm)", ylab="", cex.lab = 1.2, xaxp=c(400,750,5))})) 
+
+#par(mfrow=c(4,1))
+
+#plot(mean(spec.vd), lwd = 1.2, col = "black", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - Dark"); vps1 <- do.call(vpStack, baseViewports())
+
+#plot(mean(spec.vl), lwd = 1.2, col = "red", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - Light")
+
+#plot(mean(spec.vt), lwd = 1.2, col = "purple", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - Colourless")
+
+#plot(mean(spec.vw), lwd = 1.2, col = "blue", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - White"); vps4 <- do.call(vpStack, baseViewports())
+```
+
+ \linebreak
+
+```{r vis-nir-pca, fig.width=20, fig.height=12, fig.cap="PCA score plots for the 400 nm – 750 nm band of the NIR data. Top: PC 1 and PC 2, bottom: PC 1 and PC 3. PC 1 seems to group dark-light material on opposite sides of the plots while PC 2 does little to change the strucure. PC 3 seems to position material with a blue-gray tint towards the top of the score plot."}
 
 #prepare a basic score plot with fviz_pca_ind using PC1 and PC2
 basic_plot1 <-
@@ -373,60 +432,6 @@ comb1 <-
 comb1 +
   plot_layout(nrow = 2, guides = "collect")
 ```
-
- \linebreak
-
-```{r vis-nir-loadings, fig.width=20, fig.height=15, fig.cap="Loading lines for PC 1 - 3. The two first components mainly describes features with a linear increase in absorbance across the visual spectrum, but the 3rd component demonstrates more variation, with lower absorbance within the blue-yellow region. "}
-
-#Filter NIR data to focus on the material with a dark hue 
-#and select the NIR range 1 000 - 2 500 nm
-#vis.dark <- Points.nir %>% 
-#  filter(hue == "Dark") %>% 
-#  select(c(1:28),c(79:429))
-
-#spec.vd <- 
-#      as_spectra(vis.dark, name_idx = 1, meta_idxs = 2:28)
-
-#vis.light <- Points.nir %>% 
-#  filter(hue == "Light") %>% 
-#  select(c(1:28),c(79:429))
-
-#spec.vl <- 
-#  as_spectra(vis.light, name_idx = 1, meta_idxs = 2:28)
-
-#vis.colourless <- Points.nir %>% 
-#  filter(hue == "Colourless") %>% 
-#  select(c(1:28),c(79:429))
-
-#spec.vt <- 
-#  as_spectra(vis.colourless, name_idx = 1, meta_idxs = 2:28)
-
-
-#vis.white <- Points.nir %>% 
-#  filter(hue == "White") %>% 
-#  select(c(1:28),c(79:429))
-
-#spec.vw <- 
-#  as_spectra(vis.white, name_idx = 1, meta_idxs = 2:28)
-
-#VISNIR LOADING LINES
-#For some reason invisible() has to be used to prevent console output showing up in knitted document
-par(mfrow=c(3,1))
-invisible(sapply(1:3, function(comp){
-  plot(400:750, visnir.pca$rotation[,comp], type='l', lwd=2,
-      main=paste("PC", comp), xlab="Wavelength (nm)", ylab="", cex.lab = 1.2, xaxp=c(400,750,5))})) 
-
-#par(mfrow=c(4,1))
-
-#plot(mean(spec.vd), lwd = 1.2, col = "black", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - Dark"); vps1 <- do.call(vpStack, baseViewports())
-
-#plot(mean(spec.vl), lwd = 1.2, col = "red", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - Light")
-
-#plot(mean(spec.vt), lwd = 1.2, col = "purple", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - Colourless")
-
-#plot(mean(spec.vw), lwd = 1.2, col = "blue", ylab = "Absorbance", cex.lab = 1.5, cex.main = 1.5, xlab = "Wavelength (nm)", main = "Average - White"); vps4 <- do.call(vpStack, baseViewports())
-```
-
 
  \linebreak
 
@@ -583,7 +588,7 @@ There are two distinctive features present in the Raman data (fig. \@ref(fig:ram
 
 A third feature, present in a small subset of the samples, appears as two peaks spaced closely together at ~ 695 cm^-1^ and 795 cm^-1^. Comparing these to reference samples from the mineral and rock collections kept at the Department of Ecology and Environmental Science at Umeå University, the same peaks are present in measurements collected on, among others, albite, apatite, diabase and shale. Studies of clay minerals [@kloprogge17] have identified a number of band regions in the lower wavenumbers related to Si, Al and OH vibrations, including the 700 - 800 cm^-1^ band. Considering the petrogenesis of quartzite and the likelihood that clay minerals are present in the material it is possible that this is what generates the feature in the current dataset.
 
-The resulting PCA model (fig. \@ref(fig:raman-pca)) shows a clear trend along PC 1 (81.5 %) related to the quartz and D - G peaks. PC 2 and PC 3, however, mainly describes the remaining noise left in the spectra after detrending and preprocessing the data. Interestingly, the loading for PC 4 does include the Al-O-Si peaks around the 700 cm^-1^ - 800 cm^-1^ band, which helps in separating out those samples where this feature is present. The measurements with mainly quartz peaks gravitates towards the negative side of the PC 1, and those where the graphite peaks are dominant towards the opposite side. It is also clear that the darker material feature more pronounced graphite peaks, whereas the lighter and more colourless objects mainly feature quartz peaks. As in the case of the NIR data, however, there are exceptions that break this trend, as well as a “muddled” middle group with both well-pronounced graphite and quartz peaks. When PC 4 is added the samples with quartz and Al-O-Si peaks gravitate towards the bottom left, separating themselves from the "quarts" group.
+The resulting PCA model (fig. \@ref(fig:raman-pca)) shows a clear trend along PC 1 (81.5 %) related to the quartz and D - G peaks. PC 2 and PC 3, however, mainly describes the remaining noise left in the spectra after detrending and preprocessing the data. Interestingly, the loading for PC 4 does include the Al-O-Si peaks around the 700 cm^-1^ - 800 cm^-1^ band, which helps in separating out those samples where this feature is present. The measurements with mainly quartz peaks gravitates towards the negative side of PC 1, and those where the graphite peaks are dominant towards the opposite side. It is also clear that the darker material feature more pronounced graphite peaks, whereas the lighter and more colourless objects mainly feature quartz peaks. As in the case of the NIR data, however, there are exceptions that break this trend, as well as a “muddled” middle group with both well-pronounced graphite and quartz peaks. When PC 4 is added the samples with quartz and Al-O-Si peaks gravitate towards the bottom left, separating themselves from the "quarts" group.
 
  \linebreak
 
