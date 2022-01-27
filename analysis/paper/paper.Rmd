@@ -66,42 +66,26 @@ library(prospectr)
 library(tidyverse)
 library(spectrolab)
 
+
+#Import descriptive metadata
+metadata.csv <-
+  read.csv2("C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/raw_data/metadata_20220119.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"))
+
 #Import xrf data, set empty fields to NA
-XRF.csv <-
-  read.csv2("C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/raw_data/XRF/XRF_quantitative.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
+xrf.csv <-
+  read.csv2("C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/raw_data/XRF/xrf_raw_data_20220127.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2("C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/derived_data/NIR_master_averaged_20220119.csv", sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2("C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/raw_data/NIR/asd_raw_data_20220127.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #Import raman data, set empty fields to NA
 raman.csv <-
-  read.csv2("C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/derived_data/raman_baseline_corrected_20220119.csv", sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2("C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/raw_data/RAMAN/raman_samples_data_non_treated_20220127.csv", sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #Import sample list, set empty fields to NA
 samples <-
   read.csv2("C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/raw_data/bifacial_points.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na.strings=c("", "NA"))
-
-#Filter xrf, nir and raman data to focus on points and preforms made from quartz/quartzite material 
-Points.xrf <-
-  XRF.csv %>%
-    filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz",
-           type == "Point" | type == "Point fragment" | type == "Preform")
-
-Points.nir <-
-  nir.csv %>%
-    filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz",
-           type == "Point" | type == "Point fragment" | type == "Preform")
-
-Points.raman <-
-  raman.csv %>%
-    filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz",
-           type == "Point" | type == "Point fragment" | type == "Preform")
-
-#Fill the NA fields in the munsell_hue column and mark them as colourless samples
-Points.nir[8][is.na(Points.nir[8])] <- "Colourless"
-Points.raman[8][is.na(Points.raman[8])] <- "Colourless"
-Points.xrf[20][is.na(Points.xrf[20])] <- "Colourless"
 
 #prepare color/fill and symbols for score plots
 pca.colors <- c("#E31CFF", "#718EFF", "#0080FF", "#D5DF9E", "#C6DF39", "#FFFFC1", "#FFFFA1", "#FFFF00", "#FFFF38", "#FFB468", "#000000", "#202020", "#404040", "#606060", "#808080", "#9F9F9F", "#DFDFDF", "#FFFFFF")
@@ -111,7 +95,6 @@ pca.munsell_hue <- c("Colourless", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y",
 #If including references
 #pca.colors <- c("#E31CFF", "#718EFF", "#0080FF", "#D5DF9E", "#C6DF39", "#FFFFC1", "#FFFFA1", "#FFFF00", "#FFFF38", "#DF5555", "#FFB468", "#000000", "#202020", "#404040", "#606060", "#808080", "#9F9F9F", "#BFBFBF", "#DFDFDF", "#FFFFFF")
 #pca.munsell_hue <- c("Colourless", "2.5PB", "10B", "2.5GY", "5GY", "2.5Y", "5Y", "7.5Y", "10Y", "2.5YR", "5YR", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9")
-
 ```
 
 # Introduction
@@ -150,29 +133,29 @@ In 1925 the Geological Society arranged an exursion to Södra Storfjället in V�
 # Material
 ```{r select-point-data}
 #Filter data to focus on points, point fragments and preforms made from quartz/quartzite materials
-Points2 <-
-  samples %>%
+sample.list <-
+  metadata.csv %>%
     filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz",
          type == "Point" | type == "Point fragment" | type == "Preform")
 
 #Reorder type factor levels
-Points2$type <-
-  factor(Points2$type, levels=c("Preform", "Point fragment", "Point"))
+sample.list$type <-
+  factor(sample.list$type, levels=c("Preform", "Point fragment", "Point"))
 
 #Reorder parish factor levels
-Points2$parish <- 
-  factor(Points2$parish, levels = c("Bjurholm","Bureå","Burträsk", "Bygdeå", "Degerfors", "Dorotea", "Lycksele", "Norsjö", "Skellefteå", "Sorsele", "Stensele", "Tärna", "Umeå", "Vännäs", "Vilhelmina", "Åsele"))
+sample.list$parish <- 
+  factor(sample.list$parish, levels = c("Bjurholm","Bureå","Burträsk", "Bygdeå", "Degerfors", "Dorotea", "Lycksele", "Norsjö", "Skellefteå", "Sorsele", "Stensele", "Tärna", "Umeå", "Vännäs", "Vilhelmina", "Åsele"))
 ```
 
 ```{r sample-count, results='hide'}
 #Filter the sample data to exclude reference samples
 tot_samples <- 
-  samples %>% 
+  metadata.csv %>% 
     filter(type != "Reference") 
 
 #Filter sample data to focus on site Lycksele 301
 lycksele <-
-  samples %>% 
+  metadata.csv %>% 
     filter(site_id == "Lycksele 301") 
 
 #Then filter to focus on quartz/quartzite material that are points and preforms 
@@ -191,13 +174,13 @@ tot_uniq <-
 
 #Create a vector in order count number of unique rows in sample ID column for the number of points/preforms included in analysis
 sample_uniq <- 
-  unique(Points2$sample_id)
+  unique(sample.list$sample_id)
 ```
 
  \linebreak
  \linebreak
 
-The current study is based on spectroscopic surface measurements collected on quartz and quartzite points recovered from sites within the County of Västerbotten, Sweden. A dataset of `r length(sample_uniq)` points, point fragments and preforms made from quartz and quartzite material stored at the collections at Västerbotten (www.vbm.se) and Skellefteå (www.skellefteamuseum.se) museums were analysed using NIRS, raman and XRF spectroscopy. The material features a mainly black, grey or white hue, as well as a subset of semi-translucent material with a beige tint to almost fully translucent. The colour of the material has been classified both according to the Munsell system, as well as sorted into general categories of hue for visualization purposes: *dark* (~ N1-N4), *light* (~ N5-N8), *white* (~ N9), *colourless* (lack of colour, opaque to translucent). A number of these points have, according to prior classifications, been worked using bifacial technology. While there currently is no local chronology available for this artefact type in the North Swedish region^[For comparison, Mjæreum -@mjaerum12 has put forth a chronology for bifacial points in southwestern Norway], there have been attempts [@baudou92 p.99; @forsberg85 p.5; @forsberg89]. Previous research suggests a period of use that falls between ca. 3 800 - 2 000 BP [@kaeck09 p.60]. Similarly, studies of raw material use at sites dating to this period seems to indicate an increase in the use of quartzite [@baudou78]. 
+The current study is based on spectroscopic surface measurements collected on quartz and quartzite points recovered from sites within the County of Västerbotten, Sweden. A dataset of `r length(sample_uniq)` points, point fragments and preforms made from quartz and quartzite material stored at the collections at Västerbotten (www.vbm.se) and Skellefteå (www.skellefteamuseum.se) museums were analysed using NIRS, raman scattering and XRF. The material features a mainly black, grey or white hue, as well as a subset of semi-translucent material with a beige tint to almost fully translucent. The colour of the material has been classified both according to the Munsell system, as well as sorted into general categories of hue for visualization purposes: *dark* (~ N1-N4), *light* (~ N5-N8), *white* (~ N9), *colourless* (lack of colour, opaque to translucent). A number of these points have, according to prior classifications, been worked using bifacial technology. While there currently is no local chronology available for this artefact type in the North Swedish region^[For comparison, Mjæreum -@mjaerum12 has put forth a chronology for bifacial points in southwestern Norway], there have been attempts [@baudou92 p.99; @forsberg85 p.5; @forsberg89]. Previous research suggests a period of use that falls between ca. 3 800 - 2 000 BP [@kaeck09 p.60]. Similarly, studies of raw material use at sites dating to this period seems to indicate an increase in the use of quartzite [@baudou78]. 
 
 A large portion of the collections stored at North Swedish museums were recovered from excavations and surveys performed in conjunction with the river regulations during the 1940s – 1980s [@biornstad06; @janson_hvarfner60], as well as subsequent follow-up survey projects [e.g. @andersson15]. This has likely had a contributing factor to the distribution pattern of the artefacts observed in fig. \@ref(fig:distribution-map) as the known sites with finds of points and preforms are concentrated around the parishes of Dorotea, Lycksele^[In this case the majority of the samples from Lycksele are from the rock painting site of Lycksele 301], Vilhelmina and Tärnaby. This can be seen more clearly in fig. \@ref(fig:distribution-by-parish) with the four parishes accounting for almost ¾ of the total no. of samples. 
 
@@ -214,7 +197,7 @@ knitr::include_graphics('../figures/Distribution.jpeg', error = FALSE)
 ```{r distribution-by-parish, fig.width=12, fig.height=10, fig.fullwidth=TRUE, fig.cap= paste("Distribution of the", length(sample_uniq), "points and preforms across the parishes in Västerbotten, Sweden. Note that while Lycksele feature a large number of samples", length(lycksele_301), "of these are from the site of Lycksele 301")}
 
 #Stacked bar chart with counts of samples per parish and type
-ggplot(Points2, aes(x= fct_rev(parish), fill = type)) +
+ggplot(sample.list, aes(x= fct_rev(parish), fill = type)) +
   geom_bar() +
   theme_minimal() +
   labs(y = "Count",
@@ -244,7 +227,7 @@ Another reason for keeping a quartz category is the group referred to as *brecci
  \linebreak
  \linebreak
 
-All measurements were performed at the Environmental Archaeology Lab at Umeå University^[www.umu.se/forskning/infrastruktur/mal/]. The analysis was conducted in a dark room in order to minimize light pollution, with the main light sources in the room being the computer screens. Each artefact was measured twice, on different sides, with additional measurements in cases where sampling was difficult. The only exception to this was the XRF, where due to time constraints one measurement was collected as a rule apart from a few exceptions. This lowers the statistical reliability of the XRF analysis and inferences of the results should be evaluated with this in mind. The size of the dataset alleviates some of these issues, as for the larger sites there are multiple objects that may be of the same material, however, for the smaller sites there still remains some uncertainties. For materials that featured high heterogeneity the sample point was focused, as much as possible, on the surrounding matrix.   
+All measurements were performed at the Environmental Archaeology Lab at Umeå University^[www.umu.se/forskning/infrastruktur/mal/]. The analysis was conducted in a dark room in order to minimize light pollution, with the main light sources in the room being the computer screens. Each artefact was sampled twice, on different sides, with additional measurements in cases where sampling was difficult. The only exception to this was the XRF, where due to time constraints one measurement was collected as a rule apart from a few exceptions. This lowers the statistical reliability of the XRF analysis and inferences of the results should be evaluated with this in mind. The size of the dataset alleviates some of these issues, as for the larger sites there are multiple objects that may be of the same material, however, for the smaller sites there still remains some uncertainties. For materials that featured high heterogeneity the sample point was focused, as much as possible, on the surrounding matrix.   
 
 Pre-processing of the spectra is different for each instrumentation and based on relevant literature. After pre-processing the data was modelled using PCA, which is an unsupervised exploratory technique for reducing the dimensionality of the dataset [@geladi_linderholm20]. PCA modelling was performed using the base R *prcomp()* function [@Rteam17; @rcoreteam21].   
 
@@ -287,11 +270,31 @@ While the overall structure of the model seems to group colourless and white mat
 
  \linebreak
 
+```{r nir-prep}
+#aggregate observations by group(sample) and calculate average of wavelength measurements
+nir.averaged <- 
+  aggregate(nir.csv[, 4:2154], list(sample_id = nir.csv$sample_id), mean)
+
+#merge NIR data with metadata
+nir.merged <- 
+  as.data.frame(merge(metadata.csv, nir.averaged, by='sample_id'))
+
+#select and filter NIR data to focus on relevant material and artefact types
+Points.nir <-
+  nir.merged %>%
+  filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz",
+         type == "Point" | type == "Point fragment" | type == "Preform")
+
+#Fill the NA fields in the munsell_hue column and mark them as colourless samples
+Points.nir[8][is.na(Points.nir[8])] <- "Colourless"
+```
+
+
 ```{r vis-nir-loadings, fig.width=20, fig.height=15, fig.cap="Loading lines for PC 1 - 3. The two first components mainly describes features with a linear increase in absorbance across the visual spectrum, but the 3rd component demonstrates more variation, with lower absorbance within the blue-yellow region. "}
 
-#perform PCA with SNV normalization and mean-center
+#perform PCA with mean-centering
 visnir.pca <-
-  prcomp(Points.nir[,c(78:428)], center = TRUE, scale = FALSE)
+  prcomp(Points.nir[,c(80:430)], center = TRUE, scale = FALSE)
 
 #Filter NIR data to focus on the material with a dark hue 
 #and select the NIR range 1 000 - 2 500 nm
@@ -448,7 +451,7 @@ The PCA shows a strong trend along PC 1 that seems to correlate with the colour 
 #and select the NIR range 1 000 - 2 500 nm
 dark <- Points.nir %>% 
   filter(hue == "Dark") %>% 
-  select(c(1:28),c(680:2179))
+  select(c(1:28),c(680:2180))
 
 #create a spectra object for the dark material, and then repeat for light, white and colourless groups
 spec.d <- 
@@ -456,21 +459,21 @@ spec.d <-
 
 light <- Points.nir %>% 
   filter(hue == "Light") %>% 
-  select(c(1:28),c(680:2179))
+  select(c(1:28),c(680:2180))
 
 spec.l <- 
   as_spectra(light, name_idx = 1, meta_idxs = 2:28)
 
 colourless <- Points.nir %>% 
   filter(hue == "Colourless") %>% 
-  select(c(1:28),c(680:2179))
+  select(c(1:28),c(680:2180))
 
 spec.t <- 
   as_spectra(colourless, name_idx = 1, meta_idxs = 2:28)
 
 white <- Points.nir %>% 
   filter(hue == "White") %>% 
-  select(c(1:28),c(680:2179))
+  select(c(1:28),c(680:2180))
 
 spec.w <- 
   as_spectra(white, name_idx = 1, meta_idxs = 2:28)
@@ -531,7 +534,7 @@ grid.text("CO3", x = x4, y = unit(0.95, "npc"), just="center", gp=gpar(font=2))
 
 #perform PCA with SNV normalization and mean-center
 nir.pca <-
-  prcomp(Points.nir[,c(680:2179)], center = TRUE, scale = FALSE)
+  prcomp(Points.nir[,c(680:2180)], center = TRUE, scale = FALSE)
 
 #prepare a basic score plot with fviz_pca_ind using PC1 and PC2
 basic_plot1 <-
@@ -592,6 +595,88 @@ The resulting PCA model (fig. \@ref(fig:raman-pca)) shows a clear trend along PC
 
  \linebreak
 
+```{r raman-prep-data}
+#aggregate observations by group(sample) and calculate average of wavelength measurements
+raman.averaged <- 
+  aggregate(raman.csv[, 5:469], list(sample_id = raman.csv$sample_id), mean)
+
+#perform Standard Normal Variate on raman data
+#raman.averaged[,2:466] <- 
+#  standardNormalVariate(raman.averaged[,2:466])
+
+#merge data with metadata
+#raman_merged <- 
+#  as.data.frame(merge(metadata, raman_averaged, by='sample_id'))
+
+#select sample_id and data columns and transpose in prep for baseline de-trend
+raman.transposed <- 
+  raman.averaged %>% 
+    select(sample_id, `92.88`:`2503.59`)
+
+raman.transposed <- 
+  t(raman.transposed)
+
+#Write csv with transposed raman data for baseline de-trending in ChemoSpec package
+#ChemoSpec requires data to be read from file
+write.table(raman.transposed, file = "C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/derived_data/raman_transposed.csv", col.names = FALSE, sep = ";", dec = )
+
+#prepare vector with sample_id for reading raman data into spectra object
+sample_id <- 
+  raman.averaged$sample_id
+
+#read transposed raman data into spectra object
+raman <-matrix2SpectraObject(
+  gr.crit = sample_id,
+  gr.cols = c("auto"),
+  freq.unit ="Wavelength cm-1",
+  int.unit ="Intensity",
+  descrip ="Bifacial points measurements",
+  in.file = "C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/derived_data/raman_transposed.csv",
+  sep = ";",
+  dec = ".",
+  chk = TRUE,
+  out.file = "C:/Users/sjola/Documents/VERSION CONTROL/quantifying-quartzite/analysis/data/derived_data/raman_spec_object")
+
+#call on relevant baseline method (modified polynomial fitting) from baseline package and 
+#return corrected spectra to spectra object
+raman.baseline <- 
+  baselineSpectra(raman,
+                  int = FALSE,
+                  method = "modpolyfit",
+                  retC = TRUE)
+
+#spectra are stored in "Spectra" object, not a data frame
+#need to extract samples and frequencies from that object 
+raman.tmp <- 
+  cbind(raman.baseline$freq, t(raman.baseline$data))
+#transpose data to get frequencies as columns
+raman.tmp <- 
+  as.data.frame(t(raman.tmp))
+#Add sample_id column and remove the initial "X" character introduced to sample names by R
+raman.tmp$sample_id <- 
+  c("sample_id", sub("^X*", "", raman.baseline$names))
+
+#Make first row headers and remove the first row with the names
+names(raman.tmp) <-
+  raman.tmp[1,]
+raman.tmp <- 
+  raman.tmp[-1,]
+
+#merge raman de-trended data with metadata
+raman.baseline.merged <- 
+  as.data.frame(merge(metadata.csv, raman.tmp, by='sample_id'))
+
+#select and filter raman data to focus on relevant material and artefact types
+Points.raman <-
+  raman.baseline.merged %>%
+  filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz",
+         type == "Point" | type == "Point fragment" | type == "Preform")
+
+#fill the NA fields in the munsell hue column to mark them as colourless/translucent material
+Points.raman[8][is.na(Points.raman[8])] <- "Colourless"
+```
+
+
 ```{r raman-spectra, fig.width=20, fig.height=15, fullwidth = TRUE, fig.cap="Average Raman spectra grouped by their hue. The *quartz peak* at 460 cm^-1^ is present in all four groups, but the *graphite peaks* at 1 287  cm^-1^ (D band) and 1 598 cm^-1^ (G band) mainly appear in the dark group"}
 
 r.dark <- Points.raman %>% 
@@ -650,7 +735,7 @@ raman.pca <-
 
 #prepare different basic score plots with fviz_pca_ind
 basic_plot1 <-
-  fviz_pca_ind(raman.pca, axes = c(1,2), label="none")
+  fviz_pca_ind(raman.pca, axes = c(1,3), label="none")
 
 basic_plot2 <-
   fviz_pca_ind(raman.pca, axes = c(1,4), label="none")
@@ -732,6 +817,8 @@ comb <-
 
 comb +
   plot_layout(nrow = 2, guides = "collect")
+#ADD CIRCLES AROUND 700-800 cm-1 points , try https://datavizpyr.com/how-to-add-circles-around-specific-data-points-in-r/
+
 ```
 
  \linebreak
@@ -744,6 +831,23 @@ The two first components of the PCA have an eigenvalue above 1 and the cumulativ
 The group of measurements that are somewhat separated from the “low ^14^Si” cluster at the bottom are all but one from the rock painting site of *Finnforsberget*, which is located next to the Skellefte river. The *Finnforsberget* artefacts were sampled twice with object 491 having one measurement closer to the “low ^14^Si” group and the other the “high ^14^Si” group with ^13^Al estimated at 25 %. This artefact was sampled twice on each side, resulting in similar results both times.
 
  \linebreak
+
+```{r xrf-data-prep}
+
+#merge XRF data with metadata
+xrf.merged <- 
+  as.data.frame(merge(metadata.csv, xrf.csv, by='sample_id'))
+
+#Filter xrf data to focus on points and preforms made from quartz/quartzite material 
+Points.xrf <-
+  xrf.merged %>%
+    filter(material == "Quartz" | material == "Quartzite" | material == "Brecciated quartz" | material == "Brecciated quartzite" | material  == "Felsitic porphyric quartz",
+           type == "Point" | type == "Point fragment" | type == "Preform")
+
+#fill the NA fields in the munsell hue column to mark them as colourless/translucent material
+Points.xrf[8][is.na(Points.xrf[8])] <- "Colourless"
+```
+
 
 ```{r xrf-violin-plot, fig.width=15, fig.height=15, fig.fullwidth=TRUE, fig.cap="Violin plot of percentage element content in quartzite samples measured using pXRF. **n** represents no. of measurements above Limit of Detection (LOD) for that element out of a total of 474 measurements. Note the bimodal distribution of Si measurements, these groups are reflected in the score plot of the PCA"}
 #Prepare data in long format for violin plots, exclude samples with a dimension smaller than 10 mm 
