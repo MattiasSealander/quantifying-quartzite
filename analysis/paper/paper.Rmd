@@ -213,6 +213,7 @@ Another reason for keeping a quartz category is the group referred to as *brecci
 All measurements were performed at the Environmental Archaeology Lab at Umeå University^[www.umu.se/en/research/infrastructure/mal/]. The analysis was conducted in a dark room in order to minimize light pollution, with the main light sources in the room being the computer screens. Each artefact was sampled twice, on different sides, with additional measurements in cases where sampling was difficult. The only exception to this was the XRF, where due to time constraints one measurement was collected as a rule apart from a few exceptions. This lowers the statistical reliability of the XRF analysis and inferences of the results should be evaluated with this in mind. The size of the dataset alleviates some of these issues, as for the larger sites there are multiple objects that may be of the same material, however, for the smaller sites there still remains some uncertainties. For materials that featured high heterogeneity the sample point was focused, as much as possible, on the surrounding matrix.   
 
 Pre-processing of the spectra is different for each instrumentation and based on relevant literature. After pre-processing the data was modelled using PCA, which is an unsupervised exploratory technique for reducing the dimensionality of the dataset [@geladi_linderholm20]. PCA modelling was performed using the base R *prcomp()* function [@Rteam17; @rcoreteam21].   
+ \linebreak
 
 ## Near Infrared
 NIRS measures the absorbance of light within the near infrared region (780 nm – 2 500 nm) of the electromagnetic spectrum. Based on the theory of molecular vibration and excitation [@hunt77], by exposing a geological material to electromagnetic radiation it is possible to generate overtone vibrations which can be related to certain molecular groups. The most common group capable of generating these overtones is the OH group, which in quartz-based materials typically relates to molecular water [@hunt77 p.508]. 
@@ -407,6 +408,7 @@ visnir.p2 <-
                              title.hjust = 0.5)) +
   theme(legend.position = "none")
 
+#Set the legend for the combined figure of both score plots
 comb1 <-
   visnir.p1 + visnir.p2 & theme(plot.title = element_text(size = 12, face = "bold", colour = "black", vjust = - 10, hjust = 0.02),
                               axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
@@ -415,6 +417,7 @@ comb1 <-
                               legend.background = element_rect(linetype = "solid", color = "black"),
                               legend.position = "bottom")
 
+#Call on the finished figure and layout in 2 rows
 comb1 +
   plot_layout(nrow = 2, guides = "collect")
 ```
@@ -711,7 +714,7 @@ plot(mean(spec.rw), lwd = 1.2, col = "blue", ylab = "Intensity", cex.lab = 1.5, 
 
  \linebreak
 
-```{r raman-pca, fig.width=20, fig.height=15, fig.cap="PCA score plots for the raman spectra. The main explanatory power can be found in PC 1, which groups the data based on the quartz and D-G bands. As these are the main features in the data, the other components mainly describe the remaining noise, producing the arch-shape in the PCA. PC 4 does, however, also separate out the few samples that feature peaks at 700-800 cm^-1^ in the top left (marked with red circle), that may result from Al, Si and OH vibrations."}
+```{r raman-pca, fig.width=20, fig.height=15, fig.cap="PCA score plots for the raman spectra. The main explanatory power can be found in PC 1, which groups the data based on the quartz and D-G bands. As these are the main features in the data, the other components mainly describe the remaining noise. PC 3 does, however, separate out the few samples that feature peaks at 700-800 cm^-1^ in the top left (marked with red circle), that may result from Al, Si and OH vibrations."}
 
 
 #perform PCA with SNV normalization and mean-center
@@ -773,7 +776,7 @@ raman.p1 <- ggplot(cbind(basic_plot1$data, Points.raman[, c(8,10)]),
 r.data2 <- 
   cbind(basic_plot2$data, Points.raman[, c(1,8,10)])
 
-#Set up the score plot and 
+#Set up the score plot
 raman.p2 <- 
   r.data2 %>%  
   ggplot(aes(x=x, y=y, 
@@ -797,14 +800,17 @@ raman.p2 <-
                                                  color = "black",
                                                  size=3),
                              title.position="top", title.hjust = 0.5)) +
-  #Filter out points with 700 - 800 wavenumber peaks and give them a red circle and slightly increase their size for better identification
+  #Filter out points with 700 - 800 wavenumber peaks and give them a red circle for easier identification
   geom_point(data = r.data2 %>% 
                filter(sample_id == 6 | sample_id == 34 | sample_id == 42 | sample_id == 127 | sample_id == 445 | sample_id == 482 | sample_id == 491 | sample_id == 494 | sample_id == 495 | sample_id == 501 |sample_id == 502 | sample_id == 503 | sample_id == 504), 
              pch=21,
-             size=4, 
-             colour ="red") +
+             size=7, 
+             colour ="red",
+             fill = NA,
+             stroke = 2) +
   theme(legend.position = "none")
 
+#Set the legend for the combined figure of both score plots
 comb <-
   raman.p1 + raman.p2 & theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
                               axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
@@ -813,26 +819,14 @@ comb <-
                               legend.background = element_rect(linetype = "solid", color = "black"),
                               legend.position = "bottom")
 
+#Call on the finished figure and layout in 2 rows
 comb +
   plot_layout(nrow = 2, guides = "collect")
-
-
 ```
 
  \linebreak
 
 The resulting PCA model (fig. \@ref(fig:raman-pca)) shows a clear trend along PC 1 (`r raman.pc1var` %) related to the quartz and D - G peaks. PC 2 and PC 3, however, mainly describes the remaining noise left in the spectra after detrending and preprocessing the data. Interestingly, the loading for PC 3 does include the Al-O-Si peaks around the 700 cm^-1^ - 800 cm^-1^ band, which helps in separating out those samples where this feature is present. The measurements with mainly quartz peaks gravitates towards the negative side of PC 1, and those where the graphite peaks are dominant towards the opposite side. It is also clear that the darker material feature more pronounced graphite peaks, whereas the lighter and more colourless objects mainly feature quartz peaks. As in the case of the NIR data, however, there are exceptions that break this trend, as well as a “muddled” middle group with both well-pronounced graphite and quartz peaks. When PC 3 (`r raman.pc3var` %) is added the samples with quartz and Al-O-Si peaks gravitate towards the bottom left, separating themselves from the "quarts" group.
-
-
-
- \linebreak
-
-## XRF
-Four samples had dimensions that were < 10 mm in size of their smallest dimension, and were therefore excluded from the analysis as there may be complications when comparing these to larger samples [@shackley11b pp.9-10]. The XRF spectrometer is not capable of detecting all of the common elements, and the software therefore calculates a balance (Bal) that represents the remaining unquantifiable elements in a sample. The elements represented in this unquantifiable group are all those with an atomic number lower than ^12^Mg (REF). Univariate analysis shows that SiO^2^ makes up the main bulk of the composition of the material, and two major groups can be distinguished based on this content (fig. \@ref(fig:xrf-violin-plot)). The majority of the readings resulted in a SiO^2^ content of less than 50%, and about ¼ of the readings (~ 27%) featured a SiO^2^ content closer to 90%. The “low” SiO^2^ group also feature a Bal between 40 – 70%. 
-
-The two first components of the PCA have an eigenvalue above 1 and the cumulative explained variance is ~ 81.3%. The loadings can be be seen in figure \@ref(fig:xrf-loadings). In the score plot of PC 1 and PC 2 two large clusters can be seen (fig. \@ref(fig:xrf-score-plot)). Interestingly, the smaller cluster on the left side in the score plot includes the samples with a SiO^2^ content higher than 50%, whilst the larger cluster includes those with lower SiO^2^ content. It does not seem to be ^14^Si that is responsible for this clustering, however, but rather ^26^Fe and ^40^Zr that are the main contributors. The “low ^14^Si” cluster shows a trend along PC 2 of quartzite with a darker hue grouping towards the bottom. This may indicate a possible relation to the ^26^Fe content of the material as ^26^Fe-bearing minerals such as hematite can contribute to the dark colour in quartzite [@howard05 p.711]. The brecciated quartz samples largely group together at the top of the “low ^14^Si” cluster, with a couple ending up closer towards the “high ^14^Si” cluster. The white (N9) material is fairly evenly distributed within the right cluster. 
-
-The group of measurements that are somewhat separated from the “low ^14^Si” cluster at the bottom are all but one from the rock painting site of *Finnforsberget*, which is located next to the Skellefte river. The *Finnforsberget* artefacts were sampled twice with object 491 having one measurement closer to the “low ^14^Si” group and the other the “high ^14^Si” group with ^13^Al estimated at 25 %. This artefact was sampled twice on each side, resulting in similar results both times.
 
  \linebreak
 
@@ -850,16 +844,55 @@ Points.xrf <-
 
 #fill the NA fields in the munsell hue column to mark them as colourless/translucent material
 Points.xrf[8][is.na(Points.xrf[8])] <- "Colourless"
-```
 
+#Filter out Si values above 50%
+high_si <- 
+  Points.xrf %>% 
+    filter(`14Si` > 50)
 
-```{r xrf-violin-plot, fig.width=15, fig.height=15, fig.fullwidth=TRUE, fig.cap="Violin plot of percentage element content in quartzite samples measured using pXRF. **n** represents no. of measurements above Limit of Detection (LOD) for that element out of a total of 474 measurements. Note the bimodal distribution of Si measurements, these groups are reflected in the score plot of the PCA"}
-#Prepare data in long format for violin plots, exclude samples with a dimension smaller than 10 mm 
+#Prepare a calculation of percentage measurements above 50% to call on in text
+high_si <- 
+  round(length(high_si$`14Si`) / length(Points.xrf$`14Si`) * 100)
+
+#Prepare XRF data in long format for violin plots, exclude samples with a dimension smaller than 10 mm 
 Points_long <-
   drop_na(Points.xrf %>%
     filter(max_length_mm >= 10 | max_width_mm >= 10) %>% 
     select(`12Mg`,`13Al`, `14Si`, `15P`, `16S`, `19K`, `20Ca`, `23V`, `25Mn`, `26Fe`, `30Zn`, `38Sr`, `39Y`, `40Zr`, `56Ba`, `81Ti`) %>%
     gather(key = "Element", value = "Value"))
+
+#filter XRF data on sample size (only include samples with smallest dimension >= 10mm), 
+#select elements to include in PCA, as well as columns to group by
+xrf <-
+  Points.xrf %>%
+  filter(max_length_mm >= 10 & max_width_mm >= 10) %>% 
+  select(reading_no, sample_id, munsell_hue, material, `12Mg`, `13Al`, `14Si`, `15P`, `16S`, `19K`, `20Ca`, `23V`, `25Mn`, `26Fe`, `30Zn`, `38Sr`, `39Y`, `40Zr`, `56Ba`, `81Ti`)
+
+#log transform XRF data
+xrf.log <- log(xrf[,5:20])
+
+#impute missing values
+xrf.imp <- imputePCA(xrf.log, ncp = 2, scale = FALSE, method = "Regularized", maxiter = 1000)
+
+#perform pca with mean centering and unit variance scaling
+xrf.pca <- prcomp(xrf.imp$completeObs, center = TRUE, scale.=TRUE)
+
+#Prepare cumulative explained variance of two first XRF PCs
+xrf_variance <- 
+  round(summary(xrf.pca)$importance[2,1]*100, digits=1) + round(summary(xrf.pca)$importance[2,2]*100, digits=1)
+
+```
+
+## XRF
+Four samples had dimensions that were < 10 mm in size of their smallest dimension, and were therefore excluded from the analysis as there may be complications when comparing these to larger samples [@shackley11b pp.9-10]. The XRF spectrometer is not capable of detecting all of the common elements, and the software therefore calculates a balance (Bal) that represents the remaining unquantifiable elements in a sample. The elements represented in this unquantifiable group are all those with an atomic number lower than ^12^Mg (REF). Univariate analysis shows that ^14^Si makes up the main bulk of the composition of the material, with a bimodal distribution (fig. \@ref(fig:xrf-violin-plot)). The majority of the readings resulted in a ^14^Si content of less than 50%, and about ¼ of the readings (~ `r high_si`%) featured a ^14^Si content closer to 90%. The “low” ^14^Si group also feature a Bal between 40 – 70%. 
+
+The two first components of the PCA have an eigenvalue above 1 and the cumulative explained variance is ~ `r high_si`%. The loadings can be be seen in figure \@ref(fig:xrf-loadings). In the score plot of PC 1 and PC 2 two large clusters can be seen (fig. \@ref(fig:xrf-score-plot)). The smaller cluster on the left side in the score plot includes the samples with a ^14^Si content higher than 50%, whilst the larger cluster includes those with lower ^14^Si content. It does not seem to be ^14^Si that is responsible for this clustering, however, but rather ^26^Fe and ^40^Zr that are the main contributors. The “low ^14^Si” cluster shows a trend along PC 2 of quartzite with a darker hue grouping towards the bottom. This may indicate a possible relation to the ^26^Fe content of the material as ^26^Fe-bearing minerals such as hematite can contribute to the dark colour in quartzite [@howard05 p.711]. The brecciated quartz samples largely group together at the top of the “low ^14^Si” cluster, with a couple ending up closer towards the “high ^14^Si” cluster. The white (N9) material is fairly evenly distributed within the right cluster. 
+
+The group of measurements that are somewhat separated from the “low ^14^Si” cluster at the bottom are all but one from the rock painting site of *Finnforsberget*, which is located next to the Skellefte river. The *Finnforsberget* artefacts were sampled twice with object 491 having one measurement closer to the “low ^14^Si” group and the other the “high ^14^Si” group with ^13^Al estimated at 25%. This artefact was sampled twice on each side, resulting in similar results both times.
+
+ \linebreak
+
+```{r xrf-violin-plot, fig.width=15, fig.height=15, fig.fullwidth=TRUE, fig.cap="Violin plot of percentage element content in quartzite samples measured using pXRF. **n** represents no. of measurements above Limit of Detection (LOD) for that element out of a total of 474 measurements. Note the bimodal distribution of Si measurements, these groups are reflected in the score plot of the PCA"}
 
 # Add column with elemental groups for visualisation
 Points_long <-
@@ -994,21 +1027,6 @@ Points_long %>%
  \linebreak
 
 ```{r xrf-loadings, fig.width=8, fig.height=8, fig.cap="Loading vectors (P1-P2) with scores for each variable (element)"}
-#filter on sample size (only include samples with smallest dimension >= 10mm), 
-#select elements to include in pca, as well as columns to group by
-xrf <-
-  Points.xrf %>%
-  filter(max_length_mm >= 10 & max_width_mm >= 10) %>% 
-  select(reading_no, sample_id, munsell_hue, material, `12Mg`, `13Al`, `14Si`, `15P`, `16S`, `19K`, `20Ca`, `23V`, `25Mn`, `26Fe`, `30Zn`, `38Sr`, `39Y`, `40Zr`, `56Ba`, `81Ti`)
-
-#log transform data
-xrf.log <- log(xrf[,5:20])
-
-#impute missing values
-xrf.imp <- imputePCA(xrf.log, ncp = 2, scale = FALSE, method = "Regularized", maxiter = 1000)
-
-#perform pca with mean centering and unit variance scaling
-xrf.pca <- prcomp(xrf.imp$completeObs, center = TRUE, scale.=TRUE)
 
 #Extract loadings from xrf.pca
 loadings <- as.data.frame(xrf.pca$rotation[,1:2])
@@ -1124,16 +1142,17 @@ theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
 
 The most easily recognizable megascopic feature of petrographic material is its color, which has been the main attribute used for grouping quartzite in North Swedish archaeological research [e.g. @forsberg85 pp.60–64; @kaeck09 pp.53–55]. While it is true that some inference of elemental content can be made based on color this is significantly more difficult with heterogeneous material such as quartzite. Indeed, destructive techniques are typically necessary in order to document the various metamorphic features characteristic of quartzite [@howard05; @prieto_etal19]. Non-destructive application of the above spectroscopic techniques does, however, bring to light some interesting characteristics of the material. Although there are trends that align with the perceived color of the objects in the PCA there are also exceptions to this rule, as well as a “muddled” grey zone of material that does not conform to the light and dark extremes. It is also worth mentioning that the color classification does not take the heterogeneous nature of the material into consideration.  
 
-Although no distinct enough groupings were observed as to make classification possible, a number of structural and compositional characteristics were identified. Despite the Raman PCA lacking descriptive power, due to the few features observed in the spectra, the presence of the “graphite peaks” may present an important piece of information in the identification of the potential geological origin of the material. Interestingly, mentions of graphitic quartzite can be found in an early 20th century description of an excursion to Storfjället, Tärna parish, by the Geological Society [@geologiska25], but otherwise does not seem to be a frequently used term in the modern day. 
+Although no distinct enough groupings were observed as to make classification possible, a number of structural and chemical characteristics were identified. Despite the Raman PCA lacking descriptive power, due to the few features observed in the spectra, the presence of the “graphite peaks” may present an important piece of information in the identification of the potential geological origin of the material. Interestingly, mentions of graphitic quartzite can be found in an early 20th century description of an excursion to Storfjället, Tärna parish, by the Geological Society [@geologiska25], but otherwise does not seem to be a frequently used term in the modern day. Naturally, identifying the geological origin does not necessitate a direct link between that point and the procurement of the material, and further studies would be necessary in order to infer resource management strategies from this evidence. 
 
-Naturally, identifying the geological origin does not necessitate a direct link between that point and the procurement of the material, and further studies are necessary in order to infer resource management strategies from this evidence. The characterization of quartz and quartzite is fundamental, however, if questions of resource procurement, trade and exchange and human mobility are to be developed. Being able to distinguish between different types of quartz and quartzite would enable various spatial analyses and modelling of distribution patterns, regardless of whether the geological source is known or not.  Moving forwards, the answer may lie in the field of multi-block analysis, where the potential for joint relations between separate blocks of data can be tested.  
+The exploratory approach presented in this paper holds potential for enabling provenance studies within geologically complex regions. Screening a large enough dataset makes it possible to look at in-group variations and isolate spectroscopic distinct fingerprints [e.g. @sciuto_etal19]. These can then be used as the basis for later classification of the material into structurally different groups. The characterization of quartz and quartzite is fundamental if questions of resource procurement, trade and exchange and human mobility are to be developed within Northern Sweden. Being able to distinguish between different types of quartz and quartzite would enable the spatial analysis and modelling of distribution patterns, regardless of whether the geological source is known or not. In the current case study modelling the results of single instrumentation may have been limited for the purpose of classification, but modelling the joint relations between the separate data blocks may provide further aid in isolating distinct types of quartz and quartzite. 
+
 
 
  \linebreak
 
 # Conclusion
 
-The results demonstrate clearly that non-destructive application of all three instrumentations (NIRS, Raman, XRF) are capable of petrographically characterizing some aspect of the quartz and quartzite, however, taken on their own they lack the resolution needed to provide a detailed enough fingerprint for classification. Nevertheless, they do provide a more in-depth understanding of the composition and structure of the material, as well as showcase the complexity in the petrographic character of quartz and quartzite materials. The study represents a good example of a multivariate exploratory approach to the characterization of petrographic material where there also is an absence of reference material. There is a need for methodologies that can be applied in regions with a complex geological setting and ambiguous distribution of potential geological sources. Taking full advantage of the short integration time of these instrumentations it is possible to build large comprehensive datasets that then can be explored and mined using multivariate models. 
+The results demonstrate clearly that non-destructive application of all three instrumentations (NIRS, Raman, XRF) are capable of petrographically characterizing some aspect of the quartz and quartzite, however, taken on their own they lack the resolution needed to provide a detailed enough fingerprint for classification. Nevertheless, they do provide a more in-depth understanding of the composition and structure of the material, as well as showcase the complexity in the petrographic character of quartz and quartzite materials. The study represents a good example of a multivariate exploratory approach to the characterization of petrographic material where there also is an absence of reference material. There is a need for methodologies that can be applied in regions with a complex geological setting and ambiguous distribution of potential geological sources. Taking full advantage of the short integration time of these instruments it is possible to build large comprehensive datasets that then can be explored and mined using multivariate models. 
 
  \linebreak
  \linebreak
