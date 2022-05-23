@@ -123,7 +123,7 @@ A large portion of the collections stored at North Swedish museums were recovere
  \linebreak
 
 ```{r distribution-map, fig.width=15, fig.height=15, fig.fullwidth=TRUE, fig.cap="Geographical distribution of the sampled sites along the river of Ångermanälven, Västerbotten, Sweden. Made with Lantmäteriet (CC0), Natural Earth, and Riksantikvarieämbetet."}
-knitr::include_graphics('../figures/site_distribution.jpeg', error = FALSE)
+knitr::include_graphics('../figures/site_distribution.png', error = FALSE)
 ```
 
  \linebreak
