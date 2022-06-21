@@ -90,10 +90,10 @@ p.d258 <-
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
 #Perform Savitzky-Golay 2nd derivative on sample 258
-sg.d <- as.data.frame(gapDer(X = Points.d258[,2:1501], m = 2, w = 11, s = 5))
+sg.d <- as.data.table(gapDer(X = Points.d258[,2:1501], m = 2, w = 11, s = 5))
 
 #Transpose the data for ggplot
-sg.d.long <- reshape2::melt(sg.d, variable.name = "Wavelength", value.name = "Absorbance")
+sg.d.long <-  suppressWarnings(melt(setDT(sg.d), variable.name = "Wavelength", value.name = "Absorbance", variable.factor = FALSE))
 
 #plot the transformed dark spectra
 p.sg.d <-

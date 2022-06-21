@@ -1,4 +1,6 @@
 #Load packages
+suppressPackageStartupMessages(library(grid))
+suppressPackageStartupMessages(library(gridExtra))
 suppressPackageStartupMessages(library(OmicsPLS))
 library(parallel)
 suppressPackageStartupMessages(library(rgr))
@@ -85,87 +87,49 @@ Points.nir[,30:2180] <-
 xrf.merged <- 
   as.data.frame(merge(Points.xrf, nir.averaged, by='sample_id'))
 
-#fit the o2pls model, in this case MSE of 1.95734 was suggested with n=2, nx=3, and ny=4
+#perform cross-validation to estimate number of components to fit to the o2pls model
+cval <- 
+  crossval_o2m_adjR2(Points.nir[,681:2180], Points.xrf[,2:10], 1:4, 0:4, 0:4,
+                     nr_folds = 5, nr_cores = detectCores())
+
+#fit the o2pls model, in this case the second row provided by cval was used as at least 2 joint components is desirable 
 fit0 = o2m(Points.nir[,681:2180], Points.xrf[,2:10], 2, 3, 4)
 
-#plot the joint scores of o2pls model
-p.x <- 
-  #score plot of joint X scores 
-  qplot(x=fit0$Tt[,1],
-        y=fit0$Tt[,2],
-        label = Points.nir$sample_id) +
-  theme_bw() +
-  labs(x = "Joint X - Component 1",
-       y = "Joint X - Component 2") +
-  geom_point(aes(shape = Points.nir$material, 
-                 fill = Points.nir$hue), 
-             size = 4) +
-  geom_text(hjust=0,
-            vjust=-1,
-            size=3) +
-  scale_color_manual(values = c("purple", "black","red","blue")) +
-  scale_shape_manual(name = "Material", 
-                     values=c(24,22,21)) +
-  scale_fill_manual(name = "Hue", 
-                    values = c("purple", "black","red","blue")) +
-  guides(color = "none",
-    shape = guide_legend(override.aes = list(fill = "black"),
-                              title.position="top",
-                              title.hjust = 0.5,
-                         order = 2),
-    fill = guide_legend(override.aes = list(shape = 21,
-                                                  fill = c("purple", "black","red","blue"),
-                                                  color = "black",
-                                                  size=3),
-                        title.position="top",
-                        title.hjust = 0.5,
-                        order = 1)) +
-  theme(legend.background = element_rect(linetype = "solid", color = "black"))
+#Setup a dataframe
+sum_O2pls <- setNames(data.frame(matrix(ncol = 3, nrow = 3)), c("", "X data", "Y data"))
 
+#Add variation types
+sum_O2pls[1,1] <- "Joint"
+sum_O2pls[2,1] <- "Orthogonal"
+sum_O2pls[3,1] <- "Noise"
 
-#score plot of joint Y scores
-p.y <-   
-  qplot(x=fit0$U[,1], 
-      y=fit0$U[,2],
-      label = Points.nir$sample_id) +
-  theme_bw() +
-  labs(x = "Joint Y - Component 1",
-       y = "Joint Y - Component 2") +
-  geom_point(aes(shape = Points.nir$material, fill = Points.nir$hue), size = 4) +
-  geom_text(hjust=0, 
-            vjust=-1, 
-            size=3) +
-  scale_color_manual(values = c("purple", "black","red","blue")) +
-  scale_shape_manual(name = "Material", 
-                     values=c(24,22,21)) +
-  scale_fill_manual(name = "Hue", 
-                    values = c("purple", "black","red","blue")) +
-  guides(color = "none",
-         shape = guide_legend(override.aes = list(fill = "black"),
-                              title.position="top",
-                              title.hjust = 0.5,
-                              order = 2),
-         fill = guide_legend(override.aes = list(shape = 21,
-                                                 fill = c("purple", "black","red","blue"),
-                                                 color = "black",
-                                                 size=3),
-                             title.position="top",
-                             title.hjust = 0.5,
-                             order = 1)) +
-  theme(legend.background = element_rect(linetype = "solid", color = "black"))
+#Extract and pass joint variation for X and Y to new dataframe
+sum_O2pls$`X data`[1] <- round(fit0[["R2Xcorr"]], digits = 3)
+sum_O2pls$`Y data`[1] <- round(fit0[["R2Ycorr"]], digits = 3)
 
-fig <- 
-  ggpubr::ggarrange(p.x, p.y,
-                    nrow = 2,
-                    common.legend = TRUE,
-                    legend = "right")
+#Extract and pass orthogonal variation for X and Y to new dataframe
+sum_O2pls$`X data`[2] <- round(fit0[["R2X_YO"]], digits = 3)
+sum_O2pls$`Y data`[2] <- round(fit0[["R2Y_XO"]], digits = 3)
 
-#Save figure
-ggsave("010-O2PLS.png",
-       fig,
+#Extract and pass noise for X and Y to new dataframe
+sum_O2pls$`X data`[3] = round(1-fit0[["R2Xcorr"]]-fit0[["R2X_YO"]], digits = 3)
+sum_O2pls$`Y data`[3] = round(1-fit0[["R2Ycorr"]]-fit0[["R2Y_XO"]], digits = 3)
+
+#make table using tableGrob
+g <- tableGrob(head(sum_O2pls), rows = NULL, theme = ttheme_minimal())
+separators <- replicate(ncol(g) - 1,
+                        segmentsGrob(x1 = unit(0, "npc"), gp=gpar(lty=2)),
+                        simplify=FALSE)
+## add vertical lines on the left side of columns
+g <- gtable::gtable_add_grob(g, grobs = separators,
+                             t = 2, b = nrow(g), l = c(seq_len(ncol(g)-2)+2,seq_len(ncol(g)-2)+1))
+
+#Save table
+ggsave("010-O2PLS-model-fit.png",
+       g,
        device = "png",
        here::here("analysis/figures/"),
-       width=20, 
-       height=20,
+       width=8, 
+       height=5,
        units = "cm",
        dpi = 300)

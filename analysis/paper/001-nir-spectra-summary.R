@@ -94,7 +94,7 @@ p.c <-
 #plot the dark spectra
 p.d <-
   ggplot(Points.d, aes(x = as.numeric(Wavelength))) + 
-  geom_line(aes(y = Absorbance, colour = "", group = sample_id), size = 1, stat = "identity") +
+  geom_line(aes(y = Absorbance, colour = "", group = sample_id), size = 0.5, stat = "identity") +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
   scale_color_manual(name = "Dark",
@@ -144,7 +144,7 @@ ggsave("001-nir-spectra-summary.png",
        fig,
        device = "png",
        here::here("analysis/figures/"),
-       width=20, 
+       width=25, 
        height=20,
        units = "cm",
        dpi = 300)

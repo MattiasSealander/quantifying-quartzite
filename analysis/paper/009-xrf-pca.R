@@ -61,7 +61,7 @@ xrf.pc2lab <- paste0("PC2 (",as.character(xrf.pc2var),"%)")
 xrf.pc3lab <- paste0("PC3 (",as.character(xrf.pc3var),"%)")
 
 #prepare color/fill and symbols for score plots
-pca.colors <- c("#D62728FF", "#7F7F7FFF", "#FF7F0EFF", "#1F77B4FF")
+pca.colors <- c("#9467BDFF", "#7F7F7FFF", "#FF7F0EFF", "#1F77B4FF")
 pca.hue <- c("Colourless", "Dark", "Light", "White")
 
 #Show eigenvalue scree plot
@@ -95,25 +95,43 @@ fig <-
                 fill.var = "red", 
                 repel = TRUE,
                 pointshape = 21, 
-                pointsize = 3) +
+                pointsize = 4) +
   theme_bw() +
   labs(x = xrf.pc1lab,
        y = xrf.pc2lab) +
-  geom_point(aes(fill = xrf$hue), shape=21, size = 3) +
-  scale_fill_manual(name = "Hue", 
-                    values = pca.colors) +
+  geom_point(aes(fill = xrf$hue, 
+                 shape = factor(xrf$material)), 
+             size = 3) +
+  scale_shape_manual(name = "Material", 
+                     values=c(24,22,21),
+                     guide = guide_legend(override.aes = list(fill = "black"),
+                                          title.position="top",
+                                          title.hjust = 0.5,
+                                          order = 1)) +
+  scale_color_manual(values = pca.colors,
+                    guide = "none") +
+  scale_fill_manual(name = "Hue",
+                    values = pca.colors,
+                    guide = guide_legend(override.aes = list(shape = 21,
+                                                             fill = pca.colors,
+                                                             color = "black",
+                                                             size=3),
+                                         title.position="top",
+                                         title.hjust = 0.5,
+                                         order = 2)) +
   ggnewscale::new_scale_fill() +
   stat_chull(aes(fill = xrf$cluster),
              alpha = 0.3, 
              geom = "polygon") + 
   scale_fill_manual(name = "Cluster", 
-                    values = c( "#0072B2", "#D55E00", "#CC79A7", "#009E73")) +
+                    values = c( "#0072B2", "#D55E00", "#CC79A7", "#009E73"),
+                    guide_legend(order = 1)) +
   theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
         axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
         axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
         legend.title = element_text(size = 12, face = "bold", colour = "black"),
         legend.background = element_rect(linetype = "solid", color = "black"),
-        legend.position = "bottom")
+        legend.position = "right")
 
 
 ggsave("009-xrf-pca.png",
