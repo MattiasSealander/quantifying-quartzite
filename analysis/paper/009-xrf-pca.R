@@ -65,7 +65,7 @@ pca.colors <- c("#9467BDFF", "#7F7F7FFF", "#FF7F0EFF", "#1F77B4FF")
 pca.hue <- c("Colourless", "Dark", "Light", "White")
 
 #Show eigenvalue scree plot
-#fviz_eig(xrf.pca, choice = "eigenvalue")
+fviz_eig(xrf.pca, choice = "eigenvalue")
 
 #keep PCs above eigenvalue 1
 xrf.transform = as.data.frame(-xrf.pca$x[,1:3])

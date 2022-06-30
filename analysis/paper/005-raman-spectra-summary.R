@@ -129,59 +129,59 @@ r.white.long <-
 
 #plot the colourless spectra
 p.c <-
-  ggplot(r.colourless.long,aes(x = as.numeric(Wavenumber))) + 
-  geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
-  xlab("Wavenumber (cm-1)") +
-  ylab("Intensity") +
-  scale_color_manual(name = "Colourless",
-                     values = "purple") + 
-  theme_classic() +
-  theme(legend.position = c(.9,.95),
-        axis.title.x = element_blank(),
-        axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
-        legend.title = element_text(size = 12, face = "bold", colour = "black"))
+  ggplot(r.colourless.long,aes(x = as.numeric(as.character(Wavenumber)))) + 
+    geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+    xlab("Wavenumber (cm-1)") +
+    ylab("Intensity") +
+    scale_color_manual(name = "Colourless",
+                      values = "purple") + 
+    theme_classic() +
+    theme(legend.position = c(.9,.95),
+          axis.title.x = element_blank(),
+          axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
+          legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
 #plot the dark spectra
 p.d <-
-  ggplot(r.dark.long, aes(x = as.numeric(Wavenumber))) + 
-  geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
-  xlab("Wavenumber (cm-1)") +
-  ylab("Intensity") +
-  scale_color_manual(name = "Dark",
-                     values = "black") + 
-  theme_classic() +
-  theme(legend.position = c(.1,.95),
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        legend.title = element_text(size = 12, face = "bold", colour = "black"))
+  ggplot(r.dark.long, aes(x = as.numeric(as.character(Wavenumber)))) + 
+    geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+    xlab("Wavenumber (cm-1)") +
+    ylab("Intensity") +
+    scale_color_manual(name = "Dark",
+                      values = "black") + 
+    theme_classic() +
+    theme(legend.position = c(.1,.95),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
 #plot the light spectra
 p.l <-
-  ggplot(r.light.long, aes(x = as.numeric(Wavenumber))) + 
-  geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
-  xlab("Wavenumber (cm-1)") +
-  ylab("Intensity") +
-  scale_color_manual(name = "Light",
-                     values = "blue") + 
-  theme_classic() +
-  theme(legend.position = c(.1,.95),
-        axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
-        axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
-        legend.title = element_text(size = 12, face = "bold", colour = "black"))
+  ggplot(r.light.long, aes(x = as.numeric(as.character(Wavenumber)))) + 
+    geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+    xlab("Wavenumber (cm-1)") +
+    ylab("Intensity") +
+    scale_color_manual(name = "Light",
+                      values = "blue") + 
+    theme_classic() +
+    theme(legend.position = c(.1,.95),
+          axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
+          axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
+          legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
 #plot the white spectra
 p.w <-
-  ggplot(r.white.long, aes(x = as.numeric(Wavenumber))) + 
-  geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
-  xlab("Wavenumber (cm-1)") +
-  ylab("Intensity") +
-  scale_color_manual(name = "White",
-                     values = "red") + 
-  theme_classic() +
-  theme(legend.position = c(.1,.95),
-        axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
-        axis.title.y = element_blank(),
-        legend.title = element_text(size = 12, face = "bold", colour = "black"))
+  ggplot(r.white.long, aes(x = as.numeric(as.character(Wavenumber)))) + 
+    geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+    xlab("Wavenumber (cm-1)") +
+    ylab("Intensity") +
+    scale_color_manual(name = "White",
+                      values = "red") + 
+    theme_classic() +
+    theme(legend.position = c(.1,.95),
+          axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
+          axis.title.y = element_blank(),
+          legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
 #Layout the plots in one figure
 fig <-

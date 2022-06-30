@@ -112,6 +112,7 @@ components$PC3 <- -components$PC3
 
 components = cbind(components, Points.raman$hue)
 
+pca.colors <- c("#9467BDFF", "#7F7F7FFF", "#FF7F0EFF", "#1F77B4FF")
 
 #Plot using plotly with hue as color group
 fig <- 
@@ -123,7 +124,7 @@ fig <-
             y = ~PC3, 
             z = ~PC2,
             color = ~factor(Points.raman$hue),
-            colors = "Set1",
+            colors = pca.colors,
             marker = list(opacity = 0.8,
                           line = list(
                             color = 'rgba(0,0,0)',

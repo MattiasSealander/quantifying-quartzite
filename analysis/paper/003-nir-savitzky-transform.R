@@ -57,6 +57,7 @@ p.d <-
   ylab("Absorbance") +
   scale_color_manual(name = "Dark",
                      values = "black") + 
+  scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
   theme(legend.position = c(.1,.95),
         axis.title.x = element_blank(),
@@ -83,6 +84,7 @@ p.d258 <-
                      values = "black") + 
   #coord_cartesian(x=c(1000,2500), clip = "off") +
   #annotate("label", x = 890, y = 1.20, label = "B", label.size=NA, size= 5, fontface = "bold", fill = "white") +
+  scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
   theme(legend.position = c(.15,.95),
         axis.title.x = element_blank(),
@@ -103,6 +105,7 @@ p.sg.d <-
   ylab("Absorbance") +
   scale_color_manual(name = "Sample 258",
                      values = "black") + 
+  scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
   theme(legend.position = c(.1,.95),
         axis.title.x = element_blank(),

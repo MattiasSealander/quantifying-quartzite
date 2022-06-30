@@ -42,6 +42,8 @@ Points.nir <-
 nir.pca <-
         prcomp(Points.nir[,c(681:2180)], center = TRUE, scale = FALSE)
 
+nir.pc1var <- round(summary(nir.pca)$importance[2,1]*100, digits=2)
+
 #Prepare axis labels with variance in %
 nir.pc1lab <- as.data.frame(paste0("<b> PC1 (",as.character(round(summary(nir.pca)$importance[2,1]*100, digits=2)),"%) </b>"))
 nir.pc2lab <- as.data.frame(paste0("<b> PC2 (",as.character(round(summary(nir.pca)$importance[2,2]*100, digits=2)),"%) </b>"))
@@ -58,6 +60,8 @@ components$PC3 <- -components$PC3
 
 components = cbind(components, Points.nir$hue)
 
+pca.colors <- c("#9467BDFF", "#7F7F7FFF", "#FF7F0EFF", "#1F77B4FF")
+
 
 #Plot using plotly with hue as color group
 fig <- 
@@ -69,7 +73,7 @@ fig <-
                   y = ~PC3, 
                   z = ~PC2,
                   color = ~factor(Points.nir$hue),
-                  colors = "Set1",
+                  colors = pca.colors,
                   marker = list(opacity = 0.8,
                                 line = list(
                                         color = 'rgba(0,0,0)',

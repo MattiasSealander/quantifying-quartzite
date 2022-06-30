@@ -39,52 +39,53 @@ Points.nir <-
 
 #Filter NIR data to focus on colourless 
 #and select the NIR range 1 000 - 2 500 nm
-Points.c <- Points.nir %>%
+n.colourless <- Points.nir %>%
   dplyr::filter(hue == "Colourless") %>% 
   dplyr::select(1, c(681:2180))
 
 #Melt into long format
-Points.c <- 
-  suppressWarnings(melt(setDT(Points.c), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
+n.colourless.long <- 
+  suppressWarnings(melt(setDT(n.colourless), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on material with dark hues 
 #and select the NIR range 1 000 - 2 500 nm
-Points.d <- Points.nir %>%
+n.dark <- Points.nir %>%
   dplyr::filter(hue == "Dark") %>% 
   dplyr::select(1, c(681:2180))
 
 #Melt into long format
-Points.d <- 
-  suppressWarnings(melt(setDT(Points.d), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
+n.dark.long <- 
+  suppressWarnings(melt(setDT(n.dark), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on material with light hues 
 #and select the NIR range 1 000 - 2 500 nm
-Points.l <- Points.nir %>%
+n.light <- Points.nir %>%
   dplyr::filter(hue == "Light") %>% 
   dplyr::select(1, c(681:2180))
 
 #Melt into long format
-Points.l <- 
-  suppressWarnings(melt(setDT(Points.l), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
+n.light.long <- 
+  suppressWarnings(melt(setDT(n.light), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on material with white hues 
 #and select the NIR range 1 000 - 2 500 nm
-Points.w <- Points.nir %>%
+n.white <- Points.nir %>%
   dplyr::filter(hue == "White") %>% 
   dplyr::select(1, c(681:2180))
 
 #Melt into long format
-Points.w <- 
-  suppressWarnings(melt(setDT(Points.w), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
+n.white.long <- 
+  suppressWarnings(melt(setDT(n.white), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #plot the colourless spectra
 p.c <-
-  ggplot(Points.c,aes(x = as.numeric(Wavelength))) + 
+  ggplot(n.colourless.long, aes(x = as.numeric(Wavelength))) + 
     geom_line(aes(y = Absorbance, colour = "", group = sample_id), size = 1, stat = "identity") +
     xlab("Wavelength (nm)") +
     ylab("Absorbance") +
     scale_color_manual(name = "Colourless",
-                       values = "purple") + 
+                       values = "#9467BDFF") + 
+  scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
     theme_classic() +
     theme(legend.position = c(.9,.95),
         axis.title.x = element_blank(),
@@ -93,26 +94,28 @@ p.c <-
   
 #plot the dark spectra
 p.d <-
-  ggplot(Points.d, aes(x = as.numeric(Wavelength))) + 
+  ggplot(n.dark.long, aes(x = as.numeric(Wavelength))) + 
   geom_line(aes(y = Absorbance, colour = "", group = sample_id), size = 0.5, stat = "identity") +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
   scale_color_manual(name = "Dark",
                      values = "black") + 
+  scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
   theme(legend.position = c(.1,.95),
         axis.title.x = element_blank(),
         axis.title.y = element_blank(),
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
-
+f
 #plot the light spectra
 p.l <-
-  ggplot(Points.l, aes(x = as.numeric(Wavelength))) + 
+  ggplot(n.light.long, aes(x = as.numeric(Wavelength))) + 
   geom_line(aes(y = Absorbance, colour = "", group = sample_id), size = 1, stat = "identity") +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
   scale_color_manual(name = "Light",
-                     values = "blue") + 
+                     values = "#FF7F0EFF") + 
+  scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
   theme(legend.position = c(.1,.95),
         axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
@@ -121,12 +124,13 @@ p.l <-
 
 #plot the white spectra
 p.w <-
-  ggplot(Points.w, aes(x = as.numeric(Wavelength))) + 
+  ggplot(n.white.long, aes(x = as.numeric(Wavelength))) + 
   geom_line(aes(y = Absorbance, colour = "", group = sample_id), size = 1, stat = "identity") +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
   scale_color_manual(name = "White",
-                     values = "red") + 
+                     values = "#1F77B4FF") + 
+  scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
   theme(legend.position = c(.1,.95),
         axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
