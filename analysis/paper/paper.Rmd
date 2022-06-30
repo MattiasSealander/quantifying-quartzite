@@ -213,8 +213,25 @@ O2PLS was implemented in R [@rcoreteam21] using the *OmicsPLS* package [@bouhadd
 
 ## NIR - near infrared range
 ```{r nir-sample-count, results='hide'}
+#Select all dark samples
+points.d.tot <-
+  metadata.csv %>%
+  filter(site_id == "Vilhelmina 1069" | site_id == "Vilhelmina 109" | site_id == "Vilhelmina 112" | site_id == "Vilhelmina 1124" | site_id == "Vilhelmina 1127" | 
+           site_id == "Vilhelmina 114" | site_id == "Vilhelmina 115" | site_id == "Vilhelmina 117" | site_id == "Vilhelmina 118" | site_id == "Vilhelmina 1254" | 
+           site_id == "Vilhelmina 216" | site_id == "Vilhelmina 235" | site_id == "Vilhelmina 240" | site_id == "Vilhelmina 245" | site_id == "Vilhelmina 252" | 
+           site_id == "Vilhelmina 263" | site_id == "Vilhelmina 335" | site_id == "Vilhelmina 356" | site_id == "Vilhelmina 399" | site_id == "Vilhelmina 411" | 
+           site_id == "Vilhelmina 419" | site_id == "Vilhelmina 439" | site_id == "Vilhelmina 444" | site_id == "Vilhelmina 450" | site_id == "Vilhelmina 458" | 
+           site_id == "Vilhelmina 539" | site_id == "Vilhelmina 542" | site_id == "Vilhelmina 611" | site_id == "Vilhelmina 619" | site_id == "Vilhelmina 636" | 
+           site_id == "Vilhelmina 637" | site_id == "Vilhelmina 643" | site_id == "Vilhelmina 769" | site_id == "Vilhelmina 949" | site_id == "Vilhelmina 95" | 
+           site_id == "Åsele 101" | site_id == "Åsele 107" | site_id == "Åsele 115" | site_id == "Åsele 117" | site_id == "Åsele 119" | site_id == "Åsele 129" | 
+           site_id == "Åsele 182" | site_id == "Åsele 188" | site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | 
+           site_id == "Åsele 99", 
+         type == "Point" | type == "Point fragment" | type == "Preform", 
+         material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
+  filter(hue == "Dark")
+
 #Filter out the dark quartzite samples that feature peaks of interest in their spectra 
-points.d <-
+points.d.filt <-
   metadata.csv %>%
   filter(site_id == "Vilhelmina 1069" | site_id == "Vilhelmina 109" | site_id == "Vilhelmina 112" | site_id == "Vilhelmina 1124" | site_id == "Vilhelmina 1127" | 
            site_id == "Vilhelmina 114" | site_id == "Vilhelmina 115" | site_id == "Vilhelmina 117" | site_id == "Vilhelmina 118" | site_id == "Vilhelmina 1254" | 
@@ -234,21 +251,24 @@ points.d <-
   filter(hue == "Dark")
 
 #pass to vector so that length() can be used in text to quote nr. of dark samples
-spec.d <- 
-  points.d$sample_id
+spec.d.total <- 
+  points.d.tot$sample_id
+
+#pass to vector so that length() can be used in text to quote nr. of dark samples
+spec.d.filtered <- 
+  points.d.filt$sample_id
 ```
 
-It is well-known that NIRS is less effective on translucent material, such as a pure quartz crystal, as the absence of impurities in the material will result in little to no reflection/absorbance of light [@hunt77]. Similarly it can be difficult to work with dark materials as most of the light produced by the instrument will be absorbed, thus obscuring any potential features in the spectra. This effect can be seen in figure \@ref(fig:nir-spectra-summary) which shows a summary of the centered NIR spectra by color group. The dark group generally features less distinct peaks than the material with a lighter hue. This is not to say that all spectra collected on dark quartzite features less information, but any model including them will likely affect the clustering of the dataset as a whole. Transforming the data collected on the dark samples using derivatives can help in the evaluation of the spectra. Savitzky-Golay filtering (SG) is a smoothing technique that has been widely applied in spectroscopy (although there has been recent suggestions for adaptions, see [@schmid_etal22]). SG filters out broad spectral features, which is beneficial in NIRS, but may also amplify any existing noise in the spectra [@chryssikos_gates17 pp.78-81; @mark_workman21 pp. 351-397]. Comparing one of the centered spectra from the dark group to its derivative counterpart it becomes clear that there indeed are significant peaks that may be of relevance to the characterization of the material, despite the high absorbance (fig. \@ref(fig:nir-savitzky-transform)). Filtering out those spectra that feature no discernible peaks or mainly noise leaves `r length(spec.d)` samples in the dark group. There is still, however, a significant difference between the dark and light group, as can be seen by comparing fig. \@ref(fig:nir-spectra-summary) and fig. \@ref(fig:nir-savitzky-transform):A. 
+It is well-known that NIRS is less effective on translucent material, such as a pure quartz crystal, as the absence of impurities in the material will result in little to no reflection/absorbance of light [@hunt77]. Similarly it can be difficult to work with dark materials as most of the light produced by the instrument will be absorbed, with the high absorbance potentially obscuring visible features in the spectra. This effect can be seen in figure \@ref(fig:nir-spectra-summary) which shows a summary of the centered NIR spectra by color group. The dark group generally features less distinct peaks than the material with a lighter hue. This is not to say that all spectra collected on dark quartzite features less information, but any model including them will likely affect the clustering of the dataset as a whole. 
 
+The spectra were evaluated using using Savitzky-Golay (SG) filtering, a smoothing technique  widely applied in spectroscopy [@chryssikos_gates17 pp.78-81]. 2^nd^ derivative SG can amplify weaker peaks in the spectra, although at the cost of potentially amplifying noise [@mark_workman21 pp. 351-397; @schmid_etal22]. This effect can be seen in fig. \@ref(fig:nir-savitzky-transform), where one of the centered spectra from the dark group is compared to its derivative counterpart. The SG transformation amplifies a number of significant peaks in the spectra, as well as a shift in the instrumentation filter at 1800 nm. Out of the total of `r length(spec.d.total)` dark spectra `r length(spec.d.filtered)` were left in the dark group after filtering out those spectra that feature no discernible peaks or mainly noise leaves. Despite this there is still a considerable difference in light absorbance between the dark and light group, as can be seen by comparing fig. \@ref(fig:nir-spectra-summary) and fig. \@ref(fig:nir-savitzky-transform):A. 
+
+ \linebreak
 
 ```{r nir-spectra-summary, fig.cap= "nir spectra summary", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/001-nir-spectra-summary.R"), echo = FALSE}
 quietly(source("./analysis/paper/001-nir-spectra-summary.R", encoding = "UTF-8"))
 knitr::include_graphics('../figures/001-nir-spectra-summary.png', error = FALSE)
 ```
-
- \linebreak
-
-
 
  \linebreak
 
@@ -259,7 +279,16 @@ knitr::include_graphics("../figures/003-nir-savitzky-transform.png", error = FAL
 
  \linebreak
 
-The most common features in quartz-based material are two peaks located at 1 400 nm and 1 900 nm (fig. \@ref(fig:nir-peak-summary)), indicating the presence of molecular water [@hunt77; @sciuto_etal19]. Apart from these the main features can be found in  the > 2 000 nm range. Hydroxyl (OH) groups can produce a response in a number of different fields in the same material, and largely depend on the element they are attached to [@hunt77 pp. 509-510]. In a large group of the samples these peaks occur at 2 200 nm and 2 350 nm, with the former often being the more intense of the two. A general rule in NIRS has been that aluminium (Al) contributes to a more intense peak at 2 200 nm, and magnesium (Mg) at 2 300 nm [@hunt77 p.509]. While this often may be the case there are also exceptions to this rule, and it should thus not be considered a definitive answer [@clark_etal90 p.12664]. These absorption bands can be found in minerals like muscovite, which would not be strange to find in quartzite [@clark_etal90 p.12; hunt77 p.510; @ramanaidou15 p.207]. The 2 350 nm band is also one of the stronger carbonate (CO) bands, but considering that the 2 350 nm peak always is accompanied by the 2 200 nm peak it would be unlikely to be related to CO stretching in this case.
+```{r nir-savitzky-transform-alt, fig.cap= "nir savitzky comparison", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/003-nir-savitzky-transform-alt.R"), echo = FALSE}
+quietly(source("./analysis/paper/003-nir-savitzky-transform-alt.R", encoding = "UTF-8"))
+knitr::include_graphics("../figures/003-nir-savitzky-transform-alt.png", error = FALSE)
+```
+
+ \linebreak
+ 
+Based on the evaluation of the spectra a couple of significant peaks can be identified at 1 400 nm, 1 900 nm, 2 200 nm, and 2 350 nm. These features are all the results of overtones and vibration combinations of hydroxyl (OH) groups, with the two first peaks at 1 400 nm and 1 900 nm being indicative of molecular water (fig. \@ref(fig:nir-peak-summary)) [@hunt77 p. 508-510; @sciuto_etal19]. OH groups can produce a response in a number of different fields in the same material, with metal-OH combinations occuring in the 2 000 nm - 2 500 nm region. As a general rule, the 2 200 nm and 2 350 nm peak positions have been related to aluminium (Al) and magnesium (Mg) combinations [@hunt77 p.509; @clark_etal90 p.12664]. While there are exceptions, a more intense 2 200 nm band has typically been related to AlOH, and a more intense 2 350 nm band to MgOH. In the current spectra the 2 200 nm band is typically the more intense band. 
+
+The above absorption bands can be found in minerals such as muscovite, which would not be strange to find in quartzite [@clark_etal90 p.12; hunt77 p.510; @ramanaidou15 p.207]. Although the 2 350 nm band is one of the stronger carbonate (CO) bands these are typically not associated to water features, and considering that the 2 350 nm peak always is accompanied by the 2 200 nm peak it would be unlikely to be related to CO stretching in this case. 
 
  \linebreak
 
@@ -270,13 +299,27 @@ knitr::include_graphics('../figures/002-nir-peak-summary.png', error = FALSE)
 
  \linebreak
 
-The PCA shows a strong trend along PC 1 ( %) that seems to correlate with the colour of the material(fig. \@ref(fig:nir-pca)). Darker quartzite cluster to the right with white and colourless samples grouping to the opposite side. While the white samples seem to gravitate to the bottom left of the model the samples that are somewhat translucent, such as the brecciated quartz, seem to cluster towards the top-left. At the top of the score plot 3 black samples separate themselves clearly from the rest of the data points. These three samples come from different sites and exhibit no peaks in their spectra, making them an interesting set of outliers. 
+```{r nir-pca, fig.width=20, fig.height=20, fig.cap= "PCA score plot", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/004-nir-pca.R"), echo = FALSE}
+quietly(source("./analysis/paper/004-nir-pca.R", encoding = "UTF-8"))
+nir.pc1var <- nir.pc1var
+```
 
  \linebreak
 
-```{r nir-pca, fig.width=20, fig.height=20, fig.cap= "PCA score plot", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/004-nir-pca.R"), echo = FALSE}
-quietly(source("./analysis/paper/004-nir-pca.R", encoding = "UTF-8"))
-knitr::include_graphics("../figures/004-nir-pca.png", error = FALSE)
+```{r nir-pca-loadings, fig.width=20, fig.height=20, fig.cap= "PCA loadings", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/004-nir-pca-loadings.R"), echo = FALSE}
+quietly(source("./analysis/paper/004-nir-pca-loadings.R", encoding = "UTF-8"))
+knitr::include_graphics("../figures/004-nir-pca-loadings.png", error = FALSE)
+```
+
+ \linebreak
+
+The loading lines for the PCA can be seen in figure \@ref(fig:nir-pca-loadings). The first principal component (PC) shows a strong trend (`r nir.pc1var` %) that seems to largely correlate with the absorbance of the material \@ref(fig:nir-pca-fig). Darker material cluster towards the positive side of PC 1, with lighter towards the negative. The light group also separate into two general groups along PC 2. Material that feature less impurities and some translucence group towards the top left of the plot, with white/light grey samples grouping in the bottom left. 
+
+ \linebreak
+
+```{r nir-pca-fig, fig.width=20, fig.height=20, fig.cap= "PCA score plot", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/004-nir-pca-alt.R"), echo = FALSE}
+quietly(source("./analysis/paper/004-nir-pca-alt.R", encoding = "UTF-8"))
+knitr::include_graphics("../figures/004-nir-pca-alt.png", error = FALSE)
 ```
 
  \linebreak
@@ -327,8 +370,28 @@ knitr::include_graphics("../figures/008-xrf-violin-plot.png", error = FALSE)
 ```
 
  \linebreak
+<!--
+```{r xrf-pca-scree, fig.cap= "xrf loadings", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/009-xrf-pca-scree.R"), echo = FALSE}
+quietly(eval(parse("./analysis/paper/009-xrf-pca-scree.R", encoding = "UTF-8")))
+knitr::include_graphics("../figures/009-xrf-pca-scree.png", error = FALSE)
+```
 
-```{r xrf-score-plot, fig.cap= "xrf score plot", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/009-xrf-pca.R"), echo = FALSE}
+ \linebreak
+ 
+```{r xrf-pca-loadings, fig.cap= "xrf scree plot", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/009-xrf-pca-loadings.R"), echo = FALSE}
+quietly(eval(parse("./analysis/paper/009-xrf-pca-loadings.R", encoding = "UTF-8")))
+knitr::include_graphics("../figures/009-xrf-pca-loadings.png", error = FALSE)
+```
+-->
+
+```{r xrf-pca-loadings-scree, fig.cap= "xrf scree plot", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/009-xrf-pca-loadings-scree.R"), echo = FALSE}
+quietly(eval(parse("./analysis/paper/009-xrf-pca-loadings-scree.R", encoding = "UTF-8")))
+knitr::include_graphics("../figures/009-xrf-pca-load-scree.png", error = FALSE)
+```
+
+ \linebreak
+
+```{r xrf-pca, fig.cap= "xrf score plot", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/009-xrf-pca.R"), echo = FALSE}
 quietly(eval(parse("./analysis/paper/009-xrf-pca.R", encoding = "UTF-8")))
 knitr::include_graphics("../figures/009-xrf-pca.png", error = FALSE)
 ```
