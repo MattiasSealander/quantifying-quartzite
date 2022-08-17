@@ -42,12 +42,10 @@ Points.nir <-
 nir.pca <-
   prcomp(Points.nir[,c(681:2180)], center = TRUE, scale = FALSE)
 
-nir.pc1var <- round(summary(nir.pca)$importance[2,1]*100, digits=2)
-
 #Prepare axis labels with variance in %
-nir.pc1lab <- as.data.frame(paste0("PC1 (",as.character(round(summary(nir.pca)$importance[2,1]*100, digits=2)),"%)"))
-nir.pc2lab <- as.data.frame(paste0("PC2 (",as.character(round(summary(nir.pca)$importance[2,2]*100, digits=2)),"%)"))
-nir.pc3lab <- as.data.frame(paste0("PC3 (",as.character(round(summary(nir.pca)$importance[2,3]*100, digits=2)),"%)"))
+nir.pc1lab <- as.data.frame(paste0("PC 1 (",as.character(round(summary(nir.pca)$importance[2,1]*100, digits=2)),"%)"))
+nir.pc2lab <- as.data.frame(paste0("PC 2 (",as.character(round(summary(nir.pca)$importance[2,2]*100, digits=2)),"%)"))
+nir.pc3lab <- as.data.frame(paste0("PC 3 (",as.character(round(summary(nir.pca)$importance[2,3]*100, digits=2)),"%)"))
 
 #extract loadings from pca
 loadings <- 
@@ -60,33 +58,34 @@ loadings$wavelengths <-
 l1 <-
   ggplot(loadings,aes(x = as.numeric(wavelengths))) + 
     geom_line(aes(y = PC1), size = 1, stat = "identity") +
-    xlab("Wavelength (nm)") +
+    labs(y = nir.pc1lab) +
     scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
     theme_classic() +
     theme(legend.position = c(.9,.95),
           axis.title.x = element_blank(),
-          axis.title.y = element_blank(),
+          axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
           legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
 l2 <- 
   ggplot(loadings,aes(x = as.numeric(wavelengths))) + 
     geom_line(aes(y = PC2), size = 1, stat = "identity") +
-    xlab("Wavelength (nm)") +
+    labs(y = nir.pc2lab) +
     scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
     theme_classic() +
     theme(legend.position = c(.9,.95),
           axis.title.x = element_blank(),
-          axis.title.y = element_blank(),
+          axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
           legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
 l3 <- 
   ggplot(loadings,aes(x = as.numeric(wavelengths))) + 
     geom_line(aes(y = PC3), size = 1, stat = "identity") +
-    xlab("Wavelength (nm)") +
+    labs(y = nir.pc3lab,
+         x = "Wavelength (nm)") +
     scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
     theme_classic() +
     theme(legend.position = c(.9,.95),
-          axis.title.y = element_blank(),
+          axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
           legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
 #Layout the plots in one figure
@@ -94,7 +93,6 @@ fig <-
   ggpubr::ggarrange(l1, l2, l3, 
                     ncol = 1, 
                     nrow = 3,
-                    labels = c("PC1", "PC2", "PC3"),
                     hjust = -1.5)
 
 ggsave("004-nir-pca-loadings.png",
