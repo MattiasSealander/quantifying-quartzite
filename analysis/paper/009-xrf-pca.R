@@ -64,6 +64,15 @@ xrf.pc3lab <- paste0("PC3 (",as.character(xrf.pc3var),"%)")
 pca.colors <- c("#9467BDFF", "#7F7F7FFF", "#FF7F0EFF", "#1F77B4FF")
 pca.hue <- c("Colourless", "Dark", "Light", "White")
 
+#Extract loadings from xrf.pca
+loadings <- as.data.frame(xrf.pca$rotation[,1:3])
+#As elements are stored as rownames, set them as first column so it can be used as a variable
+loadings <- setDT(loadings, keep.rownames = "Element")[]
+#Melt loadings from wide to long format
+loadings.melted <- melt(loadings, id.vars="Element")
+#Set names of columns
+loadings <- setNames(loadings.melted, c("Element", "PC", "Value"))
+
 #Show eigenvalue scree plot
 #fviz_eig(xrf.pca, choice = "eigenvalue")
 
@@ -82,8 +91,81 @@ kmeans.xrf <-
 xrf$cluster <- 
   factor(kmeans.xrf$cluster)
 
+#pivot data so boxplot can be generated for each cluster and element
+xrf_long <- xrf %>% 
+  dplyr::select(cluster,`Mg`, `Al`, `Si`, `K`, `Ca`, `Fe`, `Sr`, `Zr`, `Ti`) %>% 
+  pivot_longer(-cluster, names_to = "variable", values_to = "value")
+
+#Prepare for facet labels
+Elements <- c(
+  'Mg' = "Mg",
+  'Al' = "Al",
+  'Si' = "Si",
+  'K' = "K",
+  'Ca' ="Ca",
+  'Fe' = "Fe",
+  'Sr' = "Sr",
+  'Zr' = "Zr",
+  'Ti' = "Ti"
+)  
+
+#Determine no. of clusters with elbow graph
+load.1 <- 
+  fviz_eig(xrf.pca, 
+           choice = "eigenvalue",
+           barfill = "#999999",
+           barcolor = "black",
+           linecolor = "black",
+           ncp = 10,
+           bar_width=0.5) +
+  theme_classic() +
+  theme(plot.title = element_blank(),
+        axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
+        axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
+        legend.title = element_text(size = 12, face = "bold", colour = "black"),
+        legend.background = element_rect(linetype = "solid", color = "black"),
+        legend.position = "right")
+
+
+#bar graph of the loadings (P1-P2) for the XRF data
+load.2 <- 
+  loadings %>%
+  ggplot(aes(x=Element, y=Value)) +
+  geom_bar(
+    stat = "identity", position = "identity",
+    color = "black", fill = "#999999",
+    width = 0.5) +
+  facet_wrap( ~ PC, scales = "free") +
+  theme_bw() +
+  theme(plot.margin = margin(10,10,10,10),
+        axis.title.y = element_blank(),
+        axis.text.y = element_text(size=10, face="bold", colour = "black"),
+        axis.text.x = element_text(size=10, face="bold", colour = "black"),
+        axis.title.x = element_blank(),
+        strip.text.x = element_text(size=14, face="bold", colour="black"))
+
+
+#Layout the plots in one figure
+fig1 <-
+  ggpubr::ggarrange(load.1,load.2, 
+                    ncol = 1, 
+                    nrow = 2,
+                    labels = c("A", "B"))
+
+
+ggsave("009-xrf-pca-load-scree.png",
+       fig1,
+       device = "png",
+       here::here("analysis/figures/"),
+       scale = 1, 
+       width=25, 
+       height=20,
+       units = "cm",
+       dpi = 300)
+
+
 #Biplot with ellipses showing the results of the k-means cluster analysis 
-fig <- 
+fig2 <- 
   fviz_pca_biplot(xrf.pca,
                 axes = c(1,2),
                 geom = "text",
@@ -135,7 +217,7 @@ fig <-
 
 
 ggsave("009-xrf-pca.png",
-       fig,
+       fig2,
        device = "png",
        here::here("analysis/figures/"),
        scale = 1, 
@@ -143,3 +225,32 @@ ggsave("009-xrf-pca.png",
        height=20,
        units = "cm",
        dpi = 300)
+
+
+fig3 <- 
+  ggplot(xrf_long, aes(x=variable, y=value, fill = cluster)) +
+  geom_boxplot() +  
+  facet_wrap( ~ variable, scales = "free", labeller = labeller(Element = Elements)) +
+  #facetted_pos_scales(y = scales) +
+  theme_bw() +
+  scale_fill_manual(name = "Cluster", 
+                    values = c("#0072B2", "#D55E00", "#CC79A7", "#009E73")) +
+  theme(
+    legend.title = element_text(size = 12, face = "bold", colour = "black"),
+    strip.text.x = element_text(size = 12, face = "bold", colour = "black"),
+    axis.title.x = element_blank(),
+    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
+    axis.title.y=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank())
+
+ggsave("009-xrf-kmeans-boxplot.png",
+       fig3,
+       device = "png",
+       here::here("analysis/figures/"),
+       scale = 1, 
+       width=20, 
+       height=20,
+       units = "cm",
+       dpi = 300)
+
