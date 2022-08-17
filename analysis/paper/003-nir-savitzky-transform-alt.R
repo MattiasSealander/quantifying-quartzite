@@ -34,9 +34,9 @@ Points.nir <-
            site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | site_id == "Åsele 99", 
          type == "Point" | type == "Point fragment" | type == "Preform", 
          material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
-  filter(!sample_id %in% c("153","167","168","169","172","174","175","177","182","183","190","191","193","194","196","198","200","204","207","210","213","214",
-                           "215","216","229","234","235","237","238","251","262","265","268","269","272","278","281","282","359","377","385","392","393","397","405",
-                           "406","410","411","413","414","415","416","417","424","425","426","428","430","432","55","56"))
+  filter(!sample_id %in% c("153","167","168","169","172","174","175","176","177","182","183","190","191","193","194","196","198","200","204","207","210","213","214",
+                           "215","216","229","234","235","237","238","251","262","265","268","272","278","281","282","359","377","392","393","397","405",
+                           "406","410","411","413","414","415","416","417","424","425","426","428","430","55","56"))
 
 
 #Filter NIR data to focus on light and dark hue material
@@ -49,7 +49,7 @@ Points <- Points.nir %>%
 Points$hue <- factor(Points$hue, c("Light", "Dark"))
 
 #Perform Savitzky-Golay 2nd derivative transformation
-sg <- cbind(Points.d$hue, as.data.table(gapDer(X = Points.d[,2:1501], m = 2, w = 11, s = 5)))
+sg <- cbind(Points$hue, as.data.table(gapDer(X = Points[,2:1501], m = 2, w = 11, s = 5)))
 
 #Transpose the data for ggplot
 sg.long <-  suppressWarnings(melt(setDT(sg), id.vars = "V1", variable.name = "Wavelength", value.name = "Absorbance", variable.factor = FALSE))
