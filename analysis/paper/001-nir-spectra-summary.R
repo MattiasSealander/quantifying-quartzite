@@ -106,7 +106,7 @@ p.d <-
         axis.title.x = element_blank(),
         axis.title.y = element_blank(),
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
-f
+
 #plot the light spectra
 p.l <-
   ggplot(n.light.long, aes(x = as.numeric(Wavelength))) + 
