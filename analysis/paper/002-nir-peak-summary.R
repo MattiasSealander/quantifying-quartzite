@@ -110,7 +110,7 @@ p.l <-
   geom_vline(xintercept=c(1413,1935,2220,2260,2350), linetype='dashed', col = 'red') +
   ylab("Light") +
   scale_color_manual(name = "Light",
-                     values = "red") +
+                     values = "#FF7F0EFF") +
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
   theme(legend.position = "none",
@@ -124,7 +124,7 @@ p.c <-
   geom_vline(xintercept=c(1413,1935,2220,2260,2350), linetype='dashed', col = 'red') +
   ylab("Colourless") +
   scale_color_manual(name = "Colourless",
-                     values = "purple") +
+                     values = "#9467BDFF") +
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   scale_y_continuous(labels = function(x) sprintf("%.2f", x)) +
   theme_classic() +
@@ -141,7 +141,7 @@ p.w <-
   xlab("Wavelength (nm)") +
   ylab("White") +
   scale_color_manual(name = "White",
-                     values = "blue") +
+                     values = "#1F77B4FF") +
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
   theme(legend.position = "none")
