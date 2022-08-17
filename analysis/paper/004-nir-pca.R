@@ -43,6 +43,8 @@ nir.pca <-
         prcomp(Points.nir[,c(681:2180)], center = TRUE, scale = FALSE)
 
 nir.pc1var <- round(summary(nir.pca)$importance[2,1]*100, digits=2)
+nir.pc2var <- round(summary(nir.pca)$importance[2,2]*100, digits=2)
+nir.pc3var <- round(summary(nir.pca)$importance[2,3]*100, digits=2)
 
 #Prepare axis labels with variance in %
 nir.pc1lab <- as.data.frame(paste0("<b> PC1 (",as.character(round(summary(nir.pca)$importance[2,1]*100, digits=2)),"%) </b>"))
