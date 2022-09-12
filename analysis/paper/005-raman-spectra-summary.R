@@ -4,7 +4,7 @@ suppressPackageStartupMessages(library(tidyverse))
 
 #Import descriptive metadata
 metadata.csv <-
-  read.csv2("./analysis/data/raw_data/metadata_20220510.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
+  read.csv2("./analysis/data/raw_data/metadata.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
 
 #Import raman data, set empty fields to NA
 raman.csv <-
@@ -51,25 +51,37 @@ raman.baseline <-
                   method = "modpolyfit",
                   retC = TRUE)
 
-#prevent baseline from plotting a figure
+#prevent baselineSpectra from plotting a figure which will show up in the knitted document
 dev.off()
 
-#spectra are stored in "Spectra" object, not a data frame
+#spectra are stored in a "Spectra" object, not a data frame
 #need to extract samples and frequencies from that object 
 raman.tmp <- 
-  cbind(raman.baseline$freq, t(raman.baseline$data))
+  #bind data from spectra object
+  as.data.frame(cbind(raman.baseline$freq, t(raman.baseline$data))) %>% 
+  #transpose data so that frequencies are column headers and observations rows
+  tibble::rownames_to_column() %>% 
+  pivot_longer(-rowname) %>% 
+  pivot_wider(names_from=rowname, values_from=value) %>%
+  #remove unnecessary column with previous column headers
+  select(-name) %>% 
+  #Set frequencies as headers, as they are still first row
+  purrr::set_names(as.character(slice(., 1))) %>%
+  slice(-1) %>% 
+  #add sample id from spectra object
+  add_column(sample_id = sub("^X*", "", raman.baseline$names))
 #transpose data to get frequencies as columns
-raman.tmp <- 
-  as.data.frame(t(raman.tmp))
+#raman.tmp <- 
+#  as.data.frame(t(raman.tmp))
 #Add sample_id column and remove the initial "X" character introduced to sample names by R
-raman.tmp$sample_id <- 
-  c("sample_id", sub("^X*", "", raman.baseline$names))
+#raman.tmp$sample_id <- 
+#  c("sample_id", sub("^X*", "", raman.baseline$names))
 
 #Make first row headers and remove the first row with the names
-names(raman.tmp) <-
-  raman.tmp[1,]
-raman.tmp <- 
-  raman.tmp[-1,]
+#names(raman.tmp) <-
+#  raman.tmp[1,]
+#raman.tmp <- 
+#  raman.tmp[-1,]
 
 #merge raman de-trended data with metadata
 raman.baseline.merged <- 
@@ -86,10 +98,8 @@ Points.raman <-
            site_id == "Åsele 107" | site_id == "Åsele 115" | site_id == "Åsele 117" | site_id == "Åsele 119" | site_id == "Åsele 129" | site_id == "Åsele 182" | site_id == "Åsele 188" |
            site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | site_id == "Åsele 99", 
          type == "Point" | type == "Point fragment" | type == "Preform", 
-         material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite")
-
-#fill the NA fields in the munsell hue column to mark them as colourless/translucent material
-Points.raman[8][is.na(Points.raman[8])] <- "Colourless"
+         material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
+  replace_na(list(munsell_hue = "Colourless"))
 
 #Filter raman data to focus on dark samples 
 r.dark <- Points.raman %>%
