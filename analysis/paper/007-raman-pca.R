@@ -9,7 +9,7 @@ raman.csv <-
   read.csv2("./analysis/data/raw_data/RAMAN/raman_samples_data_non_treated_20220407.csv", sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 metadata.csv <-
-  read.csv2("./analysis/data/raw_data/metadata_20220510.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
+  read.csv2("./analysis/data/raw_data/metadata.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
 
 #aggregate observations by group(sample) and calculate average of wavelength measurements
 raman.averaged <- 
