@@ -6,7 +6,7 @@ suppressPackageStartupMessages(library(tidyverse))
 
 #Import descriptive metadata
 metadata.csv <-
-  read.csv2("./analysis/data/raw_data/metadata_20220510.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
+  read.csv2("./analysis/data/raw_data/metadata.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
 
 #Import nir data, set empty fields to NA
 nir.csv <-
