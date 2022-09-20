@@ -10,16 +10,9 @@ metadata.csv <-
 nir.csv <-
   read.csv2("./analysis/data/raw_data/NIR/asd_raw_data_20220127.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
-#aggregate observations by group(sample) and calculate average of wavelength measurements
-nir.averaged <- 
-  aggregate(nir.csv[, 4:2154], list(sample_id = nir.csv$sample_id), mean)
-
 #merge NIR data with metadata
 nir.merged <- 
-  as.data.frame(merge(metadata.csv, nir.averaged, by='sample_id'))
-
-#Fill the NA fields in the munsell_hue column and mark them as colourless samples
-nir.merged[8][is.na(nir.merged[8])] <- "Colourless"
+  as.data.frame(merge(metadata.csv, nir.csv, by='sample_id'))
 
 #Filter xrf data to focus on points and preforms made from quartz/quartzite material 
 Points.nir <-
@@ -35,8 +28,10 @@ Points.nir <-
          type == "Point" | type == "Point fragment" | type == "Preform", 
          material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
   filter(sample_id %in% c("54","58","152","170","171","173","185","186","187","188","197","208","221","227","241","249","253","254","258","259","269","280","378","384","385","386","391","401","403","404","408",
-                          "432"))
-
+                          "432")) %>% 
+  replace_na(list(munsell_hue = "Colourless")) %>% 
+  group_by(across(sample_id:river)) %>% 
+  dplyr::summarise(across(`350.0`:`2500.0`, mean), .groups = "drop")
 
 #Filter NIR data to focus on material with dark hues 
 #and select the NIR range 1 000 - 2 500 nm
