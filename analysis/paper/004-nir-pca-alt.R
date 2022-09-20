@@ -5,24 +5,21 @@ suppressPackageStartupMessages(library(tidyverse))
 
 #Import descriptive metadata
 metadata.csv <-
-  read.csv2("./analysis/data/raw_data/metadata_20220510.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
+  read.csv2("./analysis/data/raw_data/metadata.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
 
 #Import nir data, set empty fields to NA
 nir.csv <-
   read.csv2("./analysis/data/raw_data/NIR/asd_raw_data_20220127.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #aggregate observations by group(sample) and calculate average of wavelength measurements
-nir.averaged <- 
-  aggregate(nir.csv[, 4:2154], list(sample_id = nir.csv$sample_id), mean)
+#nir.averaged <- 
+#  aggregate(nir.csv[, 4:2154], list(sample_id = nir.csv$sample_id), mean)
 
 #merge NIR data with metadata
 nir.merged <- 
-  as.data.frame(merge(metadata.csv, nir.averaged, by='sample_id'))
+  as.data.frame(merge(metadata.csv, nir.csv, by='sample_id'))
 
-#Fill the NA fields in the munsell_hue column and mark them as colourless samples
-nir.merged[8][is.na(nir.merged[8])] <- "Colourless"
-
-#Filter xrf data to focus on points and preforms made from quartz/quartzite material 
+#Filter NIR data to focus on points and preforms made from quartz/quartzite material 
 Points.nir <-
   nir.merged %>%
   filter(site_id == "Vilhelmina 1069" | site_id == "Vilhelmina 109" | site_id == "Vilhelmina 112" | site_id == "Vilhelmina 1124" | site_id == "Vilhelmina 1127" | site_id == "Vilhelmina 114" |
@@ -37,7 +34,10 @@ Points.nir <-
          material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
   filter(!sample_id %in% c("153","167","168","169","172","174","175","177","182","183","190","191","193","194","196","198","200","204","207","210","213","214",
                            "215","216","229","234","235","237","238","251","262","265","268","269","272","278","281","282","359","377","385","392","393","397","405",
-                           "406","410","411","413","414","415","416","417","424","425","426","428","430","432","55","56"))
+                           "406","410","411","413","414","415","416","417","424","425","426","428","430","432","55","56")) %>%
+  replace_na(list(munsell_hue = "Colourless")) %>% 
+  group_by(across(sample_id:river)) %>% 
+  summarise(across(`350.0`:`2500.0`, mean), .groups = "drop")
 
 #perform PCA with SNV normalization and mean-center
 nir.pca <-
@@ -49,17 +49,6 @@ nir.pc1var <- round(summary(nir.pca)$importance[2,1]*100, digits=2)
 nir.pc1lab <- as.data.frame(paste0("PC1 (",as.character(round(summary(nir.pca)$importance[2,1]*100, digits=2)),"%)"))
 nir.pc2lab <- as.data.frame(paste0("PC2 (",as.character(round(summary(nir.pca)$importance[2,2]*100, digits=2)),"%)"))
 nir.pc3lab <- as.data.frame(paste0("PC3 (",as.character(round(summary(nir.pca)$importance[2,3]*100, digits=2)),"%)"))
-
-#extract components from pca and prepare for 3d visualization
-components <- nir.pca[["x"]]
-
-components <- data.frame(components)
-
-components$PC2 <- -components$PC2
-
-components$PC3 <- -components$PC3
-
-components = cbind(components, Points.nir$hue)
 
 pca.colors <- c("#9467BDFF", "#7F7F7FFF", "#FF7F0EFF", "#1F77B4FF")
 pca.hue <- c("Colourless", "Dark", "Light", "White")
@@ -73,8 +62,8 @@ basic_plot2 <-
 #bind the basic fviz plot for PC 1 and 2, and use as basis for a more customizeable plot in ggpplot
 fig.1 <- 
   ggplot(cbind(basic_plot1$data, Points.nir[, c(7,10)]),
-         aes(x=x, y=y, shape = material, fill = hue)) + #, label = Points.nir$sample_id)) +
-  #geom_text(hjust=0, vjust=-0.5, size = 3) +
+         aes(x=x, y=y, shape = material, fill = hue)) +
+  #geom_text(aes(label=Points.nir$sample_id, hjust=0.5,vjust=-1.0)) +
   geom_point(size=3) +
   theme_bw() +
   ggtitle("Near infrared 1 000 - 2 500 nm") +
