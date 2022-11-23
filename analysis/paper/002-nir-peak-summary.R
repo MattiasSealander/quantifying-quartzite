@@ -50,7 +50,7 @@ Points.d <- Points.nir %>%
 
 #Melt into long format
 Points.d <- 
-  suppressWarnings(melt(setDT(Points.d), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
+  suppressWarnings(data.table::melt(setDT(Points.d), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on material with light hues 
 #and select the NIR range 1 000 - 2 500 nm
@@ -61,7 +61,7 @@ Points.l <- Points.nir %>%
 
 #Melt into long format
 Points.l <- 
-  suppressWarnings(melt(setDT(Points.l), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
+  suppressWarnings(data.table::melt(setDT(Points.l), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on colourless material 
 #and select the NIR range 1 000 - 2 500 nm
@@ -72,7 +72,7 @@ Points.c <- Points.nir %>%
 
 #Melt into long format
 Points.c <- 
-  suppressWarnings(melt(setDT(Points.c), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
+  suppressWarnings(data.table::melt(setDT(Points.c), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on material with a white hue
 #and select the NIR range 1 000 - 2 500 nm
@@ -83,7 +83,7 @@ Points.w <- Points.nir %>%
 
 #Melt into long format
 Points.w <- 
-  suppressWarnings(melt(setDT(Points.w), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
+  suppressWarnings(data.table::melt(setDT(Points.w), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 p.d <- 
   ggplot(Points.d, aes(x = as.numeric(Wavelength))) + 
