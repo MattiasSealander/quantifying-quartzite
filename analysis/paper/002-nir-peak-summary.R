@@ -1,4 +1,5 @@
 # Loading package
+suppressPackageStartupMessages(library(data.table))
 library(gridBase)
 library(spectrolab)
 suppressPackageStartupMessages(library(tidyverse))
@@ -36,9 +37,9 @@ Points.nir <-
                   site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | site_id == "Åsele 99", 
                 type == "Point" | type == "Point fragment" | type == "Preform", 
                 material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
-  dplyr::filter(!sample_id %in% c("153","167","168","169","172","174","175","177","182","183","190","191","193","194","196","198","200","204","207","210","213","214",
-                                  "215","216","229","234","235","237","238","251","262","265","268","269","272","278","281","282","359","377","385","392","393","397","405",
-                                  "406","410","411","413","414","415","416","417","424","425","426","428","430","432","55","56"))
+  filter(!sample_id %in% c("153","167","168","169","172","174","175","176","177","182","190","191","193","194","196","198","200","204","214",
+                           "215","216","229","238","262","265","272","282","359","391","392","393","397","405",
+                           "408","410","411","413","414","415","416","417","424","425","428","430","432","55","56"))
 
 #Filter NIR data to focus on material with dark hues 
 #and select the NIR range 1 000 - 2 500 nm
@@ -88,12 +89,10 @@ p.d <-
   ggplot(Points.d, aes(x = as.numeric(Wavelength))) + 
     geom_line(aes(y = Absorbance, colour = ""), size = 1, stat = "identity") +
     geom_vline(xintercept=c(1413,1935,2220,2260,2350), linetype='dashed', col = 'red') +
-    annotate(geom = "label", x = c(1413,1935), y = c(0.995, 1.005), 
+    annotate(geom = "label", x = c(1413,1935), y = c(1.04, 1.053), 
              label = c("OH", "OH"),label.size = NA, fill="white", fontface = 2) +
-    annotate(geom = "label", x = 2220, y = 1.008, 
-           label = "AlOH", label.size = NA, fill="white", fontface = 2, size = 2) +
-    annotate(geom = "label", x = c(2220,2260,2350), y = c(1.008, 1.015, 1.015), 
-           label = c("AlOH", "AlOH","AlOH"), label.size = NA, fill="white", fontface = 2, size = 3) +
+    annotate(geom = "label", x = c(2220,2260,2350), y = c(1.06, 1.065, 1.065), 
+           label = c("AlOH / MgOH", "AlOH","AlOH"), label.size = NA, fill="white", fontface = 2, size = 3) +
     ylab("Dark") +
     scale_color_manual(name = "Dark",
                       values = "black") +
