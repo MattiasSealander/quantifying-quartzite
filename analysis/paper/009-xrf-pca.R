@@ -108,6 +108,15 @@ cluster <-
   rename("cluster" = "factor(kmeans.xrf$cluster)") %>% 
   rownames_to_column(var = "reading_no")
 
+#Prepare legend with characteristic xrf variables for kmeans clusters to show in nir pca
+cluster <- 
+  cluster %>% 
+  mutate(variables = case_when(
+    endsWith(as.character(cluster), "1") ~ "Al, Ca, K, Si, Ti",
+    endsWith(as.character(cluster), "2") ~ "Al, Fe, Ti, Zr",
+    endsWith(as.character(cluster), "3") ~ "Al, K"
+  ))
+
 #Set reading_no as column again join with kmeans cluster output
 #Then group by kmeans cluster and calculate Si mean, concatenating the mean value with cluster for display in PCA legend
 xrf <- 
@@ -309,7 +318,7 @@ Points.nir <-
   replace_na(list(munsell_hue = "Colourless")) %>% 
   group_by(across(sample_id:river)) %>% 
   dplyr::summarise(across(`350.0`:`2500.0`, mean), .groups = "drop") %>% 
-  left_join(xrf[,c("sample_id", "cluster")], by = "sample_id")
+  left_join(xrf[,c("sample_id", "variables")], by = "sample_id")
 
 #perform PCA with SNV normalization and mean-center
 nir.pca <-
@@ -331,7 +340,7 @@ nir <- cbind(basic_plot1$data, Points.nir[, c(2181,10,1)])
 #bind the basic fviz plot for PC 1 and 2, and use as basis for a more customizeable plot in ggpplot
 fig4 <- 
   nir %>% 
-  ggplot(aes(x=x, y=y, shape = material, fill = cluster)) + 
+  ggplot(aes(x=x, y=y, shape = material, fill = variables)) + 
   geom_text(data=subset(nir, sample_id == 231 | sample_id == 404 | sample_id == 391), 
             aes(x,y,label=sample_id, hjust=-0.5,vjust=0.5)) +
   geom_point(size=4) +
