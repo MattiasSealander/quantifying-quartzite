@@ -1,6 +1,5 @@
 suppressPackageStartupMessages(library(factoextra))
 suppressPackageStartupMessages(library(ggpubr))
-suppressPackageStartupMessages(library(rgr))
 suppressPackageStartupMessages(library(robCompositions))
 suppressPackageStartupMessages(library(tidyverse))
 
@@ -10,7 +9,7 @@ xrf.csv <-
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2("./analysis/data/raw_data/NIR/asd_raw_data_20220127.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2("./analysis/data/raw_data/NIR/asd_raw_data_20220407.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #Import descriptive metadata
 metadata.csv <-
@@ -31,29 +30,37 @@ Points.xrf <-
            site_id == "Vilhelmina 637" | site_id == "Vilhelmina 643" | site_id == "Vilhelmina 769" | site_id == "Vilhelmina 949" | site_id == "Vilhelmina 95" | site_id == "Åsele 101" | 
            site_id == "Åsele 107" | site_id == "Åsele 115" | site_id == "Åsele 117" | site_id == "Åsele 119" | site_id == "Åsele 129" | site_id == "Åsele 182" | site_id == "Åsele 188" |
            site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | site_id == "Åsele 99", 
-         #!sample_id %in% c('183', '193', '259', '359', '400'),
          type == "Point" | type == "Point fragment" | type == "Preform", 
-         material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>%
-  replace_na(list(munsell_hue = "Colourless"))
+         material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") 
+
+#fill the NA fields in the munsell hue column to mark them as colourless/translucent material
+Points.xrf[8][is.na(Points.xrf[8])] <- "Colourless"
 
 #filter XRF data on sample size (only include samples with smallest dimension >= 10mm), 
 #select elements to include in PCA, as well as columns to group by
 xrf <-
   Points.xrf %>%
   filter(max_length_mm >= 10 & max_width_mm >= 10) %>% 
-  dplyr::select(reading_no, site_id, sample_id, hue, material, `Al`, `Si`, `K`, `Ca`, `Fe`, `Zr`, `Ti`)
+  dplyr::select(reading_no, site_id, sample_id, hue, material, `Al`, `Si`, `K`, `Ca`, `Fe`, `Zr`, `Ti`) %>% 
+  `row.names<-`(., NULL) %>% 
+  column_to_rownames(var = "reading_no")
 
 #impute missing data using least trimmed squares regression
 xrf.imp <- 
-  impAll(xrf[,6:12])
+  impAll(xrf[,5:11])
 
-#transform data using centered log-ratio 
-xrf.clr <- 
-  clr(xrf.imp, ifclose = TRUE)
+#log-transform data due to it being percentages
+xrf.log <- 
+  log10(xrf.imp)
+
+#if you want to transform data using centered log-ratio
+#potential issues due to using geometric mean
+#xrf.clr <- 
+#  clr(xrf.imp, ifclose = TRUE)
 
 #perform pca with mean centering and unit variance scaling
 xrf.pca <- 
-  prcomp(xrf.clr, center = TRUE, scale.=TRUE)
+  prcomp(xrf.log, center = TRUE, scale.=TRUE)
 
 #prepare labels for PCs
 xrf.pc1var <- round(summary(xrf.pca)$importance[2,1]*100, digits=2)
@@ -85,14 +92,34 @@ xrf.transform = as.data.frame(-xrf.pca$x[,1:2])
 #fviz_nbclust(xrf.transform, kmeans, method = 'wss')
 
 #Perform cluster analysis on the Principal Components
+#In order to ensure that the cluster numbering is consistent between runs kmeans is calculated one time initially,
+#center result is then ordered and passed to the kmeans in the second run. see: https://stackoverflow.com/questions/39906180/consistent-cluster-order-with-kmeans-in-r
+centers <- kmeans(xrf.transform, centers = 3, nstart = 50)$centers
+
+centers <- centers[order(-centers[,1], centers[,2]), ]
+
 kmeans.xrf <- 
-  kmeans(xrf.transform, centers = 3, nstart = 50)
+  kmeans(xrf.transform, centers = centers, nstart = 50)
 
 #Prepare result of cluster analysis, so that they can be used in biplot
-xrf$cluster <- 
-  factor(kmeans.xrf$cluster)
+#In order to guard against potential mistakes, set rownames as column and use that for joining clusters to xrf dataframe
+cluster <- 
+  as.data.frame(factor(kmeans.xrf$cluster)) %>%
+  rename("cluster" = "factor(kmeans.xrf$cluster)") %>% 
+  rownames_to_column(var = "reading_no")
 
-#pivot data so boxplot can be generated for each cluster and element
+#Set reading_no as column again join with kmeans cluster output
+#Then group by kmeans cluster and calculate Si mean, concatenating the mean value with cluster for display in PCA legend
+xrf <- 
+  xrf %>% 
+  rownames_to_column(var = "reading_no") %>% 
+  inner_join(cluster, by = "reading_no") %>%
+  group_by(cluster) %>% 
+  mutate(Si_mean = round(mean(`Si`), 1)) %>% 
+  mutate(Si_mean = paste0("mean Si (", Si_mean, " %)")) %>% 
+  unite(legend, sep = " - ", cluster, Si_mean, remove = FALSE)
+
+#pivot data and add to new dataframe, so a boxplot can be generated for each cluster and element
 xrf_long <- xrf %>% 
   dplyr::select(cluster, `Al`, `Si`, `K`, `Ca`, `Fe`, `Zr`, `Ti`) %>% 
   pivot_longer(-cluster, names_to = "variable", values_to = "value")
@@ -153,7 +180,7 @@ fig1 <-
                     labels = c("A", "B"))
 
 
-ggsave("009-xrf-pca-load-screeNOSR.png",
+ggsave("009-xrf-pca-load-scree.png",
        fig1,
        device = "png",
        here::here("analysis/figures/"),
@@ -203,7 +230,7 @@ fig2 <-
                                          title.hjust = 0.5,
                                          order = 2)) +
   ggnewscale::new_scale_fill() +
-  stat_chull(aes(fill = xrf$cluster),
+  stat_chull(aes(fill = xrf$legend),
              alpha = 0.3, 
              geom = "polygon") + 
   scale_fill_manual(name = "Cluster", 
@@ -217,7 +244,7 @@ fig2 <-
         legend.position = "right")
 
 #Save score plot for PC1-PC2
-ggsave("009-xrf-pca-aNOSR.png",
+ggsave("009-xrf-pca.png",
        fig2,
        device = "png",
        here::here("analysis/figures/"),
@@ -247,7 +274,7 @@ fig3 <-
     axis.ticks.x=element_blank())
 
 #Save K-means boxplot
-ggsave("009-xrf-kmeans-boxplotNOSR.png",
+ggsave("009-xrf-kmeans-boxplot.png",
        fig3,
        device = "png",
        here::here("analysis/figures/"),
@@ -276,9 +303,9 @@ Points.nir <-
            site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | site_id == "Åsele 99", 
          type == "Point" | type == "Point fragment" | type == "Preform", 
          material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
-  filter(!sample_id %in% c("153","167","168","169","172","174","175","177","182","183","190","191","193","194","196","198","200","204","207","210","213","214",
-                           "215","216","229","234","235","237","238","251","262","265","268","269","272","278","281","282","359","377","385","392","393","397","405",
-                           "406","410","411","413","414","415","416","417","424","425","426","428","430","432","55","56")) %>%
+  dplyr::filter(!sample_id %in% c("153","167","168","169","172","174","175","177","182","183","190","191","193","194","196","198","200","204","207","210","213","214",
+                                  "215","216","229","234","235","237","238","251","262","265","268","269","272","278","281","282","359","377","385","392","393","397","405",
+                                  "406","410","411","413","414","415","416","417","424","425","426","428","430","432","55","56")) %>% 
   replace_na(list(munsell_hue = "Colourless")) %>% 
   group_by(across(sample_id:river)) %>% 
   dplyr::summarise(across(`350.0`:`2500.0`, mean), .groups = "drop") %>% 
