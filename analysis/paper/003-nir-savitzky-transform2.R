@@ -33,20 +33,20 @@ Points.nir <-
   group_by(across(sample_id:river)) %>% 
   dplyr::summarise(across(`350.0`:`2500.0`, mean), .groups = "drop")
 
-#Filter NIR data to focus on sample 168 and 258, then select the NIR range 1 000 - 2 500 nm
+#Filter NIR data to focus on sample 258 and 411, then select the NIR range 1 000 - 2 500 nm
 raw.spec <- Points.nir %>%
   filter(sample_id == "258" | sample_id == "411") %>% 
   select(1, c(681:2180))
 
-#Melt into long format
+#Melt into long format, data.table needs to be specified to avoid r using reshape2 version that sets variable to factor
 raw.spec.long <- 
   suppressWarnings(data.table::melt(setDT(raw.spec), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
-#plot the raw spectra for sample 168, and 258
+#plot the raw spectra for sample 258, and 411
 p.raw.spec <-
   raw.spec.long %>% 
   ggplot(aes(x = as.numeric(Wavelength))) + 
-  geom_line(aes(y = Absorbance, colour = "", group = sample_id), size = 1, stat = "identity") +
+  geom_line(aes(y = Absorbance, colour = "", group = sample_id), linewidth = 1, stat = "identity") +
   geom_text(data = . %>%  filter(Wavelength == max(Wavelength)), aes(x=Inf, y = Absorbance, fontface = "bold"),
             hjust = 1.0, size = 4, label = raw.spec$sample_id) +
   coord_cartesian(clip = "off") +
@@ -59,35 +59,34 @@ p.raw.spec <-
         axis.title.x = element_blank(),
         axis.title.y = element_blank())
 
-#Filter spectra to focus on sample 168, which has some noise
+#Filter spectra to focus on sample 411, which has more noise
 sg.411 <- raw.spec %>%
   filter(sample_id == "411")
 
-#Perform Savitzky-Golay 2nd derivative on sample 168
+#Perform Savitzky-Golay 2nd derivative on sample 411
 sg.411 <- as.data.table(gapDer(X = sg.411[,2:1501], m = 2, w = 11, s = 5))
 
 #Transpose the data for ggplot
-sg.411.long <-  suppressWarnings(data.table::melt(setDT(sg.411), variable.name = "Wavelength", value.name = "Absorbance", variable.factor = FALSE))
+sg.411.long <- suppressWarnings(data.table::melt(setDT(sg.411), variable.name = "Wavelength", value.name = "Absorbance", variable.factor = FALSE))
 
-#plot the transformed dark spectra for sample 168
+#plot the transformed dark spectra for sample 411
 p.sg.411 <-
   sg.411.long %>% 
   ggplot() + 
   geom_line(aes(x = as.numeric(Wavelength), y = as.numeric(Absorbance), colour = ""), size = 1, stat = "identity") +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
-  geom_text(data=data.frame(), aes(label = '411', x = -Inf, y = Inf, fontface = "bold"), 
-            hjust = -35, vjust = 1) +
+  geom_text(data=sg.411, aes(label = '411', x = 2500, y = 1.25e-05, fontface = "bold")) +
   scale_color_manual(values = "black") + 
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
-  #setting breaks for y axis in order to prevent later label covering the tick label
+  #setting breaks for y axis in order to prevent ggarrange label covering the axis values
   scale_y_continuous(limits = c(-1.1e-05, 1.5e-05), breaks = seq(-1.0e-05, 1.5e-05, by = 0.75e-5)) +
   theme_classic() +
   theme(legend.position = "none",
         axis.title.x = element_blank(),
         axis.title.y = element_blank())
 
-#Filter spectra to focus on sample 258
+#Filter spectra to focus on sample 258, which has less noise
 sg.258 <- raw.spec %>%
   filter(sample_id == "258")
 
@@ -104,8 +103,7 @@ p.sg.258 <-
   geom_line(aes(x = as.numeric(Wavelength), y = as.numeric(Absorbance), colour = ""), size = 1, stat = "identity") +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
-  geom_text(data=data.frame(), aes(label = '258', x = -Inf, y = Inf, fontface = "bold"), 
-            hjust = -35, vjust = 1) +
+  geom_text(data=sg.258, aes(label = '258', x = 2500, y = 2.5e-05, fontface = "bold")) +
   scale_color_manual(values = "black") + 
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
@@ -122,7 +120,7 @@ ggsave("003-nir-savitzky-transform.png",
        fig,
        device = "png",
        here::here("analysis/figures/"),
-       width=20, 
+       width=25, 
        height=20,
        units = "cm",
        dpi = 300)
