@@ -1,7 +1,6 @@
 # Loading package
 suppressPackageStartupMessages(library(data.table))
 library(gridBase)
-library(spectrolab)
 suppressPackageStartupMessages(library(tidyverse))
 
 #Import descriptive metadata
@@ -12,17 +11,9 @@ metadata.csv <-
 nir.csv <-
   read.csv2("./analysis/data/raw_data/NIR/asd_raw_data_20220127.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
-#aggregate observations by group(sample) and calculate average of wavelength measurements
-nir.averaged <- 
-  aggregate(nir.csv[, 4:2154], list(sample_id = nir.csv$sample_id), mean)
-
 #merge NIR data with metadata
 nir.merged <- 
-  as.data.frame(merge(metadata.csv, nir.averaged, by='sample_id'))
-
-#Fill the NA fields in the munsell_hue column and mark them as colourless samples
-nir.merged[8][is.na(nir.merged[8])] <- "Colourless"
-Points.nir[,1] <- as.numeric(Points.nir[,1]) 
+  as.data.frame(merge(metadata.csv, nir.csv, by='sample_id'))
 
 #Filter xrf data to focus on points and preforms made from quartz/quartzite material 
 Points.nir <-
@@ -37,9 +28,12 @@ Points.nir <-
                   site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | site_id == "Åsele 99", 
                 type == "Point" | type == "Point fragment" | type == "Preform", 
                 material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
-  filter(!sample_id %in% c("153","167","168","169","172","174","175","176","177","182","190","191","193","194","196","198","200","204","214",
-                           "215","216","229","238","262","265","272","282","359","391","392","393","397","405",
-                           "408","410","411","413","414","415","416","417","424","425","428","430","432","55","56"))
+  dplyr::filter(!sample_id %in% c("153","167","168","169","172","174","175","177","182","183","190","191","193","194","196","198","200","204","207","210","213","214",
+                                  "215","216","229","234","235","237","238","251","262","265","268","269","272","278","281","282","359","377","385","392","393","397","405",
+                                  "406","410","411","413","414","415","416","417","424","425","426","428","430","432","55","56")) %>% 
+  replace_na(list(munsell_hue = "Colourless")) %>% 
+  group_by(across(sample_id:river)) %>% 
+  dplyr::summarise(across(`350.0`:`2500.0`, mean), .groups = "drop")
 
 #Filter NIR data to focus on material with dark hues 
 #and select the NIR range 1 000 - 2 500 nm
@@ -87,26 +81,29 @@ Points.w <-
 
 p.d <- 
   ggplot(Points.d, aes(x = as.numeric(Wavelength))) + 
-    geom_line(aes(y = Absorbance, colour = ""), size = 1, stat = "identity") +
-    geom_vline(xintercept=c(1413,1935,2220,2260,2350), linetype='dashed', col = 'red') +
-    annotate(geom = "label", x = c(1413,1935), y = c(1.04, 1.053), 
-             label = c("OH", "OH"),label.size = NA, fill="white", fontface = 2) +
-    annotate(geom = "label", x = c(2220,2260,2350), y = c(1.06, 1.065, 1.065), 
-           label = c("AlOH / MgOH", "AlOH","AlOH"), label.size = NA, fill="white", fontface = 2, size = 3) +
-    ylab("Dark") +
-    scale_color_manual(name = "Dark",
-                      values = "black") +
-    scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
-    theme_classic() +
-    theme(legend.position = "none",
-          axis.title.x=element_blank(),
-          axis.text.x=element_blank(),
-          axis.ticks.x=element_blank())
+    geom_line(aes(y = Absorbance, colour = ""), linewidth = 1, stat = "identity") +
+    geom_vline(xintercept=c(1065,1296,1413,1935,2220,2260,2350), linetype='dashed', col = 'red') +
+  ggtext::geom_richtext(data=data.frame(), 
+                        aes(x = c(1065,1300), y = c(0.99, 0.99), label="Fe<sup>+</sup>?"), label.size = NA, fontface = 2) +
+  ggtext::geom_richtext(data=data.frame(), 
+                        aes(x = c(1413,1935), y = c(0.995, 1.005), label=c("OH", "OH")), label.size = NA, fontface = 2) +
+  ggtext::geom_richtext(data=data.frame(), 
+                        aes(x = c(2220,2260,2350), y = c(1.0125, 1.018, 1.018), label=c("AlOH / MgOH", "AlOH", "AlOH")), label.size = NA, fontface = 2, size = 3) +
+  ylab("Dark") +
+  scale_color_manual(name = "Dark",
+                     values = "black") +
+  scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
+  theme_classic() +
+  theme(legend.position = "none",
+        axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y = element_text(size = 12, face = "bold", colour = "black"))
 
 p.l <- 
   ggplot(Points.l, aes(x = as.numeric(Wavelength))) + 
-  geom_line(aes(y = Absorbance, colour = ""), size = 1, stat = "identity") +
-  geom_vline(xintercept=c(1413,1935,2220,2260,2350), linetype='dashed', col = 'red') +
+  geom_line(aes(y = Absorbance, colour = ""), linewidth = 1, stat = "identity") +
+  geom_vline(xintercept=c(1065,1296,1413,1935,2220,2260,2350), linetype='dashed', col = 'red') +
   ylab("Light") +
   scale_color_manual(name = "Light",
                      values = "#FF7F0EFF") +
@@ -115,12 +112,13 @@ p.l <-
   theme(legend.position = "none",
         axis.title.x=element_blank(),
         axis.text.x=element_blank(),
-        axis.ticks.x=element_blank())
+        axis.ticks.x=element_blank(),
+        axis.title.y = element_text(size = 12, face = "bold", colour = "black"))
 
 p.c <- 
   ggplot(Points.c, aes(x = as.numeric(Wavelength))) + 
-  geom_line(aes(y = Absorbance, colour = ""), size = 1, stat = "identity") +
-  geom_vline(xintercept=c(1413,1935,2220,2260,2350), linetype='dashed', col = 'red') +
+  geom_line(aes(y = Absorbance, colour = ""), linewidth = 1, stat = "identity") +
+  geom_vline(xintercept=c(1065,1296,1413,1935,2220,2260,2350), linetype='dashed', col = 'red') +
   ylab("Colourless") +
   scale_color_manual(name = "Colourless",
                      values = "#9467BDFF") +
@@ -130,20 +128,23 @@ p.c <-
   theme(legend.position = "none",
         axis.title.x=element_blank(),
         axis.text.x=element_blank(),
-        axis.ticks.x=element_blank())
+        axis.ticks.x=element_blank(),
+        axis.title.y = element_text(size = 12, face = "bold", colour = "black"))
 
 
 p.w <- 
   ggplot(Points.w, aes(x = as.numeric(Wavelength))) + 
-  geom_line(aes(y = Absorbance, colour = ""), size = 1, stat = "identity") +
-  geom_vline(xintercept=c(1413,1935,2220,2260,2350), linetype='dashed', col = 'red') +
+  geom_line(aes(y = Absorbance, colour = ""), linewidth = 1, stat = "identity") +
+  geom_vline(xintercept=c(1065,1296,1413,1935,2220,2260,2350), linetype='dashed', col = 'red') +
   xlab("Wavelength (nm)") +
   ylab("White") +
   scale_color_manual(name = "White",
                      values = "#1F77B4FF") +
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
-  theme(legend.position = "none")
+  theme(legend.position = "none",
+        axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
+        axis.title.y = element_text(size = 12, face = "bold", colour = "black"))
 
 #Layout the plots in one figure
 fig <-
