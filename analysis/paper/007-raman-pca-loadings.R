@@ -111,7 +111,7 @@ loadings$wavelengths <-
 #prepare plots
 l1 <-
   ggplot(loadings,aes(x = as.numeric(wavelengths))) + 
-  geom_line(aes(y = PC1), size = 1, stat = "identity") +
+  geom_line(aes(y = PC1), linewidth = 1, stat = "identity") +
   labs(y = raman.pc1lab) +
   scale_x_continuous(limits = c(0, 2000), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
@@ -122,7 +122,7 @@ l1 <-
 
 l2 <-
   ggplot(loadings,aes(x = as.numeric(wavelengths))) + 
-  geom_line(aes(y = PC2), size = 1, stat = "identity") +
+  geom_line(aes(y = PC2), linewidth = 1, stat = "identity") +
   labs(y = raman.pc2lab) +
   scale_x_continuous(limits = c(0, 2000), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
@@ -133,7 +133,7 @@ l2 <-
 
 l3 <-
   ggplot(loadings,aes(x = as.numeric(wavelengths))) + 
-  geom_line(aes(y = PC3), size = 1, stat = "identity") +
+  geom_line(aes(y = PC3), linewidth = 1, stat = "identity") +
   labs(y = raman.pc3lab) +
   scale_x_continuous(limits = c(0, 2000), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
@@ -154,7 +154,7 @@ ggsave("007-raman-pca-loadings.png",
        device = "png",
        here::here("analysis/figures/"),
        scale = 1, 
-       width=20, 
+       width=25, 
        height=15,
        units = "cm",
        dpi = 300)
