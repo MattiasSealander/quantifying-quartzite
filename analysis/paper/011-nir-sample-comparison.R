@@ -1,7 +1,8 @@
 # Loading package
 library(png)
 library(grid)
-library(jpeg)
+library(loder)
+suppressPackageStartupMessages(library(ChemoSpec))
 suppressPackageStartupMessages(library(cowplot))
 suppressPackageStartupMessages(library(data.table))
 suppressPackageStartupMessages(library(flextable))
@@ -131,8 +132,8 @@ Points.raman <-
 #Filter xrf data to focus on points and preforms made from quartz/quartzite material 
 Points.xrf <-
   xrf.merged %>%
-  dplyr::select(sample_id, `Al`, `Si`, `K`, `Ca`, `Fe`, `Zr`, `Ti`) %>% 
-  dplyr::filter(sample_id == 231 | sample_id == 404| sample_id == 391)
+  dplyr::select(sample_id, `Mg`, `Al`, `Si`, `P`, `S`, `K`, `Ca`, `Ti`, `Fe`, `Sr`, `Zr`,  `Ba`) %>% 
+  dplyr::filter(sample_id == 386 | sample_id == 404| sample_id == 391)
 
 ft <- 
   flextable(Points.xrf) %>% 
@@ -182,8 +183,8 @@ pn.231 <-
   geom_line(aes(y = Absorbance, colour = ""), size = 1, stat = "identity") +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
-  labs(title="231") +
-  scale_color_manual(name = "231",
+  labs(title="386") +
+  scale_color_manual(name = "386",
                      values = "black") + 
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 5)) +
   theme_classic() +
@@ -264,7 +265,7 @@ pr.231 <-
   geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
   xlab("Wavenumber (cm-1)") +
   ylab("Intensity") +
-  labs(title="231") +
+  labs(title="386") +
   scale_color_manual(name = "Dark",
                      values = "black") + 
   theme_classic() +
@@ -309,13 +310,13 @@ pr.391 <-
         axis.title.y = element_blank(),
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
-img.231 <- readJPEG("./analysis/figures/231.JPG",  native=TRUE)
+img.231 <- readPNG("./analysis/figures/386.png",  native=TRUE)
 g.231 <- rasterGrob(img.231, interpolate=TRUE)
 
-img.404 <- readJPEG("./analysis/figures/404.JPG",  native=TRUE)
+img.404 <- readPNG("./analysis/figures/404.png",  native=TRUE)
 g.404 <- rasterGrob(img.404, interpolate=TRUE)
 
-img.391 <- readJPEG("./analysis/figures/391.JPG",  native=TRUE)
+img.391 <- readPNG("./analysis/figures/391.png",  native=TRUE)
 g.391 <- rasterGrob(img.391, interpolate=TRUE)
 
 top <- 
@@ -329,7 +330,9 @@ pics <-
 
 
 fig <- 
-  cowplot::plot_grid(top,p.nir,p.raman,pics, nrow = 4, align="hv")
+  cowplot::plot_grid(top,p.nir,p.raman,pics, 
+                     nrow = 4, 
+                     align="hv")
 
 #Save figure
 ggsave("011-nir-sample-comparison.png",
