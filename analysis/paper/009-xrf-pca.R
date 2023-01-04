@@ -650,7 +650,7 @@ fig4 <-
         legend.position = "bottom")
 
 #Save NIR plot with kmeans cluster
-ggsave("010-nir-pca-xrf-kmeans.png",
+ggsave("009-nir-pca-xrf-kmeans.png",
        fig4,
        device = "png",
        here::here("analysis/figures/"),
