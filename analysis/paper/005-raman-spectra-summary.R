@@ -14,78 +14,9 @@ raman.csv <-
 raman.averaged <- 
   aggregate(raman.csv[, 5:469], list(sample_id = raman.csv$sample_id), mean)
 
-#select sample_id and data columns and transpose in prep for baseline de-trend
-raman.transposed <- 
-  raman.averaged %>% 
-  select(sample_id, `92.88`:`2503.59`)
-
-raman.transposed <- 
-  t(raman.transposed)
-
-#Write csv with transposed raman data for baseline de-trending in ChemoSpec package
-#ChemoSpec requires data to be read from file
-write.table(raman.transposed, file = "./analysis/data/derived_data/raman_transposed.csv", col.names = FALSE, sep = ";", dec = ".")
-
-#prepare vector with sample_id for reading raman data into spectra object
-sample_id <- 
-  raman.averaged$sample_id
-
-#read transposed raman data into spectra object
-raman <- suppressWarnings(matrix2SpectraObject(
-  gr.crit = sample_id,
-  gr.cols = c("auto"),
-  freq.unit ="Wavelength cm-1",
-  int.unit ="Intensity",
-  descrip ="Bifacial points measurements",
-  in.file = "./analysis/data/derived_data/raman_transposed.csv",
-  sep = ";",
-  dec = ".",
-  chk = TRUE,
-  out.file = "./analysis/data/derived_data/raman_spec_object"))
-
-#call on relevant baseline method (modified polynomial fitting) from baseline package and 
-#return corrected spectra to spectra object
-raman.baseline <- 
-  baselineSpectra(raman,
-                  int = FALSE,
-                  method = "modpolyfit",
-                  retC = TRUE)
-
-#prevent baselineSpectra from plotting a figure which will show up in the knitted document
-dev.off()
-
-#spectra are stored in a "Spectra" object, not a data frame
-#need to extract samples and frequencies from that object 
-raman.tmp <- 
-  #bind data from spectra object
-  as.data.frame(cbind(raman.baseline$freq, t(raman.baseline$data))) %>% 
-  #transpose data so that frequencies are column headers and observations rows
-  tibble::rownames_to_column() %>% 
-  pivot_longer(-rowname) %>% 
-  pivot_wider(names_from=rowname, values_from=value) %>%
-  #remove unnecessary column with previous column headers
-  select(-name) %>% 
-  #Set frequencies as headers, as they are still first row
-  purrr::set_names(as.character(slice(., 1))) %>%
-  slice(-1) %>% 
-  #add sample id from spectra object
-  add_column(sample_id = sub("^X*", "", raman.baseline$names))
-#transpose data to get frequencies as columns
-#raman.tmp <- 
-#  as.data.frame(t(raman.tmp))
-#Add sample_id column and remove the initial "X" character introduced to sample names by R
-#raman.tmp$sample_id <- 
-#  c("sample_id", sub("^X*", "", raman.baseline$names))
-
-#Make first row headers and remove the first row with the names
-#names(raman.tmp) <-
-#  raman.tmp[1,]
-#raman.tmp <- 
-#  raman.tmp[-1,]
-
 #merge raman de-trended data with metadata
 raman.baseline.merged <- 
-  as.data.frame(merge(metadata.csv, raman.tmp, by='sample_id'))
+  as.data.frame(merge(metadata.csv, raman.averaged, by='sample_id'))
 
 Points.raman <-
   raman.baseline.merged %>%
@@ -141,57 +72,61 @@ r.white.long <-
 p.c <-
   ggplot(r.colourless.long,aes(x = as.numeric(as.character(Wavenumber)))) + 
     geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+    geom_text(data=data.frame(), aes(x=2200,y=38000,label="Colourless"), size=5, fontface=2) +
     xlab("Wavenumber (cm-1)") +
     ylab("Intensity") +
     scale_color_manual(name = "Colourless",
                        values = "#9467BDFF") + 
     theme_classic() +
-    theme(legend.position = c(.9,.95),
+    theme(legend.position = "none",
           axis.title.x = element_blank(),
           axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
-          legend.title = element_text(size = 12, face = "bold", colour = "black"))
+          legend.title = element_blank())
 
 #plot the dark spectra
 p.d <-
   ggplot(r.dark.long, aes(x = as.numeric(as.character(Wavenumber)))) + 
     geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+    geom_text(data=data.frame(), aes(x=2400,y=42000,label="Dark"), size=5, fontface=2) +
     xlab("Wavenumber (cm-1)") +
     ylab("Intensity") +
     scale_color_manual(name = "Dark",
                       values = "black") + 
     theme_classic() +
-    theme(legend.position = c(.1,.95),
+    theme(legend.position = "none",
           axis.title.x = element_blank(),
           axis.title.y = element_blank(),
-          legend.title = element_text(size = 12, face = "bold", colour = "black"))
+          legend.title = element_blank())
 
 #plot the light spectra
 p.l <-
   ggplot(r.light.long, aes(x = as.numeric(as.character(Wavenumber)))) + 
     geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+    geom_text(data=data.frame(), aes(x=2400,y=39500,label="Light"), size=5, fontface=2) +
     xlab("Wavenumber (cm-1)") +
     ylab("Intensity") +
     scale_color_manual(name = "Light",
                        values = "#FF7F0EFF") + 
     theme_classic() +
-    theme(legend.position = c(.1,.95),
+    theme(legend.position = "none",
           axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
           axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
-          legend.title = element_text(size = 12, face = "bold", colour = "black"))
+          legend.title = element_blank())
 
 #plot the white spectra
 p.w <-
   ggplot(r.white.long, aes(x = as.numeric(as.character(Wavenumber)))) + 
     geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+    geom_text(data=data.frame(), aes(x=2400,y=18000,label="White"), size=5, fontface=2) +
     xlab("Wavenumber (cm-1)") +
     ylab("Intensity") +
     scale_color_manual(name = "White",
                        values = "#1F77B4FF") + 
     theme_classic() +
-    theme(legend.position = c(.1,.95),
+    theme(legend.position = "none",
           axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
           axis.title.y = element_blank(),
-          legend.title = element_text(size = 12, face = "bold", colour = "black"))
+          legend.title = element_blank())
 
 #Layout the plots in one figure
 fig <-
