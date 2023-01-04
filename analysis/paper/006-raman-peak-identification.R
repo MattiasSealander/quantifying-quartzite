@@ -114,39 +114,39 @@ r.light.mean <-
 p.d <-
   ggplot(r.dark.mean, aes(x = as.numeric(rownames(r.dark.mean)))) + 
   geom_line(aes(y = r.dark.mean[,1], colour = ""), size = 1, stat = "identity") +
+  geom_text(data=data.frame(), aes(x = 2400,y = 18000, label = "Dark"), size=6, fontface=2) +
+  geom_text(data=data.frame(), aes(x = 120, y = 2800, label = "Quartz"), size=3, fontface=2) +
+  geom_text(data=data.frame(), aes(x = c(200, 460),y = c(5000, 10000), label = "Quartz"), size=5, fontface=2) +
+  geom_text(data=data.frame(), aes(x = c(1285, 1600),y = c(7500, 5500), label = c("D", "G")), size=5, fontface=2) +
   xlab("Wavenumber (cm-1)") +
   ylab("Intensity") +
   scale_color_manual(name = "Mean dark",
                      values = "black") + 
-  annotate("text", x = 120, y = 2700, label = "Quartz", size = 3, fontface = "bold") +
-  annotate("text", x = 200, y = 4000, label = "Quartz", size = 4, fontface = "bold") +
-  annotate("text", x = 460, y = 9400, label = "Quartz", size = 4, fontface = "bold") +
-  annotate("text", x = 1285, y = 6900, label = "D", size = 5, fontface = "bold") +
-  annotate("text", x = 1600, y = 4500, label = "G", size = 5, fontface = "bold") +
   theme_classic() +
-  theme(legend.position = c(.9,.95),
+  theme(legend.position = "none",
         axis.title.x = element_blank(),
         axis.title.y = element_blank(),
-        legend.title = element_text(size = 12, face = "bold", colour = "black"))
+        legend.title = element_blank())
 
 #plot the light spectra
 p.l <-
   ggplot(r.light.mean, aes(x = as.numeric(rownames(r.light.mean)))) + 
   geom_line(aes(y = r.light.mean[,1], colour = ""), size = 1, stat = "identity") +
+  geom_text(data=data.frame(), aes(x=2400,y=18000,label="Light"), size=6, fontface=2) +
   xlab("Wavenumber (cm-1)") +
   ylab("Intensity") +
   scale_color_manual(name = "Mean light",
                      values = "black") + 
   theme_classic() +
-  theme(legend.position = c(.9,.95),
+  theme(legend.position = "none",
         axis.title.x = element_blank(),
         axis.title.y = element_blank(),
-        legend.title = element_text(size = 12, face = "bold", colour = "black"))
+        legend.title = element_blank())
 
 
 #Layout the plots in one figure
 fig <-
-  ggpubr::ggarrange(p.d, p.l, 
+  ggpubr::ggarrange(p.d, p.l,
                     nrow = 2)
 
 #Save figure
@@ -155,6 +155,6 @@ ggsave("006-raman-peak-identification.png",
        device = "png",
        here::here("analysis/figures/"),
        width=20, 
-       height=20,
+       height=15,
        units = "cm",
        dpi = 300)
