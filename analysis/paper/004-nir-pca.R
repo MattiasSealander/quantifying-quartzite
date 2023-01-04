@@ -32,9 +32,9 @@ Points.nir <-
            site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | site_id == "Åsele 99", 
          type == "Point" | type == "Point fragment" | type == "Preform", 
          material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
-  filter(!sample_id %in% c("153","167","168","169","172","174","175","177","182","183","190","191","193","194","196","198","200","204","207","210","213","214",
-                           "215","216","229","234","235","237","238","251","262","265","268","269","272","278","281","282","359","377","385","392","393","397","405",
-                           "406","410","411","413","414","415","416","417","424","425","426","428","430","432","55","56")) %>%
+  filter(!sample_id %in% c("153","167","168","169","172","174","175","176","177","182","190","191","193","194","196","198","200","204","214",
+                           "215","216","229","238","262","265","272","282","359","391","392","393","397","405",
+                           "408","410","411","413","414","415","416","417","424","425","428","430","432","55","56")) %>% 
   replace_na(list(munsell_hue = "Colourless")) %>% 
   group_by(across(sample_id:river)) %>% 
   summarise(across(`350.0`:`2500.0`, mean), .groups = "drop")
@@ -43,7 +43,10 @@ Points.nir <-
 nir.pca <-
   prcomp(Points.nir[,c(681:2180)], center = TRUE, scale = FALSE)
 
+#prepare variance for call in paper.rmd
 nir.pc1var <- round(summary(nir.pca)$importance[2,1]*100, digits=2)
+nir.pc2var <- round(summary(nir.pca)$importance[2,2]*100, digits=2)
+nir.pc3var <- round(summary(nir.pca)$importance[2,3]*100, digits=2)
 
 #Prepare axis labels with variance in %
 nir.pc1lab <- as.data.frame(paste0("PC1 (",as.character(round(summary(nir.pca)$importance[2,1]*100, digits=2)),"%)"))
@@ -85,7 +88,7 @@ fig.1 <-
                                                  size=3,
                                                  order = 1),
                              title.position="top", title.hjust = 0.5))+
-  theme(plot.title = element_text(size = 12, face = "bold", colour = "black", vjust = - 10, hjust = 0.02),
+  theme(plot.title = element_text(size = 12, face = "bold", colour = "black", vjust = 1, hjust = 0.02),
         axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
         axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
         legend.title = element_text(size = 12, face = "bold", colour = "black"),
@@ -94,8 +97,8 @@ fig.1 <-
 
 fig.2 <- 
   ggplot(cbind(basic_plot2$data, Points.nir[, c(7,10)]),
-         aes(x=x, y=y, shape = material, fill = hue)) + #, label = Points.nir$sample_id)) +
-  #geom_text(hjust=0, vjust=-0.5, size = 3) +
+         aes(x=x, y=y, shape = material, fill = hue)) + 
+  #geom_text(aes(label=Points.nir$sample_id, hjust=0.5,vjust=-1.0)) +
   geom_point(size=3) +
   theme_bw() +
   ggtitle("Near infrared 1 000 - 2 500 nm") +
@@ -117,7 +120,7 @@ fig.2 <-
                                                  size=3,
                                                  order = 1),
                              title.position="top", title.hjust = 0.5))+
-  theme(plot.title = element_text(size = 12, face = "bold", colour = "black", vjust = - 10, hjust = 0.02),
+  theme(plot.title = element_blank(),
         axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
         axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
         legend.title = element_text(size = 12, face = "bold", colour = "black"),
