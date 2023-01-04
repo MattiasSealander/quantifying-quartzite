@@ -57,7 +57,7 @@ loadings$wavelengths <-
 #prepare plots
 l1 <-
   ggplot(loadings,aes(x = as.numeric(wavelengths))) + 
-    geom_line(aes(y = PC1), size = 1, stat = "identity") +
+    geom_line(aes(y = PC1), linewidth = 1, stat = "identity") +
     labs(y = nir.pc1lab) +
     scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
     theme_classic() +
@@ -68,7 +68,7 @@ l1 <-
 
 l2 <- 
   ggplot(loadings,aes(x = as.numeric(wavelengths))) + 
-    geom_line(aes(y = PC2), size = 1, stat = "identity") +
+    geom_line(aes(y = PC2), linewidth = 1, stat = "identity") +
     labs(y = nir.pc2lab) +
     scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
     theme_classic() +
@@ -79,7 +79,7 @@ l2 <-
 
 l3 <- 
   ggplot(loadings,aes(x = as.numeric(wavelengths))) + 
-    geom_line(aes(y = PC3), size = 1, stat = "identity") +
+    geom_line(aes(y = PC3), linewidth = 1, stat = "identity") +
     labs(y = nir.pc3lab,
          x = "Wavelength (nm)") +
     scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
