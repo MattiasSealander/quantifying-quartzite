@@ -1,5 +1,7 @@
 #Load packages
+suppressPackageStartupMessages(library(data.table))
 suppressPackageStartupMessages(library(prospectr))
+suppressPackageStartupMessages(library(reshape2))
 suppressPackageStartupMessages(library(tidyverse))
 
 #Import descriptive metadata
@@ -27,97 +29,98 @@ Points.nir <-
            site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | site_id == "Åsele 99", 
          type == "Point" | type == "Point fragment" | type == "Preform", 
          material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
-  filter(sample_id %in% c("54","58","152","170","171","173","185","186","187","188","197","208","221","227","241","249","253","254","258","259","269","280","378","384","385","386","391","401","403","404","408",
-                          "432")) %>% 
   replace_na(list(munsell_hue = "Colourless")) %>% 
   group_by(across(sample_id:river)) %>% 
   dplyr::summarise(across(`350.0`:`2500.0`, mean), .groups = "drop")
 
-#Filter NIR data to focus on material with dark hues 
-#and select the NIR range 1 000 - 2 500 nm
-Points.d <- Points.nir %>%
-  filter(hue == "Dark") %>% 
+#Filter NIR data to focus on sample 258 and 411, then select the NIR range 1 000 - 2 500 nm
+raw.spec <- Points.nir %>%
+  filter(sample_id == "258" | sample_id == "411") %>% 
   select(1, c(681:2180))
 
-#Melt into long format
-Points.d <- 
-  suppressWarnings(melt(setDT(Points.d), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
+#Melt into long format, data.table needs to be specified to avoid r using reshape2 version that sets variable to factor
+raw.spec.long <- 
+  suppressWarnings(data.table::melt(setDT(raw.spec), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
-#plot the dark spectra
-p.d <-
-  ggplot(Points.d, aes(x = as.numeric(Wavelength))) + 
-  geom_line(aes(y = Absorbance, colour = "", group = sample_id), size = 1, stat = "identity") +
+#plot the raw spectra for sample 258, and 411
+p.raw.spec <-
+  raw.spec.long %>% 
+  ggplot(aes(x = as.numeric(Wavelength))) + 
+  geom_line(aes(y = Absorbance, colour = "", group = sample_id), linewidth = 1, stat = "identity") +
+  geom_text(data = . %>%  filter(Wavelength == max(Wavelength)), aes(x=Inf, y = Absorbance, fontface = "bold"),
+            hjust = 1.0, size = 4, label = raw.spec$sample_id) +
+  coord_cartesian(clip = "off") +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
-  scale_color_manual(name = "Dark",
-                     values = "black") + 
+  scale_color_manual(values = "black") + 
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
-  theme(legend.position = c(.1,.95),
+  theme(legend.position = "none",
         axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        legend.title = element_text(size = 12, face = "bold", colour = "black"))
+        axis.title.y = element_blank())
 
-#Filter NIR data to focus on material with dark hues 
-#and select the NIR range 1 000 - 2 500 nm
-Points.d258 <- Points.nir %>%
-  filter(sample_id == "258") %>% 
-  select(1, c(681:2180))
+#Filter spectra to focus on sample 411, which has more noise
+sg.411 <- raw.spec %>%
+  filter(sample_id == "411")
 
-#Melt into long format
-Points.d258.long <- 
-  suppressWarnings(melt(setDT(Points.d258), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
-
-#plot the dark spectra
-p.d258 <-
-  ggplot(Points.d258.long, aes(x = as.numeric(Wavelength))) + 
-  geom_line(aes(y = Absorbance, colour = "", group = sample_id), size = 1, stat = "identity") +
-  xlab("Wavelength (nm)") +
-  ylab("Absorbance") +
-  scale_color_manual(name = "Sample 258",
-                     values = "black") + 
-  #coord_cartesian(x=c(1000,2500), clip = "off") +
-  #annotate("label", x = 890, y = 1.20, label = "B", label.size=NA, size= 5, fontface = "bold", fill = "white") +
-  scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
-  theme_classic() +
-  theme(legend.position = c(.15,.95),
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        legend.title = element_text(size = 12, face = "bold", colour = "black"))
-
-#Perform Savitzky-Golay 2nd derivative on sample 258
-sg.d <- as.data.table(gapDer(X = Points.d258[,2:1501], m = 2, w = 11, s = 5))
+#Perform Savitzky-Golay 2nd derivative on sample 411
+sg.411 <- as.data.table(gapDer(X = sg.411[,2:1501], m = 2, w = 11, s = 5))
 
 #Transpose the data for ggplot
-sg.d.long <-  suppressWarnings(melt(setDT(sg.d), variable.name = "Wavelength", value.name = "Absorbance", variable.factor = FALSE))
+sg.411.long <- suppressWarnings(data.table::melt(setDT(sg.411), variable.name = "Wavelength", value.name = "Absorbance", variable.factor = FALSE))
 
-#plot the transformed dark spectra
-p.sg.d <-
-  ggplot(sg.d.long) + 
+#plot the transformed dark spectra for sample 411
+p.sg.411 <-
+  sg.411.long %>% 
+  ggplot() + 
   geom_line(aes(x = as.numeric(Wavelength), y = as.numeric(Absorbance), colour = ""), size = 1, stat = "identity") +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
-  scale_color_manual(name = "Sample 258",
-                     values = "black") + 
+  geom_text(data=sg.411, aes(label = '411', x = 2500, y = 1.25e-05, fontface = "bold")) +
+  scale_color_manual(values = "black") + 
+  scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
+  #setting breaks for y axis in order to prevent ggarrange label covering the axis values
+  scale_y_continuous(limits = c(-1.1e-05, 1.5e-05), breaks = seq(-1.0e-05, 1.5e-05, by = 0.75e-5)) +
+  theme_classic() +
+  theme(legend.position = "none",
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+
+#Filter spectra to focus on sample 258, which has less noise
+sg.258 <- raw.spec %>%
+  filter(sample_id == "258")
+
+#Perform Savitzky-Golay 2nd derivative on sample 258
+sg.258 <- as.data.table(gapDer(X = sg.258[,2:1501], m = 2, w = 11, s = 5))
+
+#Transpose the data for ggplot
+sg.258.long <-  suppressWarnings(data.table::melt(setDT(sg.258), variable.name = "Wavelength", value.name = "Absorbance", variable.factor = FALSE))
+
+#plot the transformed dark spectra for sample 258
+p.sg.258 <-
+  sg.258.long %>% 
+  ggplot() + 
+  geom_line(aes(x = as.numeric(Wavelength), y = as.numeric(Absorbance), colour = ""), size = 1, stat = "identity") +
+  xlab("Wavelength (nm)") +
+  ylab("Absorbance") +
+  geom_text(data=sg.258, aes(label = '258', x = 2500, y = 2.5e-05, fontface = "bold")) +
+  scale_color_manual(values = "black") + 
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
-  theme(legend.position = c(.1,.95),
+  theme(legend.position = "none",
         axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        legend.title = element_text(size = 12, face = "bold", colour = "black"))
+        axis.title.y = element_blank())
 
 #Layout the plots in one figure
 fig <-
-  ggpubr::ggarrange(
-    ggpubr::ggarrange(p.d, p.d258, labels = c("A", "B")),
-    p.sg.d, labels = c("", "C"), nrow = 2)
+  ggpubr::ggarrange(p.raw.spec, p.sg.258, p.sg.411, labels = c("A", "B", "C"), nrow = 3, align="v")
 
 #Save figure
 ggsave("003-nir-savitzky-transform.png",
        fig,
        device = "png",
        here::here("analysis/figures/"),
-       width=20, 
+       width=25, 
        height=20,
        units = "cm",
        dpi = 300)
