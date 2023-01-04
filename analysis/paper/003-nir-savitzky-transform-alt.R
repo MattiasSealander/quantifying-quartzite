@@ -1,5 +1,7 @@
 #Load packages
+suppressPackageStartupMessages(library(data.table))
 suppressPackageStartupMessages(library(prospectr))
+suppressPackageStartupMessages(library(reshape2))
 suppressPackageStartupMessages(library(tidyverse))
 
 #Import descriptive metadata
@@ -43,7 +45,7 @@ Points.nir <-
 #and select the NIR range 1 000 - 2 500 nm, as well as the hue variable
 Points <- Points.nir %>%
   filter(hue == "Light" | hue == "Dark") %>% 
-  select(7, c(681:2180))
+  dplyr::select(7, c(681:2180))
 
 #Reorder the hue factor level so light spectra will be drawn behind dark spectra
 Points$hue <- factor(Points$hue, c("Light", "Dark"))
@@ -52,12 +54,12 @@ Points$hue <- factor(Points$hue, c("Light", "Dark"))
 sg <- cbind(Points$hue, as.data.table(gapDer(X = Points[,2:1501], m = 2, w = 11, s = 5)))
 
 #Transpose the data for ggplot
-sg.long <-  suppressWarnings(melt(setDT(sg), id.vars = "V1", variable.name = "Wavelength", value.name = "Absorbance", variable.factor = FALSE))
+sg.long <-  suppressWarnings(data.table::melt(setDT(sg), id.vars = "V1", variable.name = "Wavelength", value.name = "Absorbance", variable.factor = FALSE))
 
 #plot the transformed spectra
 fig <-
   ggplot(sg.long, aes(x = as.numeric(Wavelength))) + 
-  geom_line(aes(y = as.numeric(Absorbance), color = V1), size = 0.1, stat = "identity") +
+  geom_line(aes(y = as.numeric(Absorbance), color = V1), linewidth = 0.1, stat = "identity") +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
   scale_color_manual(name = "Hue",
@@ -76,6 +78,6 @@ ggsave("003-nir-savitzky-transform-alt.png",
        device = "png",
        here::here("analysis/figures/"),
        width=25, 
-       height=20,
+       height=15,
        units = "cm",
        dpi = 300)
