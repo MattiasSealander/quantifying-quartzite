@@ -136,7 +136,7 @@ fig <-
                     common.legend = TRUE,
                     legend = "bottom")
 
-ggsave("004-nir-pca-alt.png",
+ggsave("004-nir-pca.png",
        fig,
        device = "png",
        here::here("analysis/figures/"),
