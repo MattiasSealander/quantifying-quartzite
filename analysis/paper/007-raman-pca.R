@@ -1,6 +1,6 @@
 #Load packages
 suppressPackageStartupMessages(library(ChemoSpec))
-suppressPackageStartupMessages(library(plotly))
+suppressPackageStartupMessages(library(factoextra))
 suppressPackageStartupMessages(library(prospectr))
 suppressPackageStartupMessages(library(tidyverse))
 
@@ -91,9 +91,9 @@ Points.raman[8][is.na(Points.raman[8])] <- "Colourless"
 
 #perform PCA with SNV normalization and mean-center
 raman.pca <-
-  prcomp(standardNormalVariate(X = Points.raman[,c(30:321)]), center = TRUE, scale = FALSE)
+  prcomp(Points.raman[,c(30:321)], center = TRUE, scale = FALSE)
 
-#prepare labels for PCs
+#prepare labels for PCs, doing it in 2 steps allows variance percentage to be called on in the Rmd file
 raman.pc1var <- round(summary(raman.pca)$importance[2,1]*100, digits=1)
 raman.pc2var <- round(summary(raman.pca)$importance[2,2]*100, digits=1)
 raman.pc3var <- round(summary(raman.pca)$importance[2,3]*100, digits=1)
@@ -101,47 +101,53 @@ raman.pc1lab <- paste0("PC1 (",as.character(raman.pc1var),"%)")
 raman.pc2lab <- paste0("PC2 (",as.character(raman.pc2var),"%)")
 raman.pc3lab <- paste0("PC3 (",as.character(raman.pc3var),"%)")
 
-#extract components from pca and prepare for 3d visualization
-components <- raman.pca[["x"]]
-
-components <- data.frame(components)
-
-components$PC2 <- -components$PC2
-
-components$PC3 <- -components$PC3
-
-components = cbind(components, Points.raman$hue)
-
 pca.colors <- c("#9467BDFF", "#7F7F7FFF", "#FF7F0EFF", "#1F77B4FF")
+pca.hue <- c("Colourless", "Dark", "Light", "White")
 
-#Plot using plotly with hue as color group
+#prepare a basic score plot with fviz_pca_ind using PC1 and PC2
+basic_plot1 <-
+  fviz_pca_ind(raman.pca, axes = c(1,2), label="none")
+
+
+#bind the basic fviz plot for PC 1 and 2, and use as basis for a more customizeable plot in ggpplot
 fig <- 
-  plot_ly() %>%
-  add_trace(data = components, 
-            type = 'scatter3d', 
-            mode = "markers",
-            x = ~PC1, 
-            y = ~PC3, 
-            z = ~PC2,
-            color = ~factor(Points.raman$hue),
-            colors = pca.colors,
-            marker = list(opacity = 0.8,
-                          line = list(
-                            color = 'rgba(0,0,0)',
-                            width = 0.2))) %>% 
-  layout(
-    showlegend=T,
-    scene = list(
-      xaxis=list(title=raman.pc1lab),
-      yaxis=list(title=raman.pc3lab),
-      zaxis=list(title=raman.pc2lab),
-      camera = list(eye = list(x = -1.5, y = 1.0, z = 1.5))
-    )
-  )
+  ggplot(cbind(basic_plot1$data, Points.raman[, c(7,10)]),
+         aes(x=x, y=y, shape = material, fill = hue)) +
+  #geom_text(aes(label=Points.raman$sample_id, hjust=0.5,vjust=-1.0)) +
+  geom_point(size=3) +
+  theme_bw() +
+  ggtitle(bquote(bold("Raman 100 - 1 800 " ~cm^-1))) +
+  labs(x = raman.pc1lab,
+       y = raman.pc2lab) +
+  scale_shape_manual(name = "Material",
+                     values=c(24,22,21)) +
+  scale_fill_manual(name = "Hue",
+                    values=pca.colors) +
+  guides(shape = guide_legend(override.aes = list(fill = "black"), 
+                              ncol = 3,
+                              title.position="top", 
+                              title.hjust = 0.5,
+                              order = 2),
+         fill = guide_legend(override.aes = list(shape = 22,
+                                                 fill = pca.colors,
+                                                 ncol = 4,
+                                                 color = "black",
+                                                 size=3,
+                                                 order = 1),
+                             title.position="top", title.hjust = 0.5))+
+  theme(plot.title = element_text(size = 12, colour = "black", vjust = 1, hjust = 0.02),
+        axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
+        axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
+        legend.title = element_text(size = 12, face = "bold", colour = "black"),
+        legend.background = element_rect(linetype = "solid", color = "black"),
+        legend.position = "bottom")
 
-save_image(fig,
-           here::here("analysis/figures/007-raman-pca.png"),
-           scale = 1, 
-           width=1500, 
-           height=1300,
-           dpi = 300)
+ggsave("007-raman-pca.png",
+       fig,
+       device = "png",
+       here::here("analysis/figures/"),
+       scale = 1, 
+       width=25, 
+       height=20,
+       units = "cm",
+       dpi = 300)
