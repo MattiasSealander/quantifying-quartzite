@@ -335,7 +335,7 @@ fig <-
                      align="hv")
 
 #Save figure
-ggsave("011-nir-sample-comparison.png",
+ggsave("010-nir-sample-comparison.png",
        fig,
        device = "png",
        here::here("analysis/figures/"),
