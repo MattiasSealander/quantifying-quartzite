@@ -180,7 +180,7 @@ n.391.long <-
 #plot the colourless spectra
 pn.231 <-
   ggplot(n.231.long, aes(x = as.numeric(Wavelength))) + 
-  geom_line(aes(y = Absorbance, colour = ""), size = 1, stat = "identity") +
+  geom_line(aes(y = Absorbance, colour = ""), linewidth = 1, stat = "identity") +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
   labs(title="386") +
@@ -198,7 +198,7 @@ pn.231 <-
 #plot the colourless spectra
 pn.404 <-
   ggplot(n.404.long, aes(x = as.numeric(Wavelength))) + 
-  geom_line(aes(y = Absorbance, colour = ""), size = 1, stat = "identity") +
+  geom_line(aes(y = Absorbance, colour = ""), linewidth = 1, stat = "identity") +
   xlab("Wavelength (nm)") +
   #ylab("Absorbance") +
   labs(title="404") +
@@ -217,7 +217,7 @@ pn.404 <-
 #plot the colourless spectra
 pn.391 <-
   ggplot(n.391.long, aes(x = as.numeric(Wavelength))) + 
-  geom_line(aes(y = Absorbance, colour = ""), size = 1, stat = "identity") +
+  geom_line(aes(y = Absorbance, colour = ""), linewidth = 1, stat = "identity") +
   xlab("Wavelength (nm)") +
   #ylab("Absorbance") +
   labs(title="391") +
@@ -262,7 +262,7 @@ r.391.long <-
 #plot the 231 spectra
 pr.231 <-
   ggplot(r.231.long, aes(x = as.numeric(as.character(Wavenumber)))) + 
-  geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+  geom_line(aes(y = Intensity, colour = "", group = sample_id), linewidth = 1, stat = "identity") +
   xlab("Wavenumber (cm-1)") +
   ylab("Intensity") +
   labs(title="386") +
@@ -279,7 +279,7 @@ pr.231 <-
 #plot the 249 spectra
 pr.404 <-
   ggplot(r.404.long, aes(x = as.numeric(as.character(Wavenumber)))) + 
-  geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+  geom_line(aes(y = Intensity, colour = "", group = sample_id), linewidth = 1, stat = "identity") +
   xlab("Wavenumber (cm-1)") +
   ylab("Intensity") +
   labs(title="404") +
@@ -296,7 +296,7 @@ pr.404 <-
 #plot the 391 spectra
 pr.391 <-
   ggplot(r.391.long, aes(x = as.numeric(as.character(Wavenumber)))) + 
-  geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+  geom_line(aes(y = Intensity, colour = "", group = sample_id), linewidth = 1, stat = "identity") +
   xlab("Wavenumber (cm-1)") +
   ylab("Intensity") +
   labs(title="391") +
