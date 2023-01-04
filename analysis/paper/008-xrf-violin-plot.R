@@ -7,7 +7,7 @@ xrf.csv <-
 
 #Import descriptive metadata
 metadata.csv <-
-  read.csv2("./analysis/data/raw_data/metadata_20220510.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
+  read.csv2("./analysis/data/raw_data/metadata.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
 
 #merge XRF data with metadata
 xrf.merged <- 
@@ -34,7 +34,7 @@ Points.xrf[8][is.na(Points.xrf[8])] <- "Colourless"
 Points_long <-
   drop_na(Points.xrf %>%
             filter(max_length_mm >= 10 | max_width_mm >= 10) %>% 
-            select(`Mg`,`Al`, `Si`, `P`, `S`, `K`, `Ca`, `V`, `Mn`, `Fe`, `Zn`, `Sr`, `Y`, `Zr`, `Ba`, `Ti`) %>%
+            dplyr::select(`Mg`,`Al`, `Si`, `P`, `S`, `K`, `Ca`, `V`, `Mn`, `Fe`, `Zn`, `Sr`, `Y`, `Zr`, `Ba`, `Ti`) %>%
             gather(key = "Element", value = "Value"))
 
 # Add column with elemental groups for visualisation
@@ -151,8 +151,8 @@ scales <- c(
 Points_long %>%
   ggplot(aes(x=Element, y=Value, fill = Group)) +
   geom_violin(trim = TRUE) +
+  geom_boxplot(width=.05, outlier.shape = NA) +
   facet_wrap( ~ Element, scales = "free", labeller = labeller(Element = Elements)) +
-  scale_fill_manual(values=loading.colors) +
   #facetted_pos_scales(y = scales) +
   theme_bw() +
   geom_text(data=na_values, aes(x=0.25, y=ypos, label=na_values, fontface = "bold"), nudge_x = 0.4, inherit.aes = FALSE, size = 4) +
