@@ -1,6 +1,6 @@
 # Loading package
 library(gridBase)
-library(spectrolab)
+library(data.table)
 suppressPackageStartupMessages(library(tidyverse))
 
 #Import descriptive metadata
@@ -43,7 +43,7 @@ n.colourless <- Points.nir %>%
 
 #Melt into long format
 n.colourless.long <- 
-  suppressWarnings(melt(setDT(n.colourless), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
+  suppressWarnings(data.table::melt(setDT(n.colourless), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on material with dark hues 
 #and select the NIR range 1 000 - 2 500 nm
@@ -53,7 +53,7 @@ n.dark <- Points.nir %>%
 
 #Melt into long format
 n.dark.long <- 
-  suppressWarnings(melt(setDT(n.dark), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
+  suppressWarnings(data.table::melt(setDT(n.dark), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on material with light hues 
 #and select the NIR range 1 000 - 2 500 nm
@@ -63,7 +63,7 @@ n.light <- Points.nir %>%
 
 #Melt into long format
 n.light.long <- 
-  suppressWarnings(melt(setDT(n.light), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
+  suppressWarnings(data.table::melt(setDT(n.light), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on material with white hues 
 #and select the NIR range 1 000 - 2 500 nm
@@ -73,7 +73,7 @@ n.white <- Points.nir %>%
 
 #Melt into long format
 n.white.long <- 
-  suppressWarnings(melt(setDT(n.white), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
+  suppressWarnings(data.table::melt(setDT(n.white), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #plot the colourless spectra
 p.c <-
