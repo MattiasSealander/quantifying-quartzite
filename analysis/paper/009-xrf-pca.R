@@ -7,15 +7,15 @@ suppressPackageStartupMessages(library(tidyverse))
 
 #Import xrf data, set empty fields to NA
 xrf.csv <-
-  read.csv2("./analysis/data/raw_data/XRF/xrf_quantitative_data_20220407.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
+  read.csv2(here::here("analysis", "data", "raw_data", "XRF", "xrf_quantitative_data_20220407.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2("./analysis/data/raw_data/NIR/asd_raw_data_20220407.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "NIR", "asd_raw_data_20220407.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #Import descriptive metadata
 metadata.csv <-
-  read.csv2("./analysis/data/raw_data/metadata.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
+  read.csv2(here::here("analysis", "data", "raw_data", "metadata.csv"), sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
 
 #merge XRF data with metadata
 xrf.merged <- 
@@ -389,7 +389,7 @@ fig1 <-
 ggsave("009-xrf-pca-load-scree.png",
        fig1,
        device = "png",
-       here::here("analysis/figures/"),
+       here::here("analysis", "figures"),
        scale = 1, 
        width=25, 
        height=20,
@@ -505,7 +505,7 @@ fig2 <-
 ggsave("009-xrf-pca.png",
        fig2,
        device = "png",
-       here::here("analysis/figures/"),
+       here::here("analysis", "figures"),
        scale = 1, 
        width=20, 
        height=20,
@@ -555,7 +555,7 @@ fig3b <-
 ggsave("009-xrf-kmeans-boxplot.png",
        fig3,
        device = "png",
-       here::here("analysis/figures/"),
+       here::here("analysis", "figures"),
        scale = 1, 
        width=20, 
        height=15,
@@ -653,7 +653,7 @@ fig4 <-
 ggsave("009-nir-pca-xrf-kmeans.png",
        fig4,
        device = "png",
-       here::here("analysis/figures/"),
+       here::here("analysis", "figures"),
        scale = 1, 
        width=20, 
        height=15,

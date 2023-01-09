@@ -6,10 +6,10 @@ suppressPackageStartupMessages(library(tidyverse))
 
 #Import raman data, set empty fields to NA
 raman.csv <-
-  read.csv2("./analysis/data/raw_data/RAMAN/raman_samples_data_non_treated_20220407.csv", sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "RAMAN", "raman_samples_data_non_treated_20220407.csv"), sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 metadata.csv <-
-  read.csv2("./analysis/data/raw_data/metadata.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
+  read.csv2(here::here("analysis", "data", "raw_data", "metadata.csv"), sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
 
 #aggregate observations by group(sample) and calculate average of wavelength measurements
 raman.averaged <- 
@@ -21,24 +21,24 @@ raman.transposed <-
 
 #Write csv with transposed raman data for baseline de-trending in ChemoSpec package
 #ChemoSpec requires data to be read from file
-write.table(raman.transposed, file = "./analysis/data/derived_data/raman_transposed.csv", col.names = FALSE, sep = ";", dec = )
+write.table(raman.transposed, file = here::here("analysis", "data", "derived_data", "raman_transposed.csv"), col.names = FALSE, sep = ";", dec = )
 
 #prepare vector with sample_id for reading raman data into spectra object
 sample_id <- 
   raman.averaged$sample_id
 
 #read transposed raman data into spectra object
-raman <-suppressWarnings(matrix2SpectraObject(
+raman <- suppressWarnings(matrix2SpectraObject(
   gr.crit = sample_id,
   gr.cols = c("auto"),
   freq.unit ="Wavelength cm-1",
   int.unit ="Intensity",
   descrip ="Bifacial points measurements",
-  in.file = "./analysis/data/derived_data/raman_transposed.csv",
+  in.file = here::here("analysis", "data", "derived_data", "raman_transposed.csv"),
   sep = ";",
   dec = ".",
   chk = TRUE,
-  out.file = "./analysis/data/derived_data/raman_spec_object"))
+  out.file = here::here("analysis", "data", "derived_data", "raman_spec_object")))
 
 #call on relevant baseline method (modified polynomial fitting) from baseline package and 
 #return corrected spectra to spectra object
@@ -152,7 +152,7 @@ fig <-
 ggsave("007-raman-pca-loadings.png",
        fig,
        device = "png",
-       here::here("analysis/figures/"),
+       here::here("analysis", "figures"),
        scale = 1, 
        width=25, 
        height=15,

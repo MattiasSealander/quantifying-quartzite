@@ -4,11 +4,11 @@ suppressPackageStartupMessages(library(tidyverse))
 
 #Import descriptive metadata
 metadata.csv <-
-  read.csv2("./analysis/data/raw_data/metadata.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
+  read.csv2(here::here("analysis", "data", "raw_data", "metadata.csv"), sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
 
 #Import raman data, set empty fields to NA
 raman.csv <-
-  read.csv2("./analysis/data/raw_data/RAMAN/raman_samples_data_non_treated_20220407.csv", sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "RAMAN", "raman_samples_data_non_treated_20220407.csv"), sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #aggregate observations by group(sample) and calculate average of wavelength measurements
 raman.averaged <- 
@@ -24,7 +24,7 @@ raman.transposed <-
 
 #Write csv with transposed raman data for baseline de-trending in ChemoSpec package
 #ChemoSpec requires data to be read from file
-write.table(raman.transposed, file = "./analysis/data/derived_data/raman_transposed.csv", col.names = FALSE, sep = ";", dec = )
+write.table(raman.transposed, file = here::here("analysis", "data", "derived_data", "raman_transposed.csv"), col.names = FALSE, sep = ";", dec = )
 
 #prepare vector with sample_id for reading raman data into spectra object
 sample_id <- 
@@ -37,11 +37,11 @@ raman <- suppressWarnings(matrix2SpectraObject(
   freq.unit ="Wavelength cm-1",
   int.unit ="Intensity",
   descrip ="Bifacial points measurements",
-  in.file = "./analysis/data/derived_data/raman_transposed.csv",
+  in.file = here::here("analysis", "data", "derived_data", "raman_transposed.csv"),
   sep = ";",
   dec = ".",
   chk = TRUE,
-  out.file = "./analysis/data/derived_data/raman_spec_object"))
+  out.file = here::here("analysis", "data", "derived_data", "raman_spec_object")))
 
 #call on relevant baseline method (modified polynomial fitting) from baseline package and 
 #return corrected spectra to spectra object
@@ -113,7 +113,7 @@ r.light.mean <-
 #plot the dark spectra
 p.d <-
   ggplot(r.dark.mean, aes(x = as.numeric(rownames(r.dark.mean)))) + 
-  geom_line(aes(y = r.dark.mean[,1], colour = ""), size = 1, stat = "identity") +
+  geom_line(aes(y = r.dark.mean[,1], colour = ""), linewidth = 1, stat = "identity") +
   geom_text(data=data.frame(), aes(x = 2400,y = 18000, label = "Dark"), size=6, fontface=2) +
   geom_text(data=data.frame(), aes(x = 120, y = 2800, label = "Quartz"), size=3, fontface=2) +
   geom_text(data=data.frame(), aes(x = c(200, 460),y = c(5000, 10000), label = "Quartz"), size=5, fontface=2) +
@@ -131,7 +131,7 @@ p.d <-
 #plot the light spectra
 p.l <-
   ggplot(r.light.mean, aes(x = as.numeric(rownames(r.light.mean)))) + 
-  geom_line(aes(y = r.light.mean[,1], colour = ""), size = 1, stat = "identity") +
+  geom_line(aes(y = r.light.mean[,1], colour = ""), linewidth = 1, stat = "identity") +
   geom_text(data=data.frame(), aes(x=2400,y=18000,label="Light"), size=6, fontface=2) +
   xlab("Wavenumber (cm-1)") +
   ylab("Intensity") +
@@ -153,7 +153,7 @@ fig <-
 ggsave("006-raman-peak-identification.png",
        fig,
        device = "png",
-       here::here("analysis/figures/"),
+       here::here("analysis", "figures"),
        width=20, 
        height=15,
        units = "cm",

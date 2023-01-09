@@ -4,11 +4,11 @@ suppressPackageStartupMessages(library(tidyverse))
 
 #Import descriptive metadata
 metadata.csv <-
-  read.csv2("./analysis/data/raw_data/metadata.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
+  read.csv2(here::here("analysis", "data", "raw_data", "metadata.csv"), sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2("./analysis/data/raw_data/NIR/asd_raw_data_20220127.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "NIR", "asd_raw_data_20220127.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #aggregate observations by group(sample) and calculate average of wavelength measurements
 nir.averaged <- 
@@ -98,7 +98,7 @@ fig <-
 ggsave("004-nir-pca-loadings.png",
        fig,
        device = "png",
-       here::here("analysis/figures/"),
+       here::here("analysis", "figures"),
        scale = 1, 
        width=25, 
        height=15,

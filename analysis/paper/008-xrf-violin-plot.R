@@ -3,11 +3,11 @@ suppressPackageStartupMessages(library(tidyverse))
 
 #Import xrf data, set empty fields to NA
 xrf.csv <-
-  read.csv2("./analysis/data/raw_data/XRF/xrf_quantitative_data_20220407.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
+  read.csv2(here::here("analysis", "data", "raw_data", "XRF", "xrf_quantitative_data_20220407.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
 
 #Import descriptive metadata
 metadata.csv <-
-  read.csv2("./analysis/data/raw_data/metadata.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
+  read.csv2(here::here("analysis", "data", "raw_data", "metadata.csv"), sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
 
 #merge XRF data with metadata
 xrf.merged <- 
@@ -148,24 +148,28 @@ scales <- c(
 )
 
 #Violin plot of elemental content, trimmed, with fill based on elemental groups and number of values under LOD as text annotation
-Points_long %>%
-  ggplot(aes(x=Element, y=Value, fill = Group)) +
-  geom_violin(trim = TRUE) +
-  geom_boxplot(width=.05, outlier.shape = NA) +
-  facet_wrap( ~ Element, scales = "free", labeller = labeller(Element = Elements)) +
-  #facetted_pos_scales(y = scales) +
-  theme_bw() +
-  geom_text(data=na_values, aes(x=0.25, y=ypos, label=na_values, fontface = "bold"), nudge_x = 0.4, inherit.aes = FALSE, size = 4) +
-  theme(
-    legend.title = element_text(size = 12, face = "bold", colour = "black"),
-    strip.text.x = element_text(size = 12, face = "bold", colour = "black"),
-    axis.title.x = element_blank(),
-    plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
-    axis.title.y=element_blank(),
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank())
+fig <- 
+  Points_long %>%
+    ggplot(aes(x=Element, y=Value, fill = Group)) +
+    geom_violin(trim = TRUE) +
+    geom_boxplot(width=.05, outlier.shape = NA) +
+    facet_wrap( ~ Element, scales = "free", labeller = labeller(Element = Elements)) +
+    #facetted_pos_scales(y = scales) +
+    theme_bw() +
+    geom_text(data=na_values, aes(x=0.25, y=ypos, label=na_values, fontface = "bold"), nudge_x = 0.4, inherit.aes = FALSE, size = 4) +
+    theme(
+      legend.title = element_text(size = 12, face = "bold", colour = "black"),
+      strip.text.x = element_text(size = 12, face = "bold", colour = "black"),
+      axis.title.x = element_blank(),
+      plot.title = element_text(size=10, face = "bold", colour = "black", margin = margin(t = 10, b = -20), vjust=0.02, hjust=0.01),
+      axis.title.y=element_blank(),
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank())
 
-ggsave(here::here("analysis/figures/008-xrf-violin-plot.png"),
+ggsave("008-xrf-violin-plot.png",
+       fig,
+       device = "png",
+       here::here("analysis", "figures"),
        width=25, 
        height=20,
        units = "cm",

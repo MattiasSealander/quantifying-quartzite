@@ -5,11 +5,11 @@ suppressPackageStartupMessages(library(tidyverse))
 
 #Import descriptive metadata
 metadata.csv <-
-  read.csv2("./analysis/data/raw_data/metadata.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
+  read.csv2(here::here("analysis", "data", "raw_data", "metadata.csv"), sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2("./analysis/data/raw_data/NIR/asd_raw_data_20220127.csv", sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "NIR", "asd_raw_data_20220127.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #merge NIR data with metadata
 nir.merged <- 
@@ -145,7 +145,7 @@ fig <-
 ggsave("002-nir-dark-filtered-summary.png",
        fig,
        device = "png",
-       here::here("analysis/figures/"),
+       here::here("analysis", "figures"),
        width=20, 
        height=20,
        units = "cm",
