@@ -63,7 +63,7 @@ suppressPackageStartupMessages(library(tidyverse))
 
 #Import descriptive metadata
 metadata.csv <-
-  read.csv2("./analysis/data/raw_data/metadata.csv", sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
+  read.csv2(here::here("analysis", "data", "raw_data", "metadata.csv"), sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
 
 #Filter the sample data to exclude reference samples
 tot_samples <- 
@@ -133,7 +133,7 @@ A large portion of the collections stored at North Swedish museums were recovere
  \linebreak
 
 ```{r distribution-map, fig.width=15, fig.height=15, fig.fullwidth=TRUE, fig.cap="Geographical distribution of the sampled sites along the river of Ångermanälven, Västerbotten, Sweden.The glacial disturbance is visible in the widely distributd moraine. Made with ©SGU, Lantmäteriet (CC0), Natural Earth, and Riksantikvarieämbetet."}
-knitr::include_graphics('../figures/site_distribution_soils_annotated.png', error = FALSE)
+knitr::include_graphics(here::here("analysis", "figures", "site_distribution_soils_annotated.png"), error = FALSE)
 ```
 
  \linebreak
@@ -145,7 +145,7 @@ When analysing the lithic material from the *Early Norrland* project [@biornstad
  \linebreak
 
 ```{r sample-hue-pictures, fig.cap= "An assortment of points demonstrating the variation in color and heterogeneity of the material."}
-knitr::include_graphics('../figures/sample_hue.jpg', error = FALSE)
+knitr::include_graphics(here::here("analysis", "figures", "sample_hue.jpg"), error = FALSE)
 ```
 
  \linebreak
@@ -199,14 +199,6 @@ The data was evaluated using PCA, which is an unsupervised exploratory technique
 
 PCA analysis was performed using the base R *prcomp()* function [@Rteam21; @rcoreteam21].    
 
- \linebreak
-<!--
-## O2PLS
-
-O2PLS is a multivariate regression method used to integrate data from different sources into a single model [@trygg02]. It builds on the Orthogonal Partial Least Squares (OPLS) method, which was developed to correct for systematic noise in a single dataset and identify latent structures [@bylesjo_etal07]. The O2PLS method takes the systematic variation in two datasets and divides it into two parts, joint variation between the two blocks of data, and the orthogonal variation that is block specific. This makes it possible to test the potential overlap between separate instrumentation, in this case NIRS and XRF. 
-
-O2PLS was implemented in R [@rcoreteam21] using the *OmicsPLS* package [@bouhaddani_etal18]. The data was pre-processed according to the above descriptions, and then cross-validation was used in order to determine the number of components to fit to the model. 
--->
 \pagebreak
 
 # Results
@@ -267,16 +259,16 @@ The spectra were evaluated using using Savitzky-Golay (SG) filtering, a smoothin
 
  \linebreak
 
-```{r nir-spectra-summary, fig.cap= "Summary of the raw spectra for each colour group. Note the differences in absorbance between the groups, with the dark group featuring a larger range of absorbance values as well as less distinct peaks.", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/001-nir-spectra-summary.R"), echo = FALSE}
-quietly(source("./analysis/paper/001-nir-spectra-summary.R", encoding = "UTF-8"))
-knitr::include_graphics('../figures/001-nir-spectra-summary.png', error = FALSE)
+```{r nir-spectra-summary, fig.cap= "Summary of the raw spectra for each colour group. Note the differences in absorbance between the groups, with the dark group featuring a larger range of absorbance values as well as less distinct peaks.", cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "001-nir-spectra-summary.R")), echo = FALSE}
+quietly(source(here::here("analysis", "paper", "001-nir-spectra-summary.R"), encoding = "UTF-8"))
+knitr::include_graphics(here::here("analysis", "figures", "001-nir-spectra-summary.png"), error = FALSE)
 ```
 
  \linebreak
 
-```{r nir-savitzky-transform, fig.cap= "Comparison of NIR spectra between two samples from the dark group. a) the non-processed spectra for sample 258 and 411, b) sample 258 spectra with 2^nd^ derivative Savitzky-Golay filtering, c) sample 411 spectra with 2^nd^ derivative Savitzky-Golay filtering.", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/003-nir-savitzky-transform.R"), echo = FALSE}
-quietly(source("./analysis/paper/003-nir-savitzky-transform.R", encoding = "UTF-8"))
-knitr::include_graphics("../figures/003-nir-savitzky-transform.png", error = FALSE)
+```{r nir-savitzky-transform, fig.cap= "Comparison of NIR spectra between two samples from the dark group. a) the non-processed spectra for sample 258 and 411, b) sample 258 spectra with 2^nd^ derivative Savitzky-Golay filtering, c) sample 411 spectra with 2^nd^ derivative Savitzky-Golay filtering.", cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "003-nir-savitzky-transform.R")), echo = FALSE}
+quietly(source(here::here("analysis", "paper", "003-nir-savitzky-transform.R"), encoding = "UTF-8"))
+knitr::include_graphics(here::here("analysis", "figures", "003-nir-savitzky-transform.png"), error = FALSE)
 ```
 
  \linebreak
@@ -289,21 +281,21 @@ Two smaller features appear at around 1 065 nm and 1 300 nm (fig. \@ref(fig:nir-
 
  \linebreak
 
-```{r nir-savitzky-transform-alt, fig.cap= "SG transformed spectra contrasting the results between the spectra in the dark (black) and light (orange) groups.", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/003-nir-savitzky-transform-alt.R"), echo = FALSE}
-quietly(source("./analysis/paper/003-nir-savitzky-transform-alt.R", encoding = "UTF-8"))
-knitr::include_graphics("../figures/003-nir-savitzky-transform-alt.png", error = FALSE)
+```{r nir-savitzky-transform-alt, fig.cap= "SG transformed spectra contrasting the results between the spectra in the dark (black) and light (orange) groups.", cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "003-nir-savitzky-transform-alt.R")), echo = FALSE}
+quietly(source(here::here("analysis", "paper", "003-nir-savitzky-transform-alt.R"), encoding = "UTF-8"))
+knitr::include_graphics(here::here("analysis", "figures", "003-nir-savitzky-transform-alt.png"), error = FALSE)
 ```
 
 
-```{r nir-peak-summary, fig.cap= "The main features in the NIR spectra can be related to overtones and vibration combinations of OH groups. The 1 400 nm and 1 900 nm peaks are indicative of molecular water, and common in quartz-based materials. The 2 200 nm and 2 350 nm bands indicate metal-OH combinations, where a more intense 2 200 nm band has typically been related to the presence of AlOH, and a more intense 2 350 nm band MgOH. Although difficult to detect in the non-processed spectra, weaker features also appear at 1 065 nm and 1 300 nm, that may be the result of ferrous iron (Fe^2+^)", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/002-nir-peak-summary.R"), echo = FALSE}
-quietly(source("./analysis/paper/002-nir-peak-summary.R", encoding = "UTF-8"))
-knitr::include_graphics('../figures/002-nir-peak-summary.png', error = FALSE)
+```{r nir-peak-summary, fig.cap= "The main features in the NIR spectra can be related to overtones and vibration combinations of OH groups. The 1 400 nm and 1 900 nm peaks are indicative of molecular water, and common in quartz-based materials. The 2 200 nm and 2 350 nm bands indicate metal-OH combinations, where a more intense 2 200 nm band has typically been related to the presence of AlOH, and a more intense 2 350 nm band MgOH. Although difficult to detect in the non-processed spectra, weaker features also appear at 1 065 nm and 1 300 nm, that may be the result of ferrous iron (Fe^2+^)", cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "002-nir-peak-summary.R")), echo = FALSE}
+quietly(source(here::here("analysis", "paper", "002-nir-peak-summary.R"), encoding = "UTF-8"))
+knitr::include_graphics(here::here("analysis", "figures", "002-nir-peak-summary.png"), error = FALSE)
 ```
 
  \linebreak
 
-```{r nir-pca, fig.width=20, fig.height=20, fig.cap= "PCA score plot", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/004-nir-pca.R"), echo = FALSE}
-quietly(source("./analysis/paper/004-nir-pca.R", encoding = "UTF-8"))
+```{r nir-pca, fig.width=20, fig.height=20, fig.cap= "PCA score plot", cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "004-nir-pca.R")), encoding = "UTF-8", echo = FALSE}
+quietly(source(here::here("analysis", "paper","004-nir-pca.R"), encoding = "UTF-8"))
 nir.pc1var <- nir.pc1var
 nir.pc2var <- nir.pc2var
 nir.pc3var <- nir.pc3var
@@ -318,9 +310,9 @@ While the explained variance of PC 3 is low, (`r nir.pc3var` %), it still contai
 
  \linebreak
 
-```{r nir-pca-fig, fig.width=20, fig.height=20, fig.cap= "NIR PCA score plot for PC 1-3: a) dark and light material is separated out along PC 1, due to absorbance, with white and colourless material separating along PC 2, b) PC 3 adds little new information, mainly separating out a couple of light samples.", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/004-nir-pca.R"), echo = FALSE}
+```{r nir-pca-fig, fig.width=20, fig.height=20, fig.cap= "NIR PCA score plot for PC 1-3: a) dark and light material is separated out along PC 1, due to absorbance, with white and colourless material separating along PC 2, b) PC 3 adds little new information, mainly separating out a couple of light samples.", echo = FALSE}
 #quietly(source("./analysis/paper/004-nir-pca-alt.R", encoding = "UTF-8"))
-knitr::include_graphics("../figures/004-nir-pca-with-photos.png", error = FALSE)
+knitr::include_graphics(here::here("analysis", "figures", "004-nir-pca-with-photos.png"), error = FALSE)
 ```
 
  \linebreak
@@ -334,22 +326,22 @@ Aside from the above more intense features a couple of weaker peaks can also be 
 
  \linebreak
 
-```{r raman-spectra-summary, fig.cap= "The non-processed Raman spectra visualised by colour group. Note that the dark material in general feature more intense peaks at wavenumber ~ 1 300 - 1 600 (cm^-1^).", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/005-raman-spectra-summary.R"), echo = FALSE}
-quietly(source("./analysis/paper/005-raman-spectra-summary.R", encoding = "UTF-8"))
-knitr::include_graphics("../figures/005-raman-spectra-summary.png", error = FALSE)
+```{r raman-spectra-summary, fig.cap= "The non-processed Raman spectra visualised by colour group. Note that the dark material in general feature more intense peaks at wavenumber ~ 1 300 - 1 600 (cm^-1^).", cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "005-raman-spectra-summary.R")), echo = FALSE}
+quietly(source(here::here("analysis", "paper", "005-raman-spectra-summary.R"), encoding = "UTF-8"))
+knitr::include_graphics(here::here("analysis", "figures", "005-raman-spectra-summary.png"), error = FALSE)
 ```
 
  \linebreak
 
-```{r raman-peak-ident, fig.cap= "The two features that show up in the Raman spectra can be related to quartz and carbon structures in the material. The initial three peaks in the 100 - 500 cm^-1^ range correspond to some of the more well-known vibration modes of quartz. The 1 287 cm-^-1^ and 1 598 cm-^-1^ peaks fall within what is referred to as the D and G band respectively, indicating the presence of carbon structures.", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/006-raman-peak-identification.R"), echo = FALSE}
-quietly(source("./analysis/paper/006-raman-peak-identification.R", encoding = "UTF-8"))
-knitr::include_graphics("../figures/006-raman-peak-identification.png", error = FALSE)
+```{r raman-peak-ident, fig.cap= "The two features that show up in the Raman spectra can be related to quartz and carbon structures in the material. The initial three peaks in the 100 - 500 cm^-1^ range correspond to some of the more well-known vibration modes of quartz. The 1 287 cm-^-1^ and 1 598 cm-^-1^ peaks fall within what is referred to as the D and G band respectively, indicating the presence of carbon structures.", cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "006-raman-peak-identification.R")), echo = FALSE}
+quietly(source(here::here("analysis", "paper", "006-raman-peak-identification.R"), encoding = "UTF-8"))
+knitr::include_graphics(here::here("analysis", "figures", "006-raman-peak-identification.png"), error = FALSE)
 ```
 
  \linebreak
 
-```{r raman-pca-var, cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/007-raman-pca.R"), echo = FALSE}
-quietly(eval(parse("./analysis/paper/007-raman-pca.R", encoding = "UTF-8")))
+```{r raman-pca-var, cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "007-raman-pca.R")), echo = FALSE}
+quietly(eval(parse(here::here("analysis", "paper", "007-raman-pca.R"), encoding = "UTF-8")))
 raman.pc1var <- raman.pc1var
 raman.pc2var <- raman.pc2var
 raman.pc3var <- raman.pc3var
@@ -361,25 +353,23 @@ The loading lines for the PCA can be seen in Appendix \@ref(fig:raman-pca-loadin
 
  \linebreak
 
-```{r raman-pca, fig.cap= "PCA score plot for Raman data. Objects that feature only quartz peaks are clustered towards the top left of the plot, whilst the darker material that feature dominant D/G peaks are distributeted towards the right of the plot. In the middle cluster the samples feature both quartz and D/G peaks, with those that have higher intensity D/G peaks in the bottom of the cluster.", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/007-raman-pca.R"), echo = FALSE}
-knitr::include_graphics("../figures/raman-pca-with-photos.png", error = FALSE)
+```{r raman-pca, fig.cap= "PCA score plot for Raman data. Objects that feature only quartz peaks are clustered towards the top left of the plot, whilst the darker material that feature dominant D/G peaks are distributeted towards the right of the plot. In the middle cluster the samples feature both quartz and D/G peaks, with those that have higher intensity D/G peaks in the bottom of the cluster.", cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "007-raman-pca.R")), echo = FALSE}
+knitr::include_graphics(here::here("analysis", "figures", "raman-pca-with-photos.png"), error = FALSE)
 ```
 
-```{r xrf-si, cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/008-xrf-violin-plot.R"), echo = FALSE}
-quietly(eval(parse("./analysis/paper/008-xrf-violin-plot.R", encoding = "UTF-8")))
+```{r xrf-si, cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "008-xrf-violin-plot.R")), echo = FALSE}
+quietly(source(here::here("analysis", "paper", "008-xrf-violin-plot.R"), encoding = "UTF-8"))
 
 #extract samples above 80% Si 
 Si_90 <- Points.xrf %>% 
   filter(`Si` > 90)
-#total number of samples in dataset
 
 #calculate percentage of samples above 80% Si
-#si_perc <- round(((length(unique(Si_80$sample_id))/length(unique(Points.xrf$sample_id)))*100), 0)
 si_90 <- length(unique(Si_90$sample_id))
 ```
 
-```{r xrf-pca-var, cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/009-xrf-pca-alt-impute.R"), echo = FALSE}
-quietly(eval(parse("./analysis/paper/009-xrf-pca.R", encoding = "UTF-8")))
+```{r xrf-pca-var, cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "009-xrf-pca-alt-impute.R")), echo = FALSE}
+quietly(source(here::here("analysis", "paper", "009-xrf-pca.R"), encoding = "UTF-8"))
 
 xrf_var <- xrf.pc1var + xrf.pc2var
 
@@ -406,38 +396,21 @@ In the second PCA model (model B), with the high ~14~Si samples excluded, four P
 
  \linebreak
 
-```{r xrf-violin-plot, fig.cap= "Violin plot of the XRF values per element. Median and interquartile range represented with a boxplot, surrounded by a kernel density estimation. Values above LOD is noted by *n*. The bimodal distribution of Si is visible in the plot, as well as the low number of values above LOD for V, Y and Zn.", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/008-xrf-violin-plot.R"), echo = FALSE}
-quietly(eval(parse("./analysis/paper/008-xrf-violin-plot.R", encoding = "UTF-8")))
-knitr::include_graphics("../figures/008-xrf-violin-plot.png", error = FALSE)
+```{r xrf-violin-plot, fig.cap= "Violin plot of the XRF values per element. Median and interquartile range represented with a boxplot, surrounded by a kernel density estimation. Values above LOD is noted by *n*. The bimodal distribution of Si is visible in the plot, as well as the low number of values above LOD for V, Y and Zn.", cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "008-xrf-violin-plot.R")), echo = FALSE}
+quietly(source(here::here("analysis", "paper", "008-xrf-violin-plot.R"), encoding = "UTF-8"))
+knitr::include_graphics(here::here("analysis", "figures", "008-xrf-violin-plot.png"), error = FALSE)
 ```
-
- \linebreak
-<!--
-```{r xrf-pca-scree, fig.cap= "xrf loadings", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/009-xrf-pca-scree.R"), echo = FALSE}
-quietly(eval(parse("./analysis/paper/009-xrf-pca-scree.R", encoding = "UTF-8")))
-knitr::include_graphics("../figures/009-xrf-pca-scree.png", error = FALSE)
-```
-
- \linebreak
- 
-```{r xrf-pca-loadings, fig.cap= "xrf scree plot", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/009-xrf-pca-loadings.R"), echo = FALSE}
-quietly(eval(parse("./analysis/paper/009-xrf-pca-loadings.R", encoding = "UTF-8")))
-knitr::include_graphics("../figures/009-xrf-pca-loadings.png", error = FALSE)
-```
--->
 
  \linebreak
 
 ```{r xrf-pca, fig.cap= "XRF PCA score plots: a) Score plot featuring the full dataset, cluster 1 includes all samples with Si > 90%, while the remaining samples seem to cluster somewhat based on Fe and Zr content. This results in most of the darker materials clustering towards the bottom of the plot. b) Score plot with > 90% Si samples excluded. Similar to plot A there is a separation based Fe and Zr values, with darker material towards the bottom of the plot. Light-to-colourless samples also remain largely together in cluster 3. Cluster 1 stands out by featuring slightly lower Si, Fe, Ti, and Zr values, but higher values in Al, Ca, K, and Mg.", echo = FALSE}
-#quietly(eval(parse("./analysis/paper/009-xrf-pca.R", encoding = "UTF-8")))
-knitr::include_graphics("../figures/009-xrf-pca-with-photos.png", error = FALSE)
+knitr::include_graphics(here::here("analysis", "figures", "009-xrf-pca-with-photos.png"), error = FALSE)
 ```
 
  \linebreak
 
 ```{r xrf-kmeans-boxplot, fig.cap= "Boxplot of XRF values (%) for model A, grouped by K-means cluster. Note that cluster 1 feature all those samples with a Si value above 90%, with cluster 2 featuring higher Fe/Ti/Zr values.", echo = FALSE}
-#quietly(eval(parse("./analysis/paper/009-xrf-kmeans-boxplot.R", encoding = "UTF-8")))
-knitr::include_graphics("../figures/009-xrf-kmeans-boxplot.png", error = FALSE)
+knitr::include_graphics(here::here("analysis", "figures", "009-xrf-kmeans-boxplot.png"), error = FALSE)
 ```
 
  \linebreak
@@ -447,40 +420,17 @@ The K-means cluster analysis of model B is visualised in the NIRS model, which f
 The variation that occurs within the general colour groups can be further exemplified by looking closer at three samples selected from the dark group, that each belong to a different K-means cluster. They all share a similar hue with D/G peaks detected in the Raman analysis (fig. \@ref(fig:nir-sample-comparison)). All three samples have similar absorbance values, but sample 391 exhibits some differences in the spectra compared to the other two samples. Out of the three objects sample 391 seems to stand out more clearly from the others, with the XRF analysis being what mainly seems to separate the other two. 
 
 ```{r nir-xrf-kmeans, fig.cap= "NIR PCA score plot for PC 1-2, with the K-means cluster from XRF PCA model B visualised in the colour of the points. White points are samples that were excluded in the XRF PCA. The trend separating dark-light samples in the NIR PCA mostly keeps cluster 2-3 separated, showing some overlap in the results, but cluster 1 is fairly evenly distributed in the score plot. This means that whatever differences can be discerned in the compositional data does not seem to be detectable using the ASD.", echo = FALSE}
-knitr::include_graphics("../figures/009-nir-pca-xrf-kmeans.png", error = FALSE)
+knitr::include_graphics(here::here("analysis", "figures", "009-nir-pca-xrf-kmeans.png"), error = FALSE)
 ```
 
  \linebreak
 
-```{r nir-sample-comparison, fig.cap= "Comparison of three dark samples from separate K-cluster groups (model B). Sample 391 from cluster 3 stands out the most with visible differences in both the NIR and Raman spectra, when compared to the other samples. The main difference between samples 386 and 404 seems to mainly be in the XRF data.", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/010-sample-comparison.R"), echo = FALSE}
-quietly(eval(parse("./analysis/paper/010-nir-sample-comparison.R", encoding = "UTF-8")))
-knitr::include_graphics("../figures/010-nir-sample-comparison.png", error = FALSE)
+```{r nir-sample-comparison, fig.cap= "Comparison of three dark samples from separate K-cluster groups (model B). Sample 391 from cluster 3 stands out the most with visible differences in both the NIR and Raman spectra, when compared to the other samples. The main difference between samples 386 and 404 seems to mainly be in the XRF data.", cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "010-sample-comparison.R")), echo = FALSE}
+quietly(source(here::here("analysis", "paper", "010-nir-sample-comparison.R"), encoding = "UTF-8"))
+knitr::include_graphics(here::here("analysis", "figures", "010-nir-sample-comparison.png"), error = FALSE)
 ```
 
-<!--# O2PLS
  \linebreak
- \linebreak
-
-The cross-validation was performed using the *crossval_o2m_adjR2()* function from the *OmicsPLS* package, and based on the results it was decided to use 2 joint components, 3 X specific (NIRS block), and 4 Y specific (XRF block). The data was then fitted to the O2PLS model, with summary statistics of the joint and orthogonal variation in table \@ref(tab:o2pls-summary). 
-
- \linebreak
-
-
-```{r o2pls-summary, fig.width=8, fig.height=10, cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/010-O2PLS-model-fit.R"), echo = FALSE}
-quietly(eval(parse("./analysis/paper/010-O2PLS-model-fit.R", encoding = "UTF-8")))
-#setup a tempd data.frame with the image of the table, and then us kable to give it a table caption
-temp.df = data.frame(image="![](../figures/010-O2PLS-model-fit.png)")
-temp.mat <- as.matrix(temp.df)
-colnames(temp.mat) <- NULL
-knitr::kable(temp.mat, caption="A summary of the O2PLS estimated variation for the X (NIRS) and Y (XRF) data")
-```
-
-
-```{r o2pls-plot, fig.cap= "o2pls score plot", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/010-O2PLS.R"), echo = FALSE}
-quietly(eval(parse("./analysis/paper/010-O2PLS.R", encoding = "UTF-8")))
-knitr::include_graphics("../figures/010-O2PLS.png", error = FALSE)
-```
--->
 
 # Discussion
 
@@ -565,24 +515,24 @@ I would like to thank Professor Paul Geladi, as well as my supervisor Dr. Johan 
 
  \linebreak
 
-```{r nir-pca-loadings, fig.width=20, fig.height=20, fig.cap= "PCA loadings for the first 3 principal components for the NIR data. ", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/004-nir-pca-loadings.R"), echo = FALSE}
-quietly(source("./analysis/paper/004-nir-pca-loadings.R", encoding = "UTF-8"))
-knitr::include_graphics("../figures/004-nir-pca-loadings.png", error = FALSE)
+```{r nir-pca-loadings, fig.width=20, fig.height=20, fig.cap= "PCA loadings for the first 3 principal components for the NIR data. ", cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "004-nir-pca-loadings.R")), echo = FALSE}
+quietly(source(here::here("analysis", "paper", "004-nir-pca-loadings.R"), encoding = "UTF-8"))
+knitr::include_graphics(here::here("analysis", "figures", "004-nir-pca-loadings.png"), error = FALSE)
 ```
 
  \linebreak
 
 
-```{r raman-pca-loadings, fig.cap= "PCA loadings for the first 3 principal components for the Raman data", cache=TRUE, cache.extra=tools::md5sum("./analysis/paper/007-raman-pca-loadings.R"), echo = FALSE}
-quietly(eval(parse("./analysis/paper/007-raman-pca-loadings.R", encoding = "UTF-8")))
-knitr::include_graphics("../figures/007-raman-pca-loadings.png", error = FALSE)
+```{r raman-pca-loadings, fig.cap= "PCA loadings for the first 3 principal components for the Raman data", cache=TRUE, cache.extra=tools::md5sum(here::here("analysis", "paper", "007-raman-pca-loadings.R")), echo = FALSE}
+quietly(source(here::here("analysis", "paper", "007-raman-pca-loadings.R"), encoding = "UTF-8"))
+knitr::include_graphics(here::here("analysis", "figures", "007-raman-pca-loadings.png"), error = FALSE)
 ```
 
  \linebreak
 
 
 ```{r xrf-pca-loadings-scree, fig.cap= "PCA Loadings and eigenvalues for the XRF data. a) eigenvalues and loadings for the full dataset, b) eigenvalues and loadings with samples measuring > 90% ~14~Si excluded.", echo = FALSE}
-knitr::include_graphics("../figures/009-xrf-pca-load-scree.png", error = FALSE)
+knitr::include_graphics(here::here("analysis", "figures", "009-xrf-pca-load-scree.png"), error = FALSE)
 ```
 \newpage 
 
