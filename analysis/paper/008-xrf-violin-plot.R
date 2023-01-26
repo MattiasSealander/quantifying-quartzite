@@ -34,7 +34,8 @@ Points.xrf[8][is.na(Points.xrf[8])] <- "Colourless"
 Points_long <-
   drop_na(Points.xrf %>%
             filter(max_length_mm >= 10 | max_width_mm >= 10) %>% 
-            dplyr::select(`Mg`,`Al`, `Si`, `P`, `S`, `K`, `Ca`, `V`, `Mn`, `Fe`, `Zn`, `Sr`, `Y`, `Zr`, `Ba`, `Ti`) %>%
+            #leave out Zn and Y as these have less than 30 values above LOD
+            dplyr::select(`Mg`,`Al`, `Si`, `P`, `S`, `K`, `Ca`, `V`, `Mn`, `Fe`, `Sr`, `Zr`, `Ba`, `Ti`) %>%
             gather(key = "Element", value = "Value"))
 
 # Add column with elemental groups for visualisation
@@ -51,9 +52,7 @@ Points_long <-
     endsWith(Element, "V") ~ "Lithophile",
     endsWith(Element, "Mn") ~ "Siderophile",
     endsWith(Element, "Fe") ~ "Siderophile",
-    endsWith(Element, "Zn") ~ "Chalcophile",
     endsWith(Element, "Sr") ~ "Lithophile",
-    endsWith(Element, "Y") ~ "Lithophile",
     endsWith(Element, "Zr") ~ "Lithophile",
     endsWith(Element, "Ba") ~ "Lithophile",
     endsWith(Element, "Ti") ~ "Chalcophile",
@@ -82,9 +81,7 @@ Elements <- c(
   'V' = "V",
   'Mn' = "Mn",
   'Fe' = "Fe",
-  'Zn' = "Zn",
   'Sr' = "Sr",
-  'Y' = "Y",
   'Zr' = "Zr",
   'Ba' = "Ba",
   'Ti' = "Ti"
@@ -108,9 +105,7 @@ na_values <-
     paste("n = ", length(which(!is.na(Points.xrf$`V`)))),
     paste("n = ", length(which(!is.na(Points.xrf$`Mn`)))),
     paste("n = ", length(which(!is.na(Points.xrf$`Fe`)))),
-    paste("n = ", length(which(!is.na(Points.xrf$`Zn`)))),
     paste("n = ", length(which(!is.na(Points.xrf$`Sr`)))),
-    paste("n = ", length(which(!is.na(Points.xrf$`Y`)))),
     paste("n = ", length(which(!is.na(Points.xrf$`Zr`)))),
     paste("n = ", length(which(!is.na(Points.xrf$`Ba`)))),
     paste("n = ", length(which(!is.na(Points.xrf$`Ti`)))))
@@ -139,20 +134,18 @@ scales <- c(
   Element == 'V' ~ scale_y_continuous(limits = c(as.vector(t(ylims[8,2:3])))),
   Element == 'Mn' ~ scale_y_continuous(limits = c(as.vector(t(ylims[9,2:3])))),
   Element == 'Fe' ~ scale_y_continuous(limits = c(as.vector(t(ylims[10,2:3])))),
-  Element == 'Zn' ~ scale_y_continuous(limits = c(as.vector(t(ylims[11,2:3])))),
   Element == 'Sr' ~ scale_y_continuous(limits = c(as.vector(t(ylims[12,2:3])))),
-  Element == 'Y' ~ scale_y_continuous(limits = c(as.vector(t(ylims[13,2:3])))),
   Element == 'Zr' ~ scale_y_continuous(limits = c(as.vector(t(ylims[14,2:3])))),
   Element == 'Ba' ~ scale_y_continuous(limits = c(as.vector(t(ylims[15,2:3])))),
   Element == 'Ti' ~ scale_y_continuous(limits = c(as.vector(t(ylims[16,2:3]))))
 )
 
-#Violin plot of elemental content, trimmed, with fill based on elemental groups and number of values under LOD as text annotation
+#Violin plot of elemental content, trimmed, with fill based on elemental groups and number of values above LOD as text annotation
 fig <- 
   Points_long %>%
     ggplot(aes(x=Element, y=Value, fill = Group)) +
-    geom_violin(trim = TRUE) +
-    geom_boxplot(width=.05, outlier.shape = NA) +
+    see::geom_violinhalf(trim = TRUE) +
+    geom_boxplot(width=.1, outlier.shape = NA, position= position_nudge(x=-.1)) +
     facet_wrap( ~ Element, scales = "free", labeller = labeller(Element = Elements)) +
     #facetted_pos_scales(y = scales) +
     theme_bw() +
