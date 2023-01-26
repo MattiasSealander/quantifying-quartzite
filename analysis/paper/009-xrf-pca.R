@@ -514,7 +514,7 @@ ggsave("009-xrf-pca.png",
 
 
 #Boxplot of XRF raw data by element and K-means cluster for the whole dataset
-fig3 <- 
+fig3a <- 
   ggplot(xrf_long, aes(x=variable, y=value, fill = cluster)) +
   geom_boxplot() +  
   facet_wrap( ~ variable, scales = "free", labeller = labeller(Element = Elements)) +
@@ -553,7 +553,7 @@ fig3b <-
 
 #Save K-means boxplot
 ggsave("009-xrf-kmeans-boxplot.png",
-       fig3,
+       fig3b,
        device = "png",
        here::here("analysis", "figures"),
        scale = 1, 
