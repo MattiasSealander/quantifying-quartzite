@@ -10,7 +10,7 @@ metadata.csv <-
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2(here::here("analysis", "data", "raw_data", "NIR", "asd_raw_data_20220127.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "asd_raw_data.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #merge NIR data with metadata
 nir.merged <- 
@@ -30,13 +30,13 @@ Points.nir <-
          type == "Point" | type == "Point fragment" | type == "Preform", 
          material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
   replace_na(list(munsell_hue = "Colourless")) %>% 
-  group_by(across(sample_id:river)) %>% 
+  group_by(across(sample_id:weight_g)) %>% 
   dplyr::summarise(across(`350.0`:`2500.0`, mean), .groups = "drop")
 
-#Filter NIR data to focus on sample 258 and 411, then select the NIR range 1 000 - 2 500 nm
+#Filter NIR data to focus on sample 258 and 411, then select the NIR range 1 001 - 2 500 nm, exclude 1000 nm due to filter shift
 raw.spec <- Points.nir %>%
   filter(sample_id == "258" | sample_id == "411") %>% 
-  select(1, c(681:2180))
+  select(1, c(679:2178))
 
 #Melt into long format, data.table needs to be specified to avoid r using reshape2 version that sets variable to factor
 raw.spec.long <- 
