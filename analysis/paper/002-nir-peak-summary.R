@@ -9,7 +9,7 @@ metadata.csv <-
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2(here::here("analysis", "data", "raw_data", "NIR", "asd_raw_data_20220127.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "asd_raw_data.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #merge NIR data with metadata
 nir.merged <- 
@@ -32,14 +32,14 @@ Points.nir <-
                                   "215","216","229","234","235","237","238","251","262","265","268","269","272","278","281","282","359","377","385","392","393","397","405",
                                   "406","410","411","413","414","415","416","417","424","425","426","428","430","432","55","56")) %>% 
   replace_na(list(munsell_hue = "Colourless")) %>% 
-  group_by(across(sample_id:river)) %>% 
+  group_by(across(sample_id:weight_g)) %>% 
   dplyr::summarise(across(`350.0`:`2500.0`, mean), .groups = "drop")
 
 #Filter NIR data to focus on material with dark hues 
-#and select the NIR range 1 000 - 2 500 nm
+#and select the NIR range 1 001 - 2 500 nm, exclude 1000 nm due to filter shift
 Points.d <- Points.nir %>%
   dplyr::filter(hue == "Dark") %>% 
-  dplyr::select(681:2180) %>% 
+  dplyr::select(679:2178) %>% 
   summarise_if(is.numeric, mean)
 
 #Melt into long format
@@ -47,10 +47,10 @@ Points.d <-
   suppressWarnings(data.table::melt(setDT(Points.d), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on material with light hues 
-#and select the NIR range 1 000 - 2 500 nm
+#and select the NIR range 1 001 - 2 500 nm, exclude 1000 nm due to filter shift
 Points.l <- Points.nir %>%
   dplyr::filter(hue == "Light") %>% 
-  dplyr::select(681:2180) %>% 
+  dplyr::select(679:2178) %>% 
   summarise_if(is.numeric, mean)
 
 #Melt into long format
@@ -58,10 +58,10 @@ Points.l <-
   suppressWarnings(data.table::melt(setDT(Points.l), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on colourless material 
-#and select the NIR range 1 000 - 2 500 nm
+#and select the NIR range 1 001 - 2 500 nm, exclude 1000 nm due to filter shift
 Points.c <- Points.nir %>%
   dplyr::filter(hue == "Colourless") %>% 
-  dplyr::select(681:2180) %>% 
+  dplyr::select(679:2178) %>% 
   summarise_if(is.numeric, mean)
 
 #Melt into long format
@@ -69,10 +69,10 @@ Points.c <-
   suppressWarnings(data.table::melt(setDT(Points.c), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on material with a white hue
-#and select the NIR range 1 000 - 2 500 nm
+#and select the NIR range 1 001 - 2 500 nm, exclude 1000 nm due to filter shift
 Points.w <- Points.nir %>%
   dplyr::filter(hue == "White") %>% 
-  dplyr::select(681:2180) %>% 
+  dplyr::select(679:2178) %>% 
   summarise_if(is.numeric, mean)
 
 #Melt into long format
@@ -91,7 +91,7 @@ p.d <-
                         aes(x = c(2220,2260,2350), y = c(1.0125, 1.018, 1.018), label=c("AlOH / MgOH", "AlOH", "AlOH")), label.size = NA, fontface = 2, size = 3) +
   ylab("Dark") +
   scale_color_manual(name = "Dark",
-                     values = "black") +
+                     values = "#36454F") +
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
   theme(legend.position = "none",
@@ -106,7 +106,7 @@ p.l <-
   geom_vline(xintercept=c(1065,1296,1413,1935,2220,2260,2350), linetype='dashed', col = 'red') +
   ylab("Light") +
   scale_color_manual(name = "Light",
-                     values = "#FF7F0EFF") +
+                     values = "#E69F00") +
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
   theme(legend.position = "none",
@@ -121,7 +121,7 @@ p.c <-
   geom_vline(xintercept=c(1065,1296,1413,1935,2220,2260,2350), linetype='dashed', col = 'red') +
   ylab("Colourless") +
   scale_color_manual(name = "Colourless",
-                     values = "#9467BDFF") +
+                     values = "#56B4E9") +
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   scale_y_continuous(labels = function(x) sprintf("%.2f", x)) +
   theme_classic() +
@@ -139,7 +139,7 @@ p.w <-
   xlab("Wavelength (nm)") +
   ylab("White") +
   scale_color_manual(name = "White",
-                     values = "#1F77B4FF") +
+                     values = "#CC79A7") +
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
   theme(legend.position = "none",
