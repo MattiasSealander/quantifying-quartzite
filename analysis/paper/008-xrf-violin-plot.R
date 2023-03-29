@@ -65,11 +65,7 @@ Points_long <-
   group_by(Element) %>% 
   dplyr::mutate(ypos = max(Value) * 0.95)  
 
-#Prepare colors
-loading.colors <- c("lightgoldenrod1", "darkorange", "lightpink1")
-
 #Lookup for element labeller
-#Ändra ordning så att de mer avvikande (Si, Mn etc) hamnar uppe till vänster
 Elements <- c(
   'Mg' = "Mg",
   'Al' = "Al",
@@ -147,7 +143,8 @@ fig <-
     see::geom_violinhalf(trim = TRUE) +
     geom_boxplot(width=.1, outlier.shape = NA, position= position_nudge(x=-.1)) +
     facet_wrap( ~ Element, scales = "free", labeller = labeller(Element = Elements)) +
-    #facetted_pos_scales(y = scales) +
+    scale_fill_manual(name = "Group",
+                      values = c("#E69F00", "#56B4E9", "#CC79A7")) +
     theme_bw() +
     geom_text(data=na_values, aes(x=0.25, y=ypos, label=na_values, fontface = "bold"), nudge_x = 0.4, inherit.aes = FALSE, size = 4) +
     theme(
