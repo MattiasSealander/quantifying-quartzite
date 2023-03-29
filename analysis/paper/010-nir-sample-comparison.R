@@ -186,7 +186,7 @@ pn.231 <-
   labs(title="386") +
   scale_color_manual(name = "386",
                      values = "black") + 
-  scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 5)) +
+  scale_x_continuous(limits=c(1000,2500)) +
   theme_classic() +
   theme(legend.position = "none",
         plot.title = element_text(size=16, 
@@ -203,8 +203,8 @@ pn.404 <-
   #ylab("Absorbance") +
   labs(title="404") +
   scale_color_manual(name = "404",
-                     values = "black") + 
-  scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 5)) +
+                     values = "black") +
+  scale_x_continuous(limits=c(1000,2500)) +
   theme_classic() +
   theme(legend.position = "none",
         plot.title = element_text(size=16, 
@@ -223,7 +223,7 @@ pn.391 <-
   labs(title="391") +
   scale_color_manual(name = "391",
                      values = "black") + 
-  scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 5)) +
+  scale_x_continuous(limits=c(1000,2500)) +
   theme_classic() +
   theme(legend.position = "none",
         plot.title = element_text(size=16, 
