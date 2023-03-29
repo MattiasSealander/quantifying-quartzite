@@ -8,7 +8,7 @@ metadata.csv <-
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2(here::here("analysis", "data", "raw_data", "NIR", "asd_raw_data_20220127.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "asd_raw_data.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #aggregate observations by group(sample) and calculate average of wavelength measurements
 nir.averaged <- 
@@ -17,9 +17,6 @@ nir.averaged <-
 #merge NIR data with metadata
 nir.merged <- 
   as.data.frame(merge(metadata.csv, nir.averaged, by='sample_id'))
-
-#Fill the NA fields in the munsell_hue column and mark them as colourless samples
-nir.merged[8][is.na(nir.merged[8])] <- "Colourless"
 
 #Filter xrf data to focus on points and preforms made from quartz/quartzite material 
 Points.nir <-
@@ -36,7 +33,8 @@ Points.nir <-
          material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
   filter(!sample_id %in% c("153","167","168","169","172","174","175","177","182","183","190","191","193","194","196","198","200","204","207","210","213","214",
                            "215","216","229","234","235","237","238","251","262","265","268","269","272","278","281","282","359","377","385","392","393","397","405",
-                           "406","410","411","413","414","415","416","417","424","425","426","428","430","432","55","56"))
+                           "406","410","411","413","414","415","416","417","424","425","426","428","430","432","55","56")) %>% 
+  replace_na(list(munsell_hue = "Colourless"))
 
 #perform PCA with SNV normalization and mean-center
 nir.pca <-
