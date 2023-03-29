@@ -73,12 +73,12 @@ xrf <-
 #### PCA full ####
 
 #log-transform data in order to address issues with closure
-#clr can also be used, but gives similar results
+#clr can also be used, in that case comment this log10 code, but gives similar results in this instance
 xrf.log <- 
   log10(xrf[,5:16])
 
 
-#if you want to transform data using centered log-ratio
+#remove comment from code below if you want to transform data using centered log-ratio
 #potential issues due to using geometric mean
 #xrf.clr <- 
 #  compositions::clr(xrf[,5:16], ifclose = TRUE)
@@ -98,7 +98,7 @@ xrf.pc3lab <- paste0("PC3 (",as.character(xrf.pc3var),"%)")
 
 
 #prepare color/fill and symbols for score plots
-pca.colors <- c("#9467BDFF", "#7F7F7FFF", "#FF7F0EFF", "#1F77B4FF")
+pca.colors <- c("#56B4E9", "#36454F", "#E69F00", "#F9F6EE")
 pca.hue <- c("Colourless", "Dark", "Light", "White")
 
 #Extract loadings from xrf.pca
@@ -192,10 +192,10 @@ xrf.low <-
   column_to_rownames(var = "reading_no") 
 
 #log-transform data in order to address issues with closure
-#clr gives similar results in this case, at least in terms of exploration of the dataset
 xrf.log.low <- 
   log10(xrf.low[,5:16])
 
+#clr gives similar results in this case, at least in terms of exploration of the dataset
 #xrf.clr <- 
 #  compositions::clr(xrf.low[,5:16], ifclose = TRUE)
 
@@ -396,7 +396,6 @@ ggsave("009-xrf-pca-load-scree.png",
        units = "cm",
        dpi = 300)
 
-
 #Biplot for the full dataset, with ellipses showing the results of the k-means cluster analysis 
 fig2a <- 
   fviz_pca_biplot(xrf.pca,
@@ -415,12 +414,13 @@ fig2a <-
   labs(title = "XRF PCA Biplot", 
        x = xrf.pc1lab,
        y = xrf.pc2lab) +
+  #to add sample id as text
   #geom_text(aes(label=xrf$sample_id, hjust=0.5,vjust=-1.0)) +
   geom_point(aes(fill = xrf$hue, 
                  shape = factor(xrf$material)), 
              size = 2) +
   scale_shape_manual(name = "Material", 
-                     values=c(24,22,21),
+                     values=c(25,24,21),
                      guide = guide_legend(override.aes = list(fill = "black"),
                                           title.position="top",
                                           title.hjust = 0.5,
@@ -441,7 +441,7 @@ fig2a <-
              alpha = 0.3, 
              geom = "polygon") + 
   scale_fill_manual(name = "Cluster", 
-                    values = ggpubfigs::friendly_pal("contrast_three"), 
+                    values = c("#0072B2", "#CC79A7","#F0E442"), 
                     guide_legend(order = 1)) +
   theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
         axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
@@ -468,12 +468,13 @@ fig2b <-
   labs(title = "XRF PCA Biplot - Low Si ", 
        x = xrf.pc1lab.low,
        y = xrf.pc2lab.low) +
-  #geom_text(aes(label=xrf_low$sample_id, hjust=0.5,vjust=-1.0)) +
+  #to add sample id as text
+  #geom_text(aes(label=xrf.low$sample_id, hjust=0.5,vjust=-1.0)) +
   geom_point(aes(fill = xrf.low$hue, 
                  shape = factor(xrf.low$material)), 
              size = 2) +
   scale_shape_manual(name = "Material", 
-                     values=c(24,22,21),
+                     values=c(25,24,21),
                      guide = "none") +
   scale_color_manual(values = pca.colors,
                      guide = "none") +
@@ -485,7 +486,7 @@ fig2b <-
              alpha = 0.3, 
              geom = "polygon") + 
   scale_fill_manual(name = "Cluster", 
-                    values = ggpubfigs::friendly_pal("contrast_three")) +
+                    values = c("#0072B2", "#CC79A7","#F0E442")) +
   theme(plot.title = element_text(size = 12, face = "bold", colour = "black"),
         axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
         axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
@@ -499,6 +500,7 @@ fig2 <-
                     ncol = 1, 
                     nrow = 2,
                     labels = c("A", "B"),
+                    font.label = list(size = 14, face = "bold"),
                     legend = "right")
 
 #Save score plots for PC1-PC2
@@ -507,21 +509,20 @@ ggsave("009-xrf-pca.png",
        device = "png",
        here::here("analysis", "figures"),
        scale = 1, 
-       width=20, 
-       height=20,
+       width=25, 
+       height=25,
        units = "cm",
        dpi = 300)
-
+dev.off()
 
 #Boxplot of XRF raw data by element and K-means cluster for the whole dataset
 fig3a <- 
   ggplot(xrf_long, aes(x=variable, y=value, fill = cluster)) +
   geom_boxplot() +  
   facet_wrap( ~ variable, scales = "free", labeller = labeller(Element = Elements)) +
-  #facetted_pos_scales(y = scales) +
   theme_bw() +
   scale_fill_manual(name = "Cluster", 
-                    values = ggpubfigs::friendly_pal("contrast_three")) +
+                    values = c("#0072B2", "#CC79A7","#F0E442")) +
   theme(
     legend.title = element_text(size = 12, face = "bold", colour = "black"),
     strip.text.x = element_text(size = 12, face = "bold", colour = "black"),
@@ -538,10 +539,9 @@ fig3b <-
   ggplot(xrf_long_low, aes(x=variable, y=value, fill = cluster)) +
   geom_boxplot() +  
   facet_wrap( ~ variable, scales = "free", labeller = labeller(Element = Elements.low)) +
-  #facetted_pos_scales(y = scales) +
   theme_bw() +
     scale_fill_manual(name = "Cluster", 
-                      values = ggpubfigs::friendly_pal("contrast_three")) +
+                      values =c("#0072B2", "#CC79A7","#F0E442")) +
   theme(
     legend.title = element_text(size = 12, face = "bold", colour = "black"),
     strip.text.x = element_text(size = 12, face = "bold", colour = "black"),
@@ -569,6 +569,7 @@ ggsave("009-xrf-kmeans-boxplot.png",
 nir.merged <- 
   as.data.frame(merge(metadata.csv, nir.csv, by='sample_id'))
 
+#identify the high Si samples and store as a matrix
 high_si <- 
   as.matrix(xrf %>% 
   filter(cluster == "1") %>%
@@ -592,6 +593,7 @@ Points.nir <-
   dplyr::filter(!sample_id %in% c("153","167","168","169","172","174","175","177","182","183","190","191","193","194","196","198","200","204","207","210","213","214",
                                   "215","216","229","234","235","237","238","251","262","265","268","269","272","278","281","282","359","377","385","392","393","397","405",
                                   "406","410","411","413","414","415","416","417","424","425","426","428","430","432","55","56")) %>% 
+  #use previously stored high Si matrix as filter to select only the low Si samples 
   dplyr::filter(!sample_id %in% high_si) %>% 
   replace_na(list(munsell_hue = "Colourless")) %>% 
   group_by(across(sample_id:river)) %>% 
@@ -625,23 +627,38 @@ fig4 <-
   ggtitle("Near infrared 1 000 - 2 500 nm") +
   labs(x = nir.pc1lab,
        y = nir.pc2lab) +
-  scale_shape_manual(name = "Material",
-                     values=c(24,22,21)) +
   scale_fill_manual(name = "XRF Cluster",
-                    values=ggpubfigs::friendly_pal("contrast_three"),
-                    na.value="white") +
-  guides(shape = guide_legend(override.aes = list(fill = "black"), 
+                    values=c("#0072B2", "#CC79A7","#F0E442"),
+                    na.value="#D62728FF") +
+  scale_shape_manual(name = "Material",
+                     values=c(25,24,21)) +
+  guides(fill = guide_legend(override.aes = list(shape = 22,
+                                                 fill = c("#0072B2", "#CC79A7","#F0E442"), na.value="#D62728FF",
+                                                 ncol = 4,
+                                                 color = "black",
+                                                 size=3),
+                             title.position="top", 
+                             title.hjust = 0.5,
+                             order = 1),
+         shape = guide_legend(override.aes = list(fill = "black"), 
                               ncol = 3,
                               title.position="top", 
                               title.hjust = 0.5,
-                              order = 2),
-         fill = guide_legend(override.aes = list(shape = 22,
-                                                 fill = ggpubfigs::friendly_pal("contrast_three"), na.value="#D62728FF",
-                                                 ncol = 4,
+                              order = 2)) +
+  ggnewscale::new_scale_color() +
+  geom_point(data=subset(nir, is.na(variables)),
+             aes(x=x, y=y, col="#D62728FF")) +
+  scale_color_manual(name="Missing XRF data", 
+                     labels="NA", 
+                     values="#D62728FF") +
+  guides(color = guide_legend(override.aes = list(shape = 22,
+                                                 fill = "#D62728FF",
+                                                 ncol = 1,
                                                  color = "black",
                                                  size=3,
-                                                 order = 1),
-                             title.position="top", title.hjust = 0.5))+
+                                                 order = 2),
+                             title.position="top", 
+                             title.hjust = 0.5)) +
   theme(plot.title = element_text(size = 12, face = "bold", colour = "black", vjust = - 10, hjust = 0.02),
         axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
         axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
@@ -655,7 +672,7 @@ ggsave("009-nir-pca-xrf-kmeans.png",
        device = "png",
        here::here("analysis", "figures"),
        scale = 1, 
-       width=20, 
-       height=15,
+       width=25, 
+       height=20,
        units = "cm",
        dpi = 300)
