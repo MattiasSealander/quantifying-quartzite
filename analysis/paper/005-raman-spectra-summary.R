@@ -76,7 +76,7 @@ p.c <-
     xlab("Wavenumber (cm-1)") +
     ylab("Intensity") +
     scale_color_manual(name = "Colourless",
-                       values = "#9467BDFF") + 
+                       values = "#56B4E9") + 
     theme_classic() +
     theme(legend.position = "none",
           axis.title.x = element_blank(),
@@ -91,7 +91,7 @@ p.d <-
     xlab("Wavenumber (cm-1)") +
     ylab("Intensity") +
     scale_color_manual(name = "Dark",
-                      values = "black") + 
+                       values = "#36454F") + 
     theme_classic() +
     theme(legend.position = "none",
           axis.title.x = element_blank(),
@@ -106,7 +106,7 @@ p.l <-
     xlab("Wavenumber (cm-1)") +
     ylab("Intensity") +
     scale_color_manual(name = "Light",
-                       values = "#FF7F0EFF") + 
+                       values = "#E69F00") + 
     theme_classic() +
     theme(legend.position = "none",
           axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
@@ -121,7 +121,7 @@ p.w <-
     xlab("Wavenumber (cm-1)") +
     ylab("Intensity") +
     scale_color_manual(name = "White",
-                       values = "#1F77B4FF") + 
+                       values = "#CC79A7") + 
     theme_classic() +
     theme(legend.position = "none",
           axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
