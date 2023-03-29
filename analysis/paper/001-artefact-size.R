@@ -1,7 +1,5 @@
 # Loading package
-library(data.table)
 library(ggplot2)
-library(gridBase)
 suppressPackageStartupMessages(library(tidyverse))
 
 #Import descriptive metadata
@@ -34,7 +32,7 @@ fig <-
                     values=ggpubfigs::friendly_pal("contrast_three")) +
   theme_minimal() +
   theme(legend.position = c(.9,.1),
-        axis.title.x = element_blank(),
+        axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
         axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
