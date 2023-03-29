@@ -10,7 +10,7 @@ metadata.csv <-
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2(here::here("analysis", "data", "raw_data", "NIR", "asd_raw_data_20220407.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "asd_raw_data.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #merge NIR data with metadata
 nir.merged <- 
@@ -30,44 +30,44 @@ Points.nir <-
          type == "Point" | type == "Point fragment" | type == "Preform", 
          material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
   replace_na(list(munsell_hue = "Colourless")) %>% 
-  group_by(across(sample_id:river)) %>% 
+  group_by(across(sample_id:weight_g)) %>% 
   dplyr::summarise(across(`350.0`:`2500.0`, mean), .groups = "drop")
 
 #Filter NIR data to focus on colourless 
-#and select the NIR range 1 000 - 2 500 nm
+#and select the NIR range 1 001 - 2 500 nm, exclude 1000 nm due to filter shift
 n.colourless <- Points.nir %>%
   dplyr::filter(hue == "Colourless") %>% 
-  dplyr::select(1, c(681:2180))
+  dplyr::select(1, c(679:2178))
 
 #Melt into long format
 n.colourless.long <- 
   suppressWarnings(data.table::melt(setDT(n.colourless), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on material with dark hues 
-#and select the NIR range 1 000 - 2 500 nm
+#and select the NIR range 1 001 - 2 500 nm, exclude 1000 nm due to filter shift
 n.dark <- Points.nir %>%
   dplyr::filter(hue == "Dark") %>% 
-  dplyr::select(1, c(681:2180))
+  dplyr::select(1, c(679:2178))
 
 #Melt into long format
 n.dark.long <- 
   suppressWarnings(data.table::melt(setDT(n.dark), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on material with light hues 
-#and select the NIR range 1 000 - 2 500 nm
+#and select the NIR range 1 001 - 2 500 nm, exclude 1000 nm due to filter shift
 n.light <- Points.nir %>%
   dplyr::filter(hue == "Light") %>% 
-  dplyr::select(1, c(681:2180))
+  dplyr::select(1, c(679:2178))
 
 #Melt into long format
 n.light.long <- 
   suppressWarnings(data.table::melt(setDT(n.light), variable.name = "Wavelength", variable.factor = FALSE, value.name = "Absorbance"))
 
 #Filter NIR data to focus on material with white hues 
-#and select the NIR range 1 000 - 2 500 nm
+#and select the NIR range 1 001 - 2 500 nm, exclude 1000 nm due to filter shift
 n.white <- Points.nir %>%
   dplyr::filter(hue == "White") %>% 
-  dplyr::select(1, c(681:2180))
+  dplyr::select(1, c(679:2178))
 
 #Melt into long format
 n.white.long <- 
@@ -76,14 +76,15 @@ n.white.long <-
 #plot the colourless spectra
 p.c <-
   ggplot(n.colourless.long, aes(x = as.numeric(Wavelength))) + 
-    geom_line(aes(y = Absorbance, colour = "", group = sample_id), size = 1, stat = "identity") +
+    geom_line(aes(y = Absorbance, colour = "", group = sample_id), linewidth = 1, stat = "identity") +
+    geom_text(data=data.frame(), aes(x=2300,y=0.51,label="Colourless"), size=5, fontface=2) +
     xlab("Wavelength (nm)") +
     ylab("Absorbance") +
     scale_color_manual(name = "Colourless",
-                       values = "#9467BDFF") + 
+                       values = "#56B4E9") + 
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
     theme_classic() +
-    theme(legend.position = c(.9,.95),
+    theme(legend.position = "none",
         axis.title.x = element_blank(),
         axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
@@ -91,14 +92,15 @@ p.c <-
 #plot the dark spectra
 p.d <-
   ggplot(n.dark.long, aes(x = as.numeric(Wavelength))) + 
-  geom_line(aes(y = Absorbance, colour = "", group = sample_id), size = 0.5, stat = "identity") +
+  geom_line(aes(y = Absorbance, colour = "", group = sample_id), linewidth = 0.5, stat = "identity") +
+  geom_text(data=data.frame(), aes(x=1100,y=1.55,label="Dark"), size=5, fontface=2) +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
   scale_color_manual(name = "Dark",
-                     values = "black") + 
+                     values = "#36454F") +
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
-  theme(legend.position = c(.1,.95),
+  theme(legend.position = "none",
         axis.title.x = element_blank(),
         axis.title.y = element_blank(),
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
@@ -106,14 +108,15 @@ p.d <-
 #plot the light spectra
 p.l <-
   ggplot(n.light.long, aes(x = as.numeric(Wavelength))) + 
-  geom_line(aes(y = Absorbance, colour = "", group = sample_id), size = 1, stat = "identity") +
+  geom_line(aes(y = Absorbance, colour = "", group = sample_id), linewidth = 1, stat = "identity") +
+  geom_text(data=data.frame(), aes(x=1100,y=1.24,label="Light"), size=5, fontface=2) +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
   scale_color_manual(name = "Light",
-                     values = "#FF7F0EFF") + 
+                     values = "#E69F00") + 
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
-  theme(legend.position = c(.1,.95),
+  theme(legend.position = "none",
         axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
         axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
@@ -121,14 +124,15 @@ p.l <-
 #plot the white spectra
 p.w <-
   ggplot(n.white.long, aes(x = as.numeric(Wavelength))) + 
-  geom_line(aes(y = Absorbance, colour = "", group = sample_id), size = 1, stat = "identity") +
+  geom_line(aes(y = Absorbance, colour = "", group = sample_id), linewidth = 1, stat = "identity") +
+  geom_text(data=data.frame(), aes(x=1100,y=0.386,label="White"), size=5, fontface=2) +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
   scale_color_manual(name = "White",
-                     values = "#1F77B4FF") + 
+                     values = "#CC79A7") + 
   scale_x_continuous(limits = c(1000, 2500), breaks = scales::pretty_breaks(n = 10)) +
   theme_classic() +
-  theme(legend.position = c(.1,.95),
+  theme(legend.position = "none",
         axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
         axis.title.y = element_blank(),
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
