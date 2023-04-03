@@ -8,7 +8,7 @@ metadata.csv <-
 
 #Import raman data, set empty fields to NA
 raman.csv <-
-  read.csv2(here::here("analysis", "data", "raw_data", "RAMAN", "raman_samples_data_non_treated_20220407.csv"), sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "raman_raw_data.csv"), sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #aggregate observations by group(sample) and calculate average of wavelength measurements
 raman.averaged <- 
@@ -87,15 +87,13 @@ Points.raman <-
            site_id == "Åsele 107" | site_id == "Åsele 115" | site_id == "Åsele 117" | site_id == "Åsele 119" | site_id == "Åsele 129" | site_id == "Åsele 182" | site_id == "Åsele 188" |
            site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | site_id == "Åsele 99", 
          type == "Point" | type == "Point fragment" | type == "Preform", 
-         material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite")
-
-#fill the NA fields in the munsell hue column to mark them as colourless/translucent material
-Points.raman[8][is.na(Points.raman[8])] <- "Colourless"
+         material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
+  replace_na(list(munsell_hue = "Colourless"))
 
 #Filter raman data to focus on dark samples 
 r.dark <- Points.raman %>%
   filter(hue == "Dark") %>% 
-  select(30:494)
+  select(`92.88`:`2503.59`)
 
 #Calculate the mean of all dark spectra
 r.dark.mean <-
@@ -104,7 +102,7 @@ r.dark.mean <-
 #Filter raman data to focus on light samples 
 r.light <- Points.raman %>%
   filter(hue == "Light") %>% 
-  select(30:494)
+  select(`92.88`:`2503.59`)
 
 #Calculate the mean of all dark spectra
 r.light.mean <-
@@ -150,9 +148,9 @@ fig <-
                     nrow = 2)
 
 #Save figure
-ggsave("006-raman-peak-identification.png",
+ggsave("006-raman-peak-identification.jpeg",
        fig,
-       device = "png",
+       device = "jpeg",
        here::here("analysis", "figures"),
        width=20, 
        height=15,

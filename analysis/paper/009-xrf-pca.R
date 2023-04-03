@@ -7,11 +7,11 @@ suppressPackageStartupMessages(library(tidyverse))
 
 #Import xrf data, set empty fields to NA
 xrf.csv <-
-  read.csv2(here::here("analysis", "data", "raw_data", "XRF", "xrf_quantitative_data_20220407.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
+  read.csv2(here::here("analysis", "data", "raw_data", "xrf_quantitative_raw_data.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2(here::here("analysis", "data", "raw_data", "NIR", "asd_raw_data_20220407.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "asd_raw_data.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #Import descriptive metadata
 metadata.csv <-
@@ -35,10 +35,8 @@ Points.xrf <-
            site_id == "Åsele 107" | site_id == "Åsele 115" | site_id == "Åsele 117" | site_id == "Åsele 119" | site_id == "Åsele 129" | site_id == "Åsele 182" | site_id == "Åsele 188" |
            site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | site_id == "Åsele 99", 
          type == "Point" | type == "Point fragment" | type == "Preform", 
-         material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") 
-
-#fill the NA fields in the munsell hue column to mark them as colourless/translucent material
-Points.xrf[8][is.na(Points.xrf[8])] <- "Colourless"
+         material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
+  replace_na(list(munsell_hue = "Colourless"))
 
 #filter XRF data on sample size (only include samples with smallest dimension >= 10mm), 
 #select elements to include in PCA, as well as columns to group by later on
@@ -386,9 +384,9 @@ fig1 <-
                     nrow = 2)
 
 
-ggsave("009-xrf-pca-load-scree.png",
+ggsave("009-xrf-pca-load-scree.jpeg",
        fig1,
-       device = "png",
+       device = "jpeg",
        here::here("analysis", "figures"),
        scale = 1, 
        width=25, 
@@ -504,9 +502,9 @@ fig2 <-
                     legend = "right")
 
 #Save score plots for PC1-PC2
-ggsave("009-xrf-pca.png",
+ggsave("009-xrf-pca.jpeg",
        fig2,
-       device = "png",
+       device = "jpeg",
        here::here("analysis", "figures"),
        scale = 1, 
        width=25, 
@@ -552,9 +550,9 @@ fig3b <-
     axis.ticks.x=element_blank())
 
 #Save K-means boxplot
-ggsave("009-xrf-kmeans-boxplot.png",
+ggsave("009-xrf-kmeans-boxplot.jpeg",
        fig3b,
-       device = "png",
+       device = "jpeg",
        here::here("analysis", "figures"),
        scale = 1, 
        width=20, 
@@ -596,7 +594,7 @@ Points.nir <-
   #use previously stored high Si matrix as filter to select only the low Si samples 
   dplyr::filter(!sample_id %in% high_si) %>% 
   replace_na(list(munsell_hue = "Colourless")) %>% 
-  group_by(across(sample_id:river)) %>% 
+  group_by(across(sample_id:weight_g)) %>% 
   dplyr::summarise(across(`350.0`:`2500.0`, mean), .groups = "drop") %>% 
   left_join(xrf.low[,c("sample_id", "variables")], by = "sample_id")
 
@@ -614,7 +612,7 @@ basic_plot1 <-
   fviz_pca_ind(nir.pca, axes = c(1,2), label="none")
 #bind the basic plot with the columns storing legend items
 nir <- 
-  cbind(basic_plot1$data, Points.nir[, c(2181,10,1)])
+  cbind(basic_plot1$data, Points.nir[, c(2181,12,1)])
 
 #PCA score plot with k-means cluster as shape fill
 fig4 <- 
@@ -667,9 +665,9 @@ fig4 <-
         legend.position = "bottom")
 
 #Save NIR plot with kmeans cluster
-ggsave("009-nir-pca-xrf-kmeans.png",
+ggsave("009-nir-pca-xrf-kmeans.jpeg",
        fig4,
-       device = "png",
+       device = "jpeg",
        here::here("analysis", "figures"),
        scale = 1, 
        width=25, 

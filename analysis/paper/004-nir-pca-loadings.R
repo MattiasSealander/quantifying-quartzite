@@ -21,7 +21,7 @@ nir.merged <-
 #Filter xrf data to focus on points and preforms made from quartz/quartzite material 
 Points.nir <-
   nir.merged %>%
-  filter(site_id == "Vilhelmina 1069" | site_id == "Vilhelmina 109" | site_id == "Vilhelmina 112" | site_id == "Vilhelmina 1124" | site_id == "Vilhelmina 1127" | site_id == "Vilhelmina 114" |
+  dplyr::filter(site_id == "Vilhelmina 1069" | site_id == "Vilhelmina 109" | site_id == "Vilhelmina 112" | site_id == "Vilhelmina 1124" | site_id == "Vilhelmina 1127" | site_id == "Vilhelmina 114" |
            site_id == "Vilhelmina 115" | site_id == "Vilhelmina 117" | site_id == "Vilhelmina 118" | site_id == "Vilhelmina 1254" | site_id == "Vilhelmina 216" | site_id == "Vilhelmina 235" |
            site_id == "Vilhelmina 240" | site_id == "Vilhelmina 245" | site_id == "Vilhelmina 252" | site_id == "Vilhelmina 263" | site_id == "Vilhelmina 335" | site_id == "Vilhelmina 356" |
            site_id == "Vilhelmina 399" | site_id == "Vilhelmina 411" | site_id == "Vilhelmina 419" | site_id == "Vilhelmina 439" | site_id == "Vilhelmina 444" | site_id == "Vilhelmina 450" |
@@ -93,9 +93,9 @@ fig <-
                     nrow = 3,
                     hjust = -1.5)
 
-ggsave("004-nir-pca-loadings.png",
+ggsave("004-nir-pca-loadings.jpeg",
        fig,
-       device = "png",
+       device = "jpeg",
        here::here("analysis", "figures"),
        scale = 1, 
        width=25, 

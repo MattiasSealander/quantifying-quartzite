@@ -18,16 +18,18 @@ nir.merged <-
 #Filter xrf data to focus on points and preforms made from quartz/quartzite material 
 Points.nir <-
   nir.merged %>%
-  dplyr::filter(site_id == "Vilhelmina 1069" | site_id == "Vilhelmina 109" | site_id == "Vilhelmina 112" | site_id == "Vilhelmina 1124" | site_id == "Vilhelmina 1127" | site_id == "Vilhelmina 114" |
-           site_id == "Vilhelmina 115" | site_id == "Vilhelmina 117" | site_id == "Vilhelmina 118" | site_id == "Vilhelmina 1254" | site_id == "Vilhelmina 216" | site_id == "Vilhelmina 235" |
-           site_id == "Vilhelmina 240" | site_id == "Vilhelmina 245" | site_id == "Vilhelmina 252" | site_id == "Vilhelmina 263" | site_id == "Vilhelmina 335" | site_id == "Vilhelmina 356" |
-           site_id == "Vilhelmina 399" | site_id == "Vilhelmina 411" | site_id == "Vilhelmina 419" | site_id == "Vilhelmina 439" | site_id == "Vilhelmina 444" | site_id == "Vilhelmina 450" |
-           site_id == "Vilhelmina 458" | site_id == "Vilhelmina 539" | site_id == "Vilhelmina 542" | site_id == "Vilhelmina 611" | site_id == "Vilhelmina 619" | site_id == "Vilhelmina 636" | 
-           site_id == "Vilhelmina 637" | site_id == "Vilhelmina 643" | site_id == "Vilhelmina 769" | site_id == "Vilhelmina 949" | site_id == "Vilhelmina 95" | site_id == "Åsele 101" | 
-           site_id == "Åsele 107" | site_id == "Åsele 115" | site_id == "Åsele 117" | site_id == "Åsele 119" | site_id == "Åsele 129" | site_id == "Åsele 182" | site_id == "Åsele 188" |
-           site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | site_id == "Åsele 99", 
-         type == "Point" | type == "Point fragment" | type == "Preform", 
-         material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
+  dplyr::filter(site_id == "Vilhelmina 1069" | site_id == "Vilhelmina 109" | site_id == "Vilhelmina 112" | site_id == "Vilhelmina 1124" | site_id == "Vilhelmina 1127" | 
+                  site_id == "Vilhelmina 114" | site_id == "Vilhelmina 115" | site_id == "Vilhelmina 117" | site_id == "Vilhelmina 118" | site_id == "Vilhelmina 1254" | 
+                  site_id == "Vilhelmina 216" | site_id == "Vilhelmina 235" | site_id == "Vilhelmina 240" | site_id == "Vilhelmina 245" | site_id == "Vilhelmina 252" | 
+                  site_id == "Vilhelmina 263" | site_id == "Vilhelmina 335" | site_id == "Vilhelmina 356" | site_id == "Vilhelmina 399" | site_id == "Vilhelmina 411" | 
+                  site_id == "Vilhelmina 419" | site_id == "Vilhelmina 439" | site_id == "Vilhelmina 444" | site_id == "Vilhelmina 450" | site_id == "Vilhelmina 458" | 
+                  site_id == "Vilhelmina 539" | site_id == "Vilhelmina 542" | site_id == "Vilhelmina 611" | site_id == "Vilhelmina 619" | site_id == "Vilhelmina 636" | 
+                  site_id == "Vilhelmina 637" | site_id == "Vilhelmina 643" | site_id == "Vilhelmina 769" | site_id == "Vilhelmina 949" | site_id == "Vilhelmina 95" | 
+                  site_id == "Åsele 101" | site_id == "Åsele 107" | site_id == "Åsele 115" | site_id == "Åsele 117" | site_id == "Åsele 119" | site_id == "Åsele 129" | 
+                  site_id == "Åsele 182" | site_id == "Åsele 188" | site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | 
+                  site_id == "Åsele 99", 
+                type == "Point" | type == "Point fragment" | type == "Preform", 
+                material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
   dplyr::filter(!sample_id %in% c("153","167","168","169","172","174","175","177","182","183","190","191","193","194","196","198","200","204","207","210","213","214",
                            "215","216","229","234","235","237","238","251","262","265","268","269","272","278","281","282","359","377","385","392","393","397","405",
                            "406","410","411","413","414","415","416","417","424","425","426","428","430","432","55","56")) %>% 
@@ -39,7 +41,7 @@ Points.nir <-
 #and select the NIR range 1 001 - 2 500 nm, exclude 1000 nm due to filter shift
 n.colourless <- Points.nir %>%
   dplyr::filter(hue == "Colourless") %>% 
-  dplyr::select(1, c(679:2178))
+  dplyr::select(sample_id, `1001.0`:`2500.0`) 
 
 #Melt into long format
 n.colourless.long <- 
@@ -49,7 +51,7 @@ n.colourless.long <-
 #and select the NIR range 1 001 - 2 500 nm, exclude 1000 nm due to filter shift
 n.dark <- Points.nir %>%
   dplyr::filter(hue == "Dark") %>% 
-  dplyr::select(1, c(679:2178))
+  dplyr::select(sample_id, `1001.0`:`2500.0`) 
 
 #Melt into long format
 n.dark.long <- 
@@ -59,7 +61,7 @@ n.dark.long <-
 #and select the NIR range 1 001 - 2 500 nm, exclude 1000 nm due to filter shift
 n.light <- Points.nir %>%
   dplyr::filter(hue == "Light") %>% 
-  dplyr::select(1, c(679:2178))
+  dplyr::select(sample_id, `1001.0`:`2500.0`) 
 
 #Melt into long format
 n.light.long <- 
@@ -69,7 +71,7 @@ n.light.long <-
 #and select the NIR range 1 001 - 2 500 nm, exclude 1000 nm due to filter shift
 n.white <- Points.nir %>%
   dplyr::filter(hue == "White") %>% 
-  dplyr::select(1, c(679:2178))
+  dplyr::select(sample_id, `1001.0`:`2500.0`) 
 
 #Melt into long format
 n.white.long <- 
@@ -146,9 +148,9 @@ fig <-
                     nrow = 2)
 
 #Save figure
-ggsave("002-nir-dark-filtered-summary.png",
+ggsave("002-nir-dark-filtered-summary.jpeg",
        fig,
-       device = "png",
+       device = "jpeg",
        here::here("analysis", "figures"),
        width=20, 
        height=20,

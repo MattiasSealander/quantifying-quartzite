@@ -8,7 +8,7 @@ metadata.csv <-
 
 #Import raman data, set empty fields to NA
 raman.csv <-
-  read.csv2(here::here("analysis", "data", "raw_data", "RAMAN", "raman_samples_data_non_treated_20220407.csv"), sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "raman_raw_data.csv"), sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #aggregate observations by group(sample) and calculate average of wavelength measurements
 raman.averaged <- 
@@ -35,7 +35,7 @@ Points.raman <-
 #Filter raman data to focus on dark samples 
 r.dark <- Points.raman %>%
   filter(hue == "Dark") %>% 
-  select(1, c(30:494))
+  select(sample_id, c(`92.88`:`2503.59`))
 
 #Melt into long format
 r.dark.long <- 
@@ -44,7 +44,7 @@ r.dark.long <-
 #Filter raman data to focus on light samples
 r.light <- Points.raman %>%
   filter(hue == "Light") %>% 
-  select(1, c(30:494))
+  select(sample_id, c(`92.88`:`2503.59`))
 
 #Melt into long format
 r.light.long <- 
@@ -53,7 +53,7 @@ r.light.long <-
 #Filter raman data to focus on colourless samples
 r.colourless <- Points.raman %>%
   filter(hue == "Colourless") %>% 
-  select(1, c(30:494))
+  select(sample_id, c(`92.88`:`2503.59`))
 
 #Melt into long format
 r.colourless.long <- 
@@ -62,7 +62,7 @@ r.colourless.long <-
 #Filter raman data to focus on white samples 
 r.white <- Points.raman %>%
   filter(hue == "White") %>% 
-  select(1, c(30:494))
+  select(sample_id, c(`92.88`:`2503.59`))
 
 #Melt into long format
 r.white.long <- 
@@ -71,7 +71,7 @@ r.white.long <-
 #plot the colourless spectra
 p.c <-
   ggplot(r.colourless.long,aes(x = as.numeric(as.character(Wavenumber)))) + 
-    geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+    geom_line(aes(y = Intensity, colour = "", group = sample_id), linewidth = 1, stat = "identity") +
     geom_text(data=data.frame(), aes(x=2200,y=38000,label="Colourless"), size=5, fontface=2) +
     xlab("Wavenumber (cm-1)") +
     ylab("Intensity") +
@@ -86,7 +86,7 @@ p.c <-
 #plot the dark spectra
 p.d <-
   ggplot(r.dark.long, aes(x = as.numeric(as.character(Wavenumber)))) + 
-    geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+    geom_line(aes(y = Intensity, colour = "", group = sample_id), linewidth = 1, stat = "identity") +
     geom_text(data=data.frame(), aes(x=2400,y=42000,label="Dark"), size=5, fontface=2) +
     xlab("Wavenumber (cm-1)") +
     ylab("Intensity") +
@@ -101,7 +101,7 @@ p.d <-
 #plot the light spectra
 p.l <-
   ggplot(r.light.long, aes(x = as.numeric(as.character(Wavenumber)))) + 
-    geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+    geom_line(aes(y = Intensity, colour = "", group = sample_id), linewidth = 1, stat = "identity") +
     geom_text(data=data.frame(), aes(x=2400,y=39500,label="Light"), size=5, fontface=2) +
     xlab("Wavenumber (cm-1)") +
     ylab("Intensity") +
@@ -116,7 +116,7 @@ p.l <-
 #plot the white spectra
 p.w <-
   ggplot(r.white.long, aes(x = as.numeric(as.character(Wavenumber)))) + 
-    geom_line(aes(y = Intensity, colour = "", group = sample_id), size = 1, stat = "identity") +
+    geom_line(aes(y = Intensity, colour = "", group = sample_id), linewidth = 1, stat = "identity") +
     geom_text(data=data.frame(), aes(x=2400,y=18000,label="White"), size=5, fontface=2) +
     xlab("Wavenumber (cm-1)") +
     ylab("Intensity") +
@@ -135,9 +135,9 @@ fig <-
                     nrow = 2)
 
 #Save figure
-ggsave("005-raman-spectra-summary.png",
+ggsave("005-raman-spectra-summary.jpeg",
        fig,
-       device = "png",
+       device = "jpeg",
        here::here("analysis", "figures"),
        width=20, 
        height=20,

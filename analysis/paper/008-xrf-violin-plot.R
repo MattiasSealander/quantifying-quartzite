@@ -3,7 +3,7 @@ suppressPackageStartupMessages(library(tidyverse))
 
 #Import xrf data, set empty fields to NA
 xrf.csv <-
-  read.csv2(here::here("analysis", "data", "raw_data", "XRF", "xrf_quantitative_data_20220407.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
+  read.csv2(here::here("analysis", "data", "raw_data", "xrf_quantitative_raw_data.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
 
 #Import descriptive metadata
 metadata.csv <-
@@ -25,10 +25,8 @@ Points.xrf <-
            site_id == "Åsele 107" | site_id == "Åsele 115" | site_id == "Åsele 117" | site_id == "Åsele 119" | site_id == "Åsele 129" | site_id == "Åsele 182" | site_id == "Åsele 188" |
            site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | site_id == "Åsele 99", 
          type == "Point" | type == "Point fragment" | type == "Preform", 
-         material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") 
-
-#fill the NA fields in the munsell hue column to mark them as colourless/translucent material
-Points.xrf[8][is.na(Points.xrf[8])] <- "Colourless"
+         material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
+  replace_na(list(munsell_hue = "Colourless"))
 
 #Prepare XRF data in long format for violin plots, exclude samples with a dimension smaller than 10 mm 
 Points_long <-
@@ -156,9 +154,9 @@ fig <-
       axis.text.x=element_blank(),
       axis.ticks.x=element_blank())
 
-ggsave("008-xrf-violin-plot.png",
+ggsave("008-xrf-violin-plot.jpeg",
        fig,
-       device = "png",
+       device = "jpeg",
        here::here("analysis", "figures"),
        width=25, 
        height=20,

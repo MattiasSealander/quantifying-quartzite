@@ -6,7 +6,7 @@ suppressPackageStartupMessages(library(tidyverse))
 
 #Import raman data, set empty fields to NA
 raman.csv <-
-  read.csv2(here::here("analysis", "data", "raw_data", "RAMAN", "raman_samples_data_non_treated_20220407.csv"), sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "raman_raw_data.csv"), sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 metadata.csv <-
   read.csv2(here::here("analysis", "data", "raw_data", "metadata.csv"), sep = ";", header = TRUE, na = c("", "NA", "NULL"), encoding = "UTF-8")
@@ -21,7 +21,7 @@ raman.transposed <-
 
 #Write csv with transposed raman data for baseline de-trending in ChemoSpec package
 #ChemoSpec requires data to be read from file
-write.table(raman.transposed, file = here::here("analysis", "data", "derived_data", "raman_transposed.csv"), col.names = FALSE, sep = ";", dec = )
+write.table(raman.transposed, file = here::here("analysis", "data", "derived_data", "raman_averaged_transposed.csv"), col.names = FALSE, sep = ";", dec = )
 
 #prepare vector with sample_id for reading raman data into spectra object
 sample_id <- 
@@ -34,7 +34,7 @@ raman <- suppressWarnings(matrix2SpectraObject(
   freq.unit ="Wavelength cm-1",
   int.unit ="Intensity",
   descrip ="Bifacial points measurements",
-  in.file = here::here("analysis", "data", "derived_data", "raman_transposed.csv"),
+  in.file = here::here("analysis", "data", "derived_data", "raman_averaged_transposed.csv"),
   sep = ";",
   dec = ".",
   chk = TRUE,
@@ -84,14 +84,12 @@ Points.raman <-
            site_id == "Åsele 107" | site_id == "Åsele 115" | site_id == "Åsele 117" | site_id == "Åsele 119" | site_id == "Åsele 129" | site_id == "Åsele 182" | site_id == "Åsele 188" |
            site_id == "Åsele 393" | site_id == "Åsele 56" | site_id == "Åsele 91" | site_id == "Åsele 92" | site_id == "Åsele 99", 
          type == "Point" | type == "Point fragment" | type == "Preform", 
-         material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite")
-
-#fill the NA fields in the munsell hue column to mark them as colourless/translucent material
-Points.raman[8][is.na(Points.raman[8])] <- "Colourless"
+         material == "Brecciated quartz" | material == "Quartz" | material == "Quartzite") %>% 
+  replace_na(list(munsell_hue = "Colourless"))
 
 #perform PCA with SNV normalization and mean-center
 raman.pca <-
-  prcomp(Points.raman[,c(30:321)], center = TRUE, scale = FALSE)
+  prcomp(Points.raman[,c(30:322)], center = TRUE, scale = FALSE)
 
 #prepare labels for PCs, doing it in 2 steps allows variance percentage to be called on in the Rmd file
 raman.pc1var <- round(summary(raman.pca)$importance[2,1]*100, digits=1)
@@ -111,7 +109,7 @@ basic_plot1 <-
 
 #bind the basic fviz plot for PC 1 and 2, and use as basis for a more customizeable plot in ggpplot
 fig <- 
-  ggplot(cbind(basic_plot1$data, Points.raman[, c(7,10)]),
+  ggplot(cbind(basic_plot1$data, Points.raman[, c(9,12)]),
          aes(x=x, y=y, shape = material, fill = hue)) +
   #to add sample id as text
   #geom_text(aes(label=Points.raman$sample_id, hjust=0.5,vjust=-1.0)) +
@@ -143,9 +141,9 @@ fig <-
         legend.background = element_rect(linetype = "solid", color = "black"),
         legend.position = "bottom")
 
-ggsave("007-raman-pca.png",
+ggsave("007-raman-pca.jpeg",
        fig,
-       device = "png",
+       device = "jpeg",
        here::here("analysis", "figures"),
        scale = 1, 
        width=25, 

@@ -19,7 +19,7 @@ nir.merged <-
 #Filter xrf data to focus on points and preforms made from quartz/quartzite material 
 Points.nir <-
   nir.merged %>%
-  filter(site_id == "Vilhelmina 1069" | site_id == "Vilhelmina 109" | site_id == "Vilhelmina 112" | site_id == "Vilhelmina 1124" | site_id == "Vilhelmina 1127" | site_id == "Vilhelmina 114" |
+  dplyr::filter(site_id == "Vilhelmina 1069" | site_id == "Vilhelmina 109" | site_id == "Vilhelmina 112" | site_id == "Vilhelmina 1124" | site_id == "Vilhelmina 1127" | site_id == "Vilhelmina 114" |
            site_id == "Vilhelmina 115" | site_id == "Vilhelmina 117" | site_id == "Vilhelmina 118" | site_id == "Vilhelmina 1254" | site_id == "Vilhelmina 216" | site_id == "Vilhelmina 235" |
            site_id == "Vilhelmina 240" | site_id == "Vilhelmina 245" | site_id == "Vilhelmina 252" | site_id == "Vilhelmina 263" | site_id == "Vilhelmina 335" | site_id == "Vilhelmina 356" |
            site_id == "Vilhelmina 399" | site_id == "Vilhelmina 411" | site_id == "Vilhelmina 419" | site_id == "Vilhelmina 439" | site_id == "Vilhelmina 444" | site_id == "Vilhelmina 450" |
@@ -36,7 +36,7 @@ Points.nir <-
 #Filter NIR data to focus on sample 258 and 411, then select the NIR range 1 001 - 2 500 nm, exclude 1000 nm due to filter shift
 raw.spec <- Points.nir %>%
   filter(sample_id == "258" | sample_id == "411") %>% 
-  select(1, c(679:2178))
+  dplyr::select(sample_id, `1001.0`:`2500.0`) 
 
 #Melt into long format, data.table needs to be specified to avoid r using reshape2 version that sets variable to factor
 raw.spec.long <- 
@@ -73,7 +73,7 @@ sg.411.long <- suppressWarnings(data.table::melt(setDT(sg.411), variable.name = 
 p.sg.411 <-
   sg.411.long %>% 
   ggplot() + 
-  geom_line(aes(x = as.numeric(Wavelength), y = as.numeric(Absorbance), colour = ""), size = 1, stat = "identity") +
+  geom_line(aes(x = as.numeric(Wavelength), y = as.numeric(Absorbance), colour = ""), linewidth = 1, stat = "identity") +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
   geom_text(data=sg.411, aes(label = '411', x = 2500, y = 1.25e-05, fontface = "bold")) +
@@ -83,7 +83,7 @@ p.sg.411 <-
   scale_y_continuous(limits = c(-1.1e-05, 1.5e-05), breaks = seq(-1.0e-05, 1.5e-05, by = 0.75e-5)) +
   theme_classic() +
   theme(legend.position = "none",
-        axis.title.x = element_blank(),
+        axis.title.x = element_text(size = 12, face = "bold", colour = "black"),
         axis.title.y = element_blank())
 
 #Filter spectra to focus on sample 258, which has less noise
@@ -116,9 +116,9 @@ fig <-
   ggpubr::ggarrange(p.raw.spec, p.sg.258, p.sg.411, labels = c("A", "B", "C"), nrow = 3, align="v")
 
 #Save figure
-ggsave("003-nir-savitzky-transform.png",
+ggsave("003-nir-savitzky-transform.jpeg",
        fig,
-       device = "png",
+       device = "jpeg",
        here::here("analysis", "figures"),
        width=25, 
        height=20,

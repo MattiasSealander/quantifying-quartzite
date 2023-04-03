@@ -1,6 +1,5 @@
 # Loading package
 library(png)
-library(grid)
 library(loder)
 suppressPackageStartupMessages(library(ChemoSpec))
 suppressPackageStartupMessages(library(cowplot))
@@ -15,15 +14,15 @@ metadata.csv <-
 
 #Import nir data, set empty fields to NA
 nir.csv <-
-  read.csv2(here::here("analysis", "data", "raw_data", "NIR", "asd_raw_data_20220407.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "asd_raw_data.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #Import raman data, set empty fields to NA
 raman.csv <-
-  read.csv2(here::here("analysis", "data", "raw_data", "RAMAN", "raman_samples_data_non_treated_20220407.csv"), sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
+  read.csv2(here::here("analysis", "data", "raw_data", "raman_raw_data.csv"), sep = ";", dec = ",", header = TRUE, check.names = FALSE, na = c("","NA","NULL",NULL))
 
 #Import xrf data, set empty fields to NA
 xrf.csv <-
-  read.csv2(here::here("analysis", "data", "raw_data", "XRF", "xrf_quantitative_data_20220407.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
+  read.csv2(here::here("analysis", "data", "raw_data", "xrf_quantitative_raw_data.csv"), sep = ";", dec = ".", header = TRUE, check.names = FALSE, na = c("","NA","NULL"))
 
 #aggregate observations by group(sample) and calculate average of wavelength measurements
 nir.averaged <- 
@@ -133,7 +132,9 @@ Points.raman <-
 Points.xrf <-
   xrf.merged %>%
   dplyr::select(sample_id, `Mg`, `Al`, `Si`, `P`, `S`, `K`, `Ca`, `Ti`, `Fe`, `Sr`, `Zr`,  `Ba`) %>% 
-  dplyr::filter(sample_id == 386 | sample_id == 404| sample_id == 391)
+  dplyr::filter(sample_id == 386 | sample_id == 404| sample_id == 391) %>% 
+  rename("Mg(%)" = `Mg`, "Al(%)" = `Al`, "Si(%)" = `Si`, "P(%)" = `P`, "S(%)" = `S`, "K(%)" = `K`, "Ca(%)" = `Ca`, "Ti(%)" = `Ti`, "Fe(%)" = `Fe`, 
+         "Sr(%)" = `Sr`, "Zr(%)" = `Zr`,  "Ba(%)" = `Ba`)
 
 ft <- 
   flextable(Points.xrf) %>% 
@@ -151,7 +152,7 @@ x.ft <-
 #and select the NIR range 1 000 - 2 500 nm
 n.231 <- Points.nir %>%
   dplyr::filter(sample_id == 231) %>% 
-  dplyr::select(1, c(681:2180))
+  dplyr::select(sample_id, `1001.0`:`2500.0`)
 
 #Melt into long format
 n.231.long <- 
@@ -161,7 +162,7 @@ n.231.long <-
 #and select the NIR range 1 000 - 2 500 nm
 n.404 <- Points.nir %>%
   dplyr::filter(sample_id == 249) %>% 
-  dplyr::select(1, c(681:2180))
+  dplyr::select(sample_id, `1001.0`:`2500.0`)
 
 #Melt into long format
 n.404.long <- 
@@ -171,7 +172,7 @@ n.404.long <-
 #and select the NIR range 1 000 - 2 500 nm
 n.391 <- Points.nir %>%
   dplyr::filter(sample_id == 391) %>% 
-  dplyr::select(1, c(681:2180))
+  dplyr::select(sample_id, `1001.0`:`2500.0`)
 
 #Melt into long format
 n.391.long <- 
@@ -179,63 +180,63 @@ n.391.long <-
 
 #plot the colourless spectra
 pn.231 <-
-  ggplot(n.231.long, aes(x = as.numeric(Wavelength))) + 
+  ggplot(n.231.long, aes(x = as.numeric(as.character(Wavelength)))) + 
   geom_line(aes(y = Absorbance, colour = ""), linewidth = 1, stat = "identity") +
   xlab("Wavelength (nm)") +
   ylab("Absorbance") +
   labs(title="386") +
   scale_color_manual(name = "386",
                      values = "black") + 
-  scale_x_continuous(limits=c(1000,2500)) +
+  scale_x_continuous(limits=c(1000,2500), breaks = scales::pretty_breaks(n = 5)) +
   theme_classic() +
   theme(legend.position = "none",
         plot.title = element_text(size=16, 
                                   hjust = .9),        
-        axis.title.x = element_blank(),
+        axis.title.x = element_text(size = 10, colour = "black"),
         axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
 #plot the colourless spectra
 pn.404 <-
-  ggplot(n.404.long, aes(x = as.numeric(Wavelength))) + 
+  ggplot(n.404.long, aes(x = as.numeric(as.character(Wavelength)))) + 
   geom_line(aes(y = Absorbance, colour = ""), linewidth = 1, stat = "identity") +
   xlab("Wavelength (nm)") +
   #ylab("Absorbance") +
   labs(title="404") +
   scale_color_manual(name = "404",
                      values = "black") +
-  scale_x_continuous(limits=c(1000,2500)) +
+  scale_x_continuous(limits=c(1000,2500), breaks = scales::pretty_breaks(n = 5)) +
   theme_classic() +
   theme(legend.position = "none",
         plot.title = element_text(size=16, 
                                   hjust = .9),
-        axis.title.x = element_blank(),
+        axis.title.x = element_text(size = 10, colour = "black"),
         axis.title.y = element_blank(),
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
 
 #plot the colourless spectra
 pn.391 <-
-  ggplot(n.391.long, aes(x = as.numeric(Wavelength))) + 
+  ggplot(n.391.long, aes(x = as.numeric(as.character(Wavelength)))) + 
   geom_line(aes(y = Absorbance, colour = ""), linewidth = 1, stat = "identity") +
   xlab("Wavelength (nm)") +
   #ylab("Absorbance") +
   labs(title="391") +
   scale_color_manual(name = "391",
                      values = "black") + 
-  scale_x_continuous(limits=c(1000,2500)) +
+  scale_x_continuous(limits=c(1000,2500), breaks = scales::pretty_breaks(n = 5)) +
   theme_classic() +
   theme(legend.position = "none",
         plot.title = element_text(size=16, 
                                   hjust = .9),
-        axis.title.x = element_blank(),
+        axis.title.x = element_text(size = 10, colour = "black"),
         axis.title.y = element_blank(),
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
 #Filter raman data for sample 231 
 r.231 <- Points.raman %>%
   filter(sample_id == 231) %>% 
-  dplyr::select(1, c(30:494))
+  select(sample_id, c(`92.88`:`2503.59`))
 
 #Melt into long format
 r.231.long <- 
@@ -244,7 +245,7 @@ r.231.long <-
 #Filter raman data for sample 249 
 r.404 <- Points.raman %>%
   filter(sample_id == 404) %>% 
-  dplyr::select(1, c(30:494))
+  select(sample_id, c(`92.88`:`2503.59`))
 
 #Melt into long format
 r.404.long <- 
@@ -253,7 +254,7 @@ r.404.long <-
 #Filter raman data for sample 391
 r.391 <- Points.raman %>%
   filter(sample_id == 391) %>% 
-  dplyr::select(1, c(30:494))
+  select(sample_id, c(`92.88`:`2503.59`))
 
 #Melt into long format
 r.391.long <- 
@@ -272,7 +273,7 @@ pr.231 <-
   theme(legend.position = "none",
         plot.title = element_text(size=16, 
                                   hjust = .9),
-        axis.title.x = element_blank(),
+        axis.title.x = element_text(size = 10, colour = "black"),
         axis.title.y = element_text(size = 12, face = "bold", colour = "black"),
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
@@ -289,7 +290,7 @@ pr.404 <-
   theme(legend.position = "none",
         plot.title = element_text(size=16, 
                                   hjust = .9),
-        axis.title.x = element_blank(),
+        axis.title.x = element_text(size = 10, colour = "black"),
         axis.title.y = element_blank(),
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
@@ -306,17 +307,17 @@ pr.391 <-
   theme(legend.position = "none",
         plot.title = element_text(size=16, 
                                   hjust = .9),
-        axis.title.x = element_blank(),
+        axis.title.x = element_text(size = 10, colour = "black"),
         axis.title.y = element_blank(),
         legend.title = element_text(size = 12, face = "bold", colour = "black"))
 
-img.231 <- readPNG("./analysis/figures/386.png",  native=TRUE)
+img.231 <- readPNG(here::here("analysis", "figures", "386.png"),  native=TRUE)
 g.231 <- rasterGrob(img.231, interpolate=TRUE)
 
-img.404 <- readPNG("./analysis/figures/404.png",  native=TRUE)
+img.404 <- readPNG(here::here("analysis", "figures", "404.png"),  native=TRUE)
 g.404 <- rasterGrob(img.404, interpolate=TRUE)
 
-img.391 <- readPNG("./analysis/figures/391.png",  native=TRUE)
+img.391 <- readPNG(here::here("analysis", "figures", "391.png"),  native=TRUE)
 g.391 <- rasterGrob(img.391, interpolate=TRUE)
 
 top <- 
@@ -335,9 +336,9 @@ fig <-
                      align="hv")
 
 #Save figure
-ggsave("010-nir-sample-comparison.png",
+ggsave("010-nir-sample-comparison.jpeg",
        fig,
-       device = "png",
+       device = "jpeg",
        here::here("analysis", "figures"),
        width=25, 
        height=25,
