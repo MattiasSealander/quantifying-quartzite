@@ -11,27 +11,27 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 # Please put your title here to include it in the file below.
-Title <- "Title of your paper goes here"
+Title <- "Quartzite Complexities: Non-destructive analysis of bifacial points from Västerbotten, Sweden"
 ```
 
-# MethodPaper
+# Quartzite Complexities: Non-destructive analysis of bifacial points from Västerbotten, Sweden
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MattiasSealander/Quantifying-Quartzite/master?urlpath=rstudio)
 
 This repository contains the data and code for our paper:
 
-> Sjölander, Mattias. (2023). _`r Title`_. Name of journal/book <https://doi.org/xxx/xxx>
+> Sjölander M., Linderholm, J., Geladi P (2023). _`r Title`_. Journal of Archaeological and Anthropological Sciences <https://doi.org/xxx/xxx>
 
 The pre-print is online here:
 
-> Sjölander, Mattias. (2023). _`r Title`_. Name of journal/book, Accessed `r format(Sys.Date(), "%d %b %Y")`. Online at <https://doi.org/xxx/xxx>
+> Sjölander M., Linderholm, J., Geladi P (2023). _`r Title`_. Journal of Archaeological and Anthropological Sciences `r format(Sys.Date(), "%d %b %Y")`. Online at <https://doi.org/xxx/xxx>
 
 
 ### How to cite
 
 Please cite this compendium as:
 
-> Sjölander, Mattias. (`r format(Sys.Date(), "%Y")`). _Compendium of R code and data for `r Title`_. Accessed `r format(Sys.Date(), "%d %b %Y")`. Online at <https://doi.org/xxx/xxx>
+> Sjölander M., Linderholm, J., Geladi P (2023). (`r format(Sys.Date(), "%Y")`). _Compendium of R code and data for `r Title`_. Accessed `r format(Sys.Date(), "%d %b %Y")`. Online at <https://doi.org/xxx/xxx>
 
 ## Contents
 
